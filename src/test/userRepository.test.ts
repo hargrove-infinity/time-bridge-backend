@@ -1,27 +1,13 @@
 import bcrypt from "bcrypt";
-import mongoose, { Document } from "mongoose";
+import mongoose from "mongoose";
 import { ZodError } from "zod";
 import { FIELD_NAMES, ERROR_MESSAGES } from "../constants";
-import { User, UserModel } from "../models";
+import { UserModel } from "../models";
 import { userRepository } from "../repositories";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
-import { userValidationSchema } from "../validation";
 
 const MOCK_EMAIL = "mail@mail.com";
 const MOCK_PASSWORD = "password";
-
-async function createUser(
-  args: unknown
-): Promise<[(User & Document) | null, null] | [null, unknown]> {
-  try {
-    const parsedArgs = userValidationSchema.parse(args);
-    await userRepository.create(parsedArgs);
-    const result = await UserModel.findOne({ email: parsedArgs.email });
-    return [result, null];
-  } catch (error) {
-    return [null, error];
-  }
-}
 
 function validateDate(date: NativeDate): boolean {
   const convertedDate = new Date(date);
@@ -43,7 +29,7 @@ describe("create user", () => {
   });
 
   test("should fail: undefined email", async () => {
-    const [, error] = await createUser({ password: MOCK_PASSWORD });
+    const [, error] = await userRepository.create({ password: MOCK_PASSWORD });
 
     // Assert
     expect(error).toBeInstanceOf(ZodError);
@@ -54,7 +40,10 @@ describe("create user", () => {
   });
 
   test("should fail: empty email", async () => {
-    const [, error] = await createUser({ email: "", password: MOCK_PASSWORD });
+    const [, error] = await userRepository.create({
+      email: "",
+      password: MOCK_PASSWORD,
+    });
 
     // Assert
     expect(error).toBeInstanceOf(ZodError);
@@ -65,7 +54,7 @@ describe("create user", () => {
   });
 
   test("should fail: invalid email", async () => {
-    const [, error] = await createUser({
+    const [, error] = await userRepository.create({
       email: "abc",
       password: MOCK_PASSWORD,
     });
@@ -79,7 +68,7 @@ describe("create user", () => {
   });
 
   test("should fail: undefined password", async () => {
-    const [, error] = await createUser({ email: MOCK_EMAIL });
+    const [, error] = await userRepository.create({ email: MOCK_EMAIL });
 
     // Assert
     expect(error).toBeInstanceOf(ZodError);
@@ -90,7 +79,7 @@ describe("create user", () => {
   });
 
   test("should fail: password too short", async () => {
-    const [, error] = await createUser({
+    const [, error] = await userRepository.create({
       email: MOCK_EMAIL,
       password: "321",
     });
@@ -104,7 +93,7 @@ describe("create user", () => {
   });
 
   test("should add a user to the database", async () => {
-    const result = await createUser({
+    const result = await userRepository.create({
       email: MOCK_EMAIL,
       password: MOCK_PASSWORD,
     });
@@ -114,7 +103,7 @@ describe("create user", () => {
   });
 
   test("should give new users correct email", async () => {
-    const [user] = await createUser({
+    const [user] = await userRepository.create({
       email: MOCK_EMAIL,
       password: MOCK_PASSWORD,
     });
@@ -124,7 +113,7 @@ describe("create user", () => {
   });
 
   test("should hash new user's password", async () => {
-    const [result] = await createUser({
+    const [result] = await userRepository.create({
       email: MOCK_EMAIL,
       password: MOCK_PASSWORD,
     });
@@ -140,7 +129,7 @@ describe("create user", () => {
   });
 
   test("should not store user's password as plain text", async () => {
-    const [result] = await createUser({
+    const [result] = await userRepository.create({
       email: MOCK_EMAIL,
       password: MOCK_PASSWORD,
     });
@@ -151,7 +140,7 @@ describe("create user", () => {
   });
 
   test("should return user", async () => {
-    const [createdUser] = await createUser({
+    const [createdUser] = await userRepository.create({
       email: MOCK_EMAIL,
       password: MOCK_PASSWORD,
     });
