@@ -7,4 +7,7 @@ describe("userService.create", () => {
     userService.create();
     expect(spy).toHaveBeenCalled();
   });
+
+  // TODO Implement test to check output of userRepository.create
+  test.todo("test output of userRepository.create");
 });
