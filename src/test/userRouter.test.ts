@@ -23,7 +23,7 @@ describe("userRouter.create", () => {
     ]);
   });
 
-  test("should fail validation: email is undefined", async () => {
+  test("should fail validation: email and password are undefined", async () => {
     const response = await request(app)
       .post(paths.users.base)
       .send({ email: undefined, password: undefined });
