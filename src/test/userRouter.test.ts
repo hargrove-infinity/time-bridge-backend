@@ -23,6 +23,15 @@ describe("userRouter.create", () => {
     );
   });
 
+  test("should fail validation: email is undefined", async () => {
+    const response = await request(app)
+      .post(paths.users.base)
+      .send({ email: undefined });
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toContain(ERROR_MESSAGES.EMAIL_UNDEFINED);
+  });
+
   test("should call userRoutes.create", async () => {
     await request(app)
       .post(paths.users.base)
