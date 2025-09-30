@@ -65,6 +65,15 @@ describe("userRouter.create", () => {
     expect(response.body.errors).toEqual([ERROR_MESSAGES.PASSWORD_UNDEFINED]);
   });
 
+  test("should fail validation: email is valid, password is invalid", async () => {
+    const response = await request(app)
+      .post(paths.users.base)
+      .send({ email: "mail@mail.com", password: "pass" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toEqual([ERROR_MESSAGES.PASSWORD_LENGTH]);
+  });
+
   test("should call userRoutes.create", async () => {
     await request(app)
       .post(paths.users.base)
