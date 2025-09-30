@@ -4,6 +4,7 @@ export const FIELD_NAMES = {
 };
 
 export const ERROR_MESSAGES = {
+  USER_CREATION_BODY_UNDEFINED: "User creation body undefined",
   EMAIL_UNDEFINED: "Email undefined",
   EMAIL_EMPTY: "Empty email",
   EMAIL_INVALID: "Email invalid",
