@@ -47,6 +47,15 @@ describe("userRouter.create", () => {
     ]);
   });
 
+  test("should fail validation: email is invalid, password is valid", async () => {
+    const response = await request(app)
+      .post(paths.users.base)
+      .send({ email: "abc", password: "password" });
+
+    expect(response.status).toBe(400);
+    expect(response.body.errors).toEqual([ERROR_MESSAGES.EMAIL_INVALID]);
+  });
+
   test("should call userRoutes.create", async () => {
     await request(app)
       .post(paths.users.base)
