@@ -18,18 +18,21 @@ describe("userRouter.create", () => {
   test("should fail validation: body in undefined", async () => {
     const response = await request(app).post(paths.users.base).send();
     expect(response.status).toBe(400);
-    expect(response.body.errors).toContain(
-      ERROR_MESSAGES.USER_CREATION_BODY_UNDEFINED
-    );
+    expect(response.body.errors).toEqual([
+      ERROR_MESSAGES.USER_CREATION_BODY_UNDEFINED,
+    ]);
   });
 
   test("should fail validation: email is undefined", async () => {
     const response = await request(app)
       .post(paths.users.base)
-      .send({ email: undefined });
+      .send({ email: undefined, password: undefined });
 
     expect(response.status).toBe(400);
-    expect(response.body.errors).toContain(ERROR_MESSAGES.EMAIL_UNDEFINED);
+    expect(response.body.errors).toEqual([
+      ERROR_MESSAGES.EMAIL_UNDEFINED,
+      ERROR_MESSAGES.PASSWORD_UNDEFINED,
+    ]);
   });
 
   test("should call userRoutes.create", async () => {
