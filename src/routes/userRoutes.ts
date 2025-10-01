@@ -10,7 +10,6 @@ async function create(req: Request<{}, {}, IUserCreateDto>, res: Response) {
 
   if (error) {
     res.status(400).send({ errors: [ERROR_MESSAGES.USER_CREATE_ROUTE] });
-
     return;
   }
 

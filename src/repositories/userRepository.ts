@@ -1,21 +1,10 @@
-import bcrypt from "bcrypt";
-import { UserDocument, UserModel } from "../models";
-import { userValidationSchema } from "../validation";
+import { UserInput, UserDocument, UserModel } from "../models";
 
 async function create(
-  args: unknown
+  args: UserInput
 ): Promise<[UserDocument, null] | [null, unknown]> {
   try {
-    const parsedArgs = userValidationSchema.parse(args);
-    const { email, password } = parsedArgs;
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const createdUser = await UserModel.create({
-      email,
-      password: hashedPassword,
-    });
-
+    const createdUser = await UserModel.create(args);
     return [createdUser, null];
   } catch (error) {
     return [null, error];
