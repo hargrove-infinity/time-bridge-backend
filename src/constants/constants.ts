@@ -10,4 +10,9 @@ export const ERROR_MESSAGES = {
   EMAIL_INVALID: "Email invalid",
   PASSWORD_UNDEFINED: "Password undefined",
   PASSWORD_LENGTH: "Password must be 6 chars",
+  USER_CREATE_ROUTE: "Some error occurred in user create route",
+};
+
+export const SUCCESS_MESSAGES = {
+  USER_SUCCESSFULLY_CREATED: "User successfully created",
 };

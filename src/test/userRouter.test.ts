@@ -1,6 +1,8 @@
 import express, { Express } from "express";
 import request from "supertest";
-import { ERROR_MESSAGES, paths } from "../constants";
+import { ERROR_MESSAGES, paths, SUCCESS_MESSAGES } from "../constants";
+import { closeConnectionDatabase, connectDatabase } from "../utils";
+import { UserModel } from "../models";
 import { userRoutes } from "../routes/userRoutes";
 // Create the spy at module level, before userRouter is imported
 const spy = jest.spyOn(userRoutes, "create");
@@ -8,10 +10,21 @@ import { userRouter } from "../routes/userRouter";
 
 let app: Express;
 
-beforeAll(() => {
+beforeAll(async () => {
+  await connectDatabase();
+
   app = express();
   app.use(express.json());
   app.use(paths.users.base, userRouter);
+});
+
+afterEach(async () => {
+  await UserModel.deleteMany({});
+});
+
+afterAll(async () => {
+  await UserModel.deleteMany({});
+  await closeConnectionDatabase();
 });
 
 describe("userRouter.create", () => {
@@ -86,5 +99,15 @@ describe("userRouter.create", () => {
       .post(paths.users.base)
       .send({ email: "mail@mail.com", password: "password" });
     expect(response.status).toBe(200);
+  });
+
+  test("should receive correct payload", async () => {
+    const response = await request(app).post(paths.users.base).send({
+      email: "mail@mail.com",
+      password: "password",
+    });
+    expect(response.body).toEqual({
+      payload: SUCCESS_MESSAGES.USER_SUCCESSFULLY_CREATED,
+    });
   });
 });
