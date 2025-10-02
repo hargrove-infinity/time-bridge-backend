@@ -11,6 +11,8 @@ export const userObject = z.object({
     .min(6, ERROR_MESSAGES.PASSWORD_LENGTH),
 });
 
+export type CreateUserInput = z.infer<typeof userObject>;
+
 export const userValidationSchema = z
   .any()
   .refine((val) => val !== undefined && val !== null, {

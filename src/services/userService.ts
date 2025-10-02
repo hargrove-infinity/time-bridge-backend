@@ -1,12 +1,12 @@
 import bcrypt from "bcrypt";
 import { userRepository } from "../repositories";
-import { IUserCreateDto } from "../types";
+import { CreateUserInput } from "../validation";
 
-async function create(dto: IUserCreateDto) {
-  const hashedPassword = await bcrypt.hash(dto.password, 10);
+async function create(args: CreateUserInput) {
+  const hashedPassword = await bcrypt.hash(args.password, 10);
 
   const data = await userRepository.create({
-    email: dto.email,
+    email: args.email,
     password: hashedPassword,
   });
 

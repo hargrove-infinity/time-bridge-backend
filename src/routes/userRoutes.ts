@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { ERROR_MESSAGES, SUCCESS_MESSAGES } from "../constants";
 import { userService } from "../services";
-import { IUserCreateDto } from "../types";
+import { CreateUserInput } from "../validation";
 
-async function create(req: Request<{}, {}, IUserCreateDto>, res: Response) {
+async function create(req: Request<{}, {}, CreateUserInput>, res: Response) {
   const { body } = req;
 
   const [, error] = await userService.create(body);
