@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { IValidateArgs, ValidateReturn } from "./types";
+import { ValidateArgs, ValidateReturn } from "./types";
 
 export function validate<T>({
   schema,
   key = "body",
-}: IValidateArgs): ValidateReturn<T> {
+}: ValidateArgs): ValidateReturn<T> {
   return (req: Request<T>, res: Response, next: NextFunction): void => {
     const result = schema.safeParse(req[key]);
 

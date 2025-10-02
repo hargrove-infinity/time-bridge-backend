@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ZodObject, ZodPipe, ZodRawShape } from "zod";
 
-export interface IValidateArgs {
+export interface ValidateArgs {
   schema: ZodObject<ZodRawShape> | ZodPipe;
   key?: "params" | "body" | "query";
 }
