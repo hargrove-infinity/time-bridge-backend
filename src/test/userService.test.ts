@@ -29,14 +29,10 @@ describe("userService.create", () => {
       password: "password",
     });
 
-    console.log("user-from-service-1", user); //! here user is mongo document
-
     expect(error).toBeNull();
     expect(user).toBeDefined();
 
     const userInDb = await UserModel.findOne({ email: "mail@mail.com" });
-
-    console.log("userInDb-1", userInDb); //! here userInDb is null
 
     expect(userInDb).not.toBeNull();
 
@@ -44,20 +40,14 @@ describe("userService.create", () => {
   });
 
   test("stored password in database and password was sent should match", async () => {
-    const userInDbBefore = await UserModel.findOne({ email: "mail@mail.com" });
-
     const [user, error] = await userService.create({
       email: "mail@mail.com",
       password: "password",
     });
 
-    console.log("user-from-service-1", user); //! here user is mongo document
-
     expect(error).toBeNull();
     expect(user).toBeDefined();
     const userInDb = await UserModel.findOne({ email: "mail@mail.com" });
-
-    console.log("userInDb-2", userInDb); //! here userInDb is null
 
     expect(userInDb).not.toBeNull();
 
