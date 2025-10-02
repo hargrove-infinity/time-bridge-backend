@@ -59,6 +59,6 @@ describe("userService.create", () => {
     expect(isPasswordsMatched).toBe(true);
   });
 
-  // TODO Implement test to check output of userRepository.create
-  test.todo("test output of userRepository.create");
+  // TODO Implement test to check output of userService.create
+  test.todo("test output of userService.create");
 });
