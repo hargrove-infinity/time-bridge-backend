@@ -1,4 +1,4 @@
-// import bcrypt from "bcrypt";
+import bcrypt from "bcrypt";
 import { UserModel } from "../models";
 import { userRepository } from "../repositories";
 import { userService } from "../services";
@@ -24,61 +24,51 @@ describe("userService.create", () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  //! These tests are not passing
-  // test("should not store user's password as plain text", async () => {
-  //   const [user, error] = await userService.create({
-  //     email: "mail@mail.com",
-  //     password: "password",
-  //   });
+  test("should not store user's password as plain text", async () => {
+    const [user, error] = await userService.create({
+      email: "mail@mail.com",
+      password: "password",
+    });
 
-  //   console.log("user-from-service-1", user); //! here user is mongo document
+    console.log("user-from-service-1", user); //! here user is mongo document
 
-  //   expect(error).toBeNull();
-  //   expect(user).toBeDefined();
+    expect(error).toBeNull();
+    expect(user).toBeDefined();
 
-  //! I can't replace user from database (await UserModel.findOne())
-  //! with user from service (const [user, error] = await userService.create())
-  //! because I am planning to return jwt from userService.create()
-  //! pass jwt to the userRoutes.create() so user can login after registration
-  //   const userInDb = await UserModel.findOne({ email: "mail@mail.com" });
+    const userInDb = await UserModel.findOne({ email: "mail@mail.com" });
 
-  //   console.log("userInDb-1", userInDb); //! here userInDb is null
+    console.log("userInDb-1", userInDb); //! here userInDb is null
 
-  //   expect(userInDb).not.toBeNull();
+    expect(userInDb).not.toBeNull();
 
-  //   expect(userInDb?.password).not.toBe("password");
-  // });
+    expect(userInDb?.password).not.toBe("password");
+  });
 
-  // test("stored password in database and password was sent should match", async () => {
-  //   const userInDbBefore = await UserModel.findOne({ email: "mail@mail.com" });
+  test("stored password in database and password was sent should match", async () => {
+    const userInDbBefore = await UserModel.findOne({ email: "mail@mail.com" });
 
-  //   const [user, error] = await userService.create({
-  //     email: "mail@mail.com",
-  //     password: "password",
-  //   });
+    const [user, error] = await userService.create({
+      email: "mail@mail.com",
+      password: "password",
+    });
 
-  //   console.log("user-from-service-1", user); //! here user is mongo document
+    console.log("user-from-service-1", user); //! here user is mongo document
 
-  //   expect(error).toBeNull();
-  //   expect(user).toBeDefined();
+    expect(error).toBeNull();
+    expect(user).toBeDefined();
+    const userInDb = await UserModel.findOne({ email: "mail@mail.com" });
 
-  //! I can't replace user from database (await UserModel.findOne())
-  //! with user from service (const [user, error] = await userService.create())
-  //! because I am planning to return jwt from userService.create()
-  //! pass jwt to the userRoutes.create() so user can login after registration
-  //   const userInDb = await UserModel.findOne({ email: "mail@mail.com" });
+    console.log("userInDb-2", userInDb); //! here userInDb is null
 
-  //   console.log("userInDb-2", userInDb); //! here userInDb is null
+    expect(userInDb).not.toBeNull();
 
-  //   expect(userInDb).not.toBeNull();
+    const isPasswordsMatched = await bcrypt.compare(
+      "password",
+      userInDb!.password
+    );
 
-  //   const isPasswordsMatched = await bcrypt.compare(
-  //     "password",
-  //     userInDb!.password
-  //   );
-
-  //   expect(isPasswordsMatched).toBe(true);
-  // });
+    expect(isPasswordsMatched).toBe(true);
+  });
 
   // TODO Implement test to check output of userRepository.create
   test.todo("test output of userRepository.create");
