@@ -35,7 +35,6 @@ describe("userService.create", () => {
     const userInDb = await UserModel.findOne({ email: "mail@mail.com" });
 
     expect(userInDb).not.toBeNull();
-
     expect(userInDb?.password).not.toBe("password");
   });
 
@@ -47,6 +46,7 @@ describe("userService.create", () => {
 
     expect(error).toBeNull();
     expect(user).toBeDefined();
+
     const userInDb = await UserModel.findOne({ email: "mail@mail.com" });
 
     expect(userInDb).not.toBeNull();

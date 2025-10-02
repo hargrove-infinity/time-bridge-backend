@@ -4,8 +4,10 @@ import { ERROR_MESSAGES, paths, SUCCESS_MESSAGES } from "../constants";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { UserModel } from "../models";
 import { userRoutes } from "../routes/userRoutes";
+
 // Create the spy at module level, before userRouter is imported
 const spy = jest.spyOn(userRoutes, "create");
+
 import { userRouter } from "../routes/userRouter";
 
 let app: Express;
