@@ -13,7 +13,6 @@ afterEach(async () => {
 });
 
 afterAll(async () => {
-  await UserModel.deleteMany({});
   await closeConnectionDatabase();
 });
 

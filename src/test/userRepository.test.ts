@@ -21,7 +21,6 @@ describe("create user", () => {
   });
 
   afterAll(async () => {
-    await UserModel.deleteMany({});
     await closeConnectionDatabase();
   });
 
