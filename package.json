@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "npx jest --verbose"
+    "test": "npx jest --verbose --runInBand"
   },
   "keywords": [],
   "author": "",
