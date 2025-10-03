@@ -96,4 +96,18 @@ describe("validate middleware", () => {
 
     expect(data.errors).toEqual([ERROR_MESSAGES.PASSWORD_LENGTH]);
   });
+
+  test("should pass: email and password are valid", () => {
+    const request = httpMocks.createRequest({
+      body: { email: "mail@mail.com", password: "password" },
+    });
+    const response = httpMocks.createResponse();
+    const next = jest.fn();
+
+    const middleware = validate({ schema: userValidationSchema });
+    middleware(request, response, next);
+
+    expect(response.statusCode).toBe(200);
+    expect(next).toHaveBeenCalled();
+  });
 });
