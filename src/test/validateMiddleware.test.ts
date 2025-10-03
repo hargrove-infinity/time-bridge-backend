@@ -23,4 +23,26 @@ describe("validate middleware", () => {
 
     expect(next).not.toHaveBeenCalled();
   });
+
+  test("should fail: email is empty and invalid, password is valid", () => {
+    const request = httpMocks.createRequest({
+      body: { email: "", password: "password" },
+    });
+    const response = httpMocks.createResponse();
+    const next = jest.fn();
+
+    const middleware = validate({ schema: userValidationSchema });
+    middleware(request, response, next);
+
+    expect(response.statusCode).toBe(400);
+
+    const data = response._getData();
+
+    expect(data.errors).toEqual([
+      ERROR_MESSAGES.EMAIL_EMPTY,
+      ERROR_MESSAGES.EMAIL_INVALID,
+    ]);
+
+    expect(next).not.toHaveBeenCalled();
+  });
 });
