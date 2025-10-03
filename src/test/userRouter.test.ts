@@ -3,11 +3,16 @@ import request from "supertest";
 import { ERROR_MESSAGES, paths, SUCCESS_MESSAGES } from "../constants";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { UserModel } from "../models";
+
+// Import and spy on validation middleware
+import { middlewares } from "../middlewares";
+const spyOnValidationMiddleware = jest.spyOn(middlewares, "validate");
+
+// Import and spy on userRoutes.create
 import { userRoutes } from "../routes/userRoutes";
-
-// Create the spy at module level, before userRouter is imported
-const spy = jest.spyOn(userRoutes, "create");
-
+// Create the spy at module level, BEFORE userRouter is imported
+const spyOnUserRoutesCreate = jest.spyOn(userRoutes, "create");
+// Import userRouter AFTER creating a spy
 import { userRouter } from "../routes/userRouter";
 
 let app: Express;
@@ -29,6 +34,14 @@ afterAll(async () => {
 });
 
 describe("userRouter.create", () => {
+  test("should call validate middleware", async () => {
+    await request(app).post(paths.users.base).send({
+      email: "mail@mail.com",
+      password: "password",
+    });
+    expect(spyOnValidationMiddleware).toHaveBeenCalled();
+  });
+
   test("should fail validation: body in undefined", async () => {
     const response = await request(app).post(paths.users.base).send();
     expect(response.status).toBe(400);
@@ -92,7 +105,7 @@ describe("userRouter.create", () => {
     await request(app)
       .post(paths.users.base)
       .send({ email: "mail@mail.com", password: "password" });
-    expect(spy).toHaveBeenCalled();
+    expect(spyOnUserRoutesCreate).toHaveBeenCalled();
   });
 
   test("should receive 200 status code", async () => {
