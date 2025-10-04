@@ -115,7 +115,7 @@ describe("userRouter.create", () => {
     expect(response.status).toBe(200);
   });
 
-  test("should receive correct payload", async () => {
+  test("should respond with confirmation message when correct input is provided", async () => {
     const response = await request(app).post(paths.users.base).send({
       email: "mail@mail.com",
       password: "password",
