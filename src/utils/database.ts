@@ -6,9 +6,19 @@ export async function connectDatabase(): Promise<void> {
     throw new Error("URI is not found in process.env");
   }
 
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
+
+  if (mongoose.connection.readyState === 2) {
+    return;
+  }
+
   await mongoose.connect(process.env.URI);
 }
 
 export async function closeConnectionDatabase(): Promise<void> {
-  await mongoose.connection.close();
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.connection.close();
+  }
 }
