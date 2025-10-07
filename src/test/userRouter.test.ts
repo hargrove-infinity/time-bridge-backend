@@ -22,7 +22,9 @@ beforeAll(async () => {
 
   app = express();
   app.use(express.json());
-  app.use(paths.users.base, userRouter);
+  // NOTE: prefix with "/users" from useeRouter
+  // app.use(paths.users.base, userRouter);
+  app.use(userRouter);
 });
 
 afterEach(async () => {

@@ -7,7 +7,9 @@ import { userRoutes } from "./userRoutes";
 export const userRouter = Router();
 
 userRouter.post(
-  paths.common.base,
+  // NOTE: replaced path "/" with "/users"
+  // paths.common.base,
+  paths.users.base,
   middlewares.validate({ schema: userValidationSchema }),
   userRoutes.create
 );
