@@ -1,5 +1,6 @@
 import request from "supertest";
 import { app } from "../app";
+import { envVariables } from "../common";
 import { paths } from "../constants";
 import { UserModel } from "../models";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
@@ -19,7 +20,7 @@ afterAll(async () => {
 
 describe("app.ts", () => {
   test("server starts and responds", async () => {
-    const server = app.listen(process.env.PORT);
+    const server = app.listen(envVariables.port);
     const response = await request(server).get(paths.common.base);
     expect(response.status).toBe(404);
     server.close();

@@ -1,3 +1,4 @@
+import { envVariables } from "../common";
 import { SERVER_TEST_DELAY } from "../constants";
 import { server } from "../server";
 
@@ -24,7 +25,7 @@ describe("server.ts", () => {
       throw new Error("address is a string");
     }
 
-    const port = Number(process.env.PORT);
+    const port = Number(envVariables.port);
 
     expect(address.port).toBe(port);
   });
@@ -33,7 +34,7 @@ describe("server.ts", () => {
     await new Promise((resolve) => setTimeout(resolve, SERVER_TEST_DELAY));
 
     expect(spy).toHaveBeenCalledWith(
-      `Server is running on port ${process.env.PORT}`
+      `Server is running on port ${envVariables.port}`
     );
   });
 });
