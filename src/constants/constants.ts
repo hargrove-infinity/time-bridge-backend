@@ -16,3 +16,5 @@ export const ERROR_MESSAGES = {
 export const SUCCESS_MESSAGES = {
   USER_SUCCESSFULLY_CREATED: "User successfully created",
 };
+
+export const SERVER_TEST_DELAY = 1000;

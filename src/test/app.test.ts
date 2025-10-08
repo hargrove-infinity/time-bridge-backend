@@ -1,8 +1,23 @@
 import request from "supertest";
 import { app } from "../app";
 import { paths } from "../constants";
+import { UserModel } from "../models";
+import { closeConnectionDatabase, connectDatabase } from "../utils";
+import { verifyCreateUserRequest } from "./utils";
 
-describe("app server", () => {
+beforeAll(async () => {
+  await connectDatabase();
+});
+
+afterEach(async () => {
+  await UserModel.deleteMany({});
+});
+
+afterAll(async () => {
+  await closeConnectionDatabase();
+});
+
+describe("app.ts", () => {
   test("server starts and responds", async () => {
     const server = app.listen(process.env.PORT);
     const response = await request(server).get(paths.common.base);
@@ -10,7 +25,7 @@ describe("app server", () => {
     server.close();
   });
 
-  // TODO Implement test to check if router is mounted
-  // TODO Use app.router.stack for this
-  test.todo("should mount user router to /users");
+  test("should mount the user create route", async () => {
+    await verifyCreateUserRequest(app);
+  });
 });

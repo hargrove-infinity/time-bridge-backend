@@ -59,6 +59,7 @@ describe("userService.create", () => {
     expect(isPasswordsMatched).toBe(true);
   });
 
-  // TODO Implement test to check output of userService.create
-  test.todo("test output of userService.create");
+  // TODO Implement test to check that output of userService.create is JWT
+  // TODO expect(data from service === token)
+  test.todo("should return JWT");
 });

@@ -1,8 +1,8 @@
 import httpMocks from "node-mocks-http";
+import { UserModel } from "../models";
 import { userRoutes } from "../routes";
 import { userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
-import { UserModel } from "../models";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -27,12 +27,8 @@ describe("userRoutes.create", () => {
     expect(spy).toHaveBeenCalled();
   });
 
-  // TODO Implement test to check validation input
-  test.todo("validate input");
-
-  // TODO Implement test to check correctness of output
-  test.todo("check correct output");
-
   // TODO Implement test to check correctness of status code
-  test.todo("check correct status code");
+  test.todo(
+    "same test as test from service to check if response has correct JWT"
+  );
 });

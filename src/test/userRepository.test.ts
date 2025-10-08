@@ -11,26 +11,25 @@ function validateDate(date: NativeDate): boolean {
   return !isNaN(convertedDate.getTime());
 }
 
+beforeAll(async () => {
+  await connectDatabase();
+});
+
+beforeEach(async () => {
+  await UserModel.deleteMany({});
+});
+
+afterAll(async () => {
+  await closeConnectionDatabase();
+});
+
 describe("create user", () => {
-  beforeAll(async () => {
-    await connectDatabase();
-  });
-
-  beforeEach(async () => {
-    await UserModel.deleteMany({});
-  });
-
-  afterAll(async () => {
-    await closeConnectionDatabase();
-  });
-
   test("should add a user to the database", async () => {
     const result = await userRepository.create({
       email: MOCK_EMAIL,
       password: MOCK_PASSWORD,
     });
 
-    // Assert
     expect(result).toEqual(expect.anything());
   });
 
@@ -40,7 +39,6 @@ describe("create user", () => {
       password: MOCK_PASSWORD,
     });
 
-    // Assert
     expect(user?.email).toEqual(MOCK_EMAIL);
   });
 
@@ -50,7 +48,6 @@ describe("create user", () => {
       password: MOCK_PASSWORD,
     });
 
-    // Assert
     expect(createdUser).toEqual(expect.anything());
 
     expect(mongoose.Types.ObjectId.isValid(createdUser?.id)).toBe(true);
