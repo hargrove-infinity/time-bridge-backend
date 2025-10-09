@@ -11,6 +11,7 @@ export const ERROR_MESSAGES = {
   PASSWORD_UNDEFINED: "Password undefined",
   PASSWORD_LENGTH: "Password must be 6 chars",
   USER_CREATE_ROUTE: "Some error occurred in user create route",
+  ERROR_SIGNING_TOKEN: "Error during signing token",
 };
 
 export const SUCCESS_MESSAGES = {
