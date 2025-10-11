@@ -1,8 +1,3 @@
-export const FIELD_NAMES = {
-  EMAIL: "email",
-  PASSWORD: "password",
-};
-
 export const ERROR_MESSAGES = {
   // USER CREATE
   USER_CREATION_BODY_UNDEFINED: "User creation body undefined",
