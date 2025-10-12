@@ -1,9 +1,5 @@
 import jwt, { Jwt, JwtPayload, VerifyOptions } from "jsonwebtoken";
-import { ErrorData } from "../../types";
-
-interface SignAuthTokenPayload {
-  email: string;
-}
+import { ErrorData, SignAuthTokenPayload } from "../../types";
 
 export interface SignTokenArgs {
   payload: SignAuthTokenPayload;
@@ -14,8 +10,6 @@ export interface VerifyTokenArgs {
   token: string;
   options?: VerifyOptions;
 }
-
-export type SignTokenResult = [string, null] | [null, ErrorData];
 
 export type VerifyTokenResult =
   | [Jwt | JwtPayload | string, null]
