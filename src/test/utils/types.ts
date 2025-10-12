@@ -1,7 +1,12 @@
+import { Schema, Types } from "mongoose";
 import jwt from "jsonwebtoken";
-import { SignAuthTokenPayload } from "../../types";
+
+interface SignTestJwtPayload {
+  email?: string;
+  _id?: Types.ObjectId;
+}
 
 export interface SignTestJwtArgs {
-  payload?: SignAuthTokenPayload;
+  payload?: SignTestJwtPayload;
   options?: jwt.SignOptions;
 }

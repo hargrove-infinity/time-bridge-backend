@@ -2,9 +2,7 @@ import mongoose from "mongoose";
 import { UserModel } from "../models";
 import { userRepository } from "../repositories";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
-
-const MOCK_EMAIL = "mail@mail.com";
-const MOCK_PASSWORD = "password";
+import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
 
 function validateDate(date: NativeDate): boolean {
   const convertedDate = new Date(date);
@@ -26,8 +24,8 @@ afterAll(async () => {
 describe("create user", () => {
   test("should add a user to the database", async () => {
     const result = await userRepository.create({
-      email: MOCK_EMAIL,
-      password: MOCK_PASSWORD,
+      email: TEST_USER_EMAIL,
+      password: TEST_USER_PASSWORD,
     });
 
     expect(result).toEqual(expect.anything());
@@ -35,24 +33,24 @@ describe("create user", () => {
 
   test("should give new users correct email", async () => {
     const [user] = await userRepository.create({
-      email: MOCK_EMAIL,
-      password: MOCK_PASSWORD,
+      email: TEST_USER_EMAIL,
+      password: TEST_USER_PASSWORD,
     });
 
-    expect(user?.email).toEqual(MOCK_EMAIL);
+    expect(user?.email).toEqual(TEST_USER_EMAIL);
   });
 
   test("should return user", async () => {
     const [createdUser] = await userRepository.create({
-      email: MOCK_EMAIL,
-      password: MOCK_PASSWORD,
+      email: TEST_USER_EMAIL,
+      password: TEST_USER_PASSWORD,
     });
 
     expect(createdUser).toEqual(expect.anything());
 
-    expect(mongoose.Types.ObjectId.isValid(createdUser?.id)).toBe(true);
+    expect(mongoose.Types.ObjectId.isValid(createdUser!._id)).toBe(true);
 
-    expect(createdUser?.email).toEqual(MOCK_EMAIL);
+    expect(createdUser?.email).toEqual(TEST_USER_EMAIL);
 
     if (createdUser) {
       const validCreatedAt = validateDate(createdUser.createdAt);

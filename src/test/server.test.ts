@@ -1,6 +1,7 @@
 import { envVariables } from "../common";
-import { SERVER_TEST_DELAY } from "../constants";
 import { server } from "../server";
+import { SERVER_TEST_DELAY } from "./constants";
+import { sleep } from "./utils";
 
 const spy = jest.spyOn(console, "info");
 
@@ -31,7 +32,7 @@ describe("server.ts", () => {
   });
 
   test("server logs start message", async () => {
-    await new Promise((resolve) => setTimeout(resolve, SERVER_TEST_DELAY));
+    await sleep(SERVER_TEST_DELAY);
 
     expect(spy).toHaveBeenCalledWith(
       `Server is running on port ${envVariables.port}`

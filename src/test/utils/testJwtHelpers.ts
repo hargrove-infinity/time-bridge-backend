@@ -1,17 +1,26 @@
+import mongoose from "mongoose";
 import { Algorithm } from "jsonwebtoken";
 import { StringValue } from "ms";
+import { TEST_USER_EMAIL, TEST_USER_ID_STRING } from "../constants";
 import { jwtService } from "../../services";
 import { SignTokenResult } from "../../types";
 import { SignTestJwtArgs } from "./types";
 
 export function signTestJwt(args?: SignTestJwtArgs): SignTokenResult {
-  const defaultPayload = { email: "mail@mail.com" };
+  const defaultPayload = {
+    email: TEST_USER_EMAIL,
+    _id: new mongoose.Types.ObjectId(TEST_USER_ID_STRING),
+  };
+
   const defaultOptions = {
     algorithm: "HS256" as Algorithm,
     expiresIn: "3h" as StringValue | number,
   };
 
-  const payload = args?.payload || defaultPayload;
+  const payload = args?.payload
+    ? { ...defaultPayload, ...args.payload }
+    : defaultPayload;
+
   const options = args?.options
     ? { ...defaultOptions, ...args.options }
     : defaultOptions;

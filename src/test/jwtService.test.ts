@@ -1,14 +1,25 @@
 import jwt from "jsonwebtoken";
-import { jwtService } from "../services";
 import { ERROR_MESSAGES } from "../constants";
-import { signAndVerifyTestJwt, signTestJwt } from "./utils";
+import { jwtService } from "../services";
+import {
+  TEST_USER_EMAIL,
+  TEST_USER_ID_STRING,
+  TOKEN_EXPIRED_DELAY,
+} from "./constants";
+import { signAndVerifyTestJwt, signTestJwt, sleep } from "./utils";
 
 describe("jwtService", () => {
   describe("jwtService.sign", () => {
     test("should return valid tuple [JWT token, null] when provided with valid arguments", () => {
       const [token] = signAndVerifyTestJwt();
       const decoded = jwt.decode(token!);
-      expect(decoded).toMatchObject({ email: "mail@mail.com" });
+
+      expect(decoded).toStrictEqual({
+        _id: TEST_USER_ID_STRING,
+        email: TEST_USER_EMAIL,
+        iat: expect.any(Number),
+        exp: expect.any(Number),
+      });
     });
 
     test("should use HS256 algorithm for signing", () => {
@@ -151,8 +162,9 @@ describe("jwtService", () => {
       expect(typeof verifyResult).not.toBe("string");
       expect(typeof verifyResult).toBe("object");
 
-      expect(verifyResult).toMatchObject({
-        email: "mail@mail.com",
+      expect(verifyResult).toStrictEqual({
+        _id: TEST_USER_ID_STRING,
+        email: TEST_USER_EMAIL,
         iat: expect.any(Number),
         exp: expect.any(Number),
       });
@@ -200,7 +212,7 @@ describe("jwtService", () => {
     test("should return error when token is expired", async () => {
       const [token] = signAndVerifyTestJwt({ options: { expiresIn: "1ms" } });
 
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      await sleep(TOKEN_EXPIRED_DELAY);
 
       const [verifyResult, errorVerify] = jwtService.verify({ token: token! });
 

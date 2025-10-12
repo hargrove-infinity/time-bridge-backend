@@ -1,13 +1,16 @@
-import { UserInput, UserDocument, UserModel } from "../models";
+import { ERROR_MESSAGES } from "../constants";
+import { UserInput, UserDocumentWithoutPassword, UserModel } from "../models";
+import { ErrorData } from "../types";
 
 async function create(
   args: UserInput
-): Promise<[UserDocument, null] | [null, unknown]> {
+): Promise<[UserDocumentWithoutPassword, null] | [null, ErrorData]> {
   try {
     const createdUser = await UserModel.create(args);
-    return [createdUser, null];
+    const { password, ...userWithoutPassword } = createdUser.toObject();
+    return [userWithoutPassword, null];
   } catch (error) {
-    return [null, error];
+    return [null, { errors: [ERROR_MESSAGES.USER_CREATE_REPOSITORY] }];
   }
 }
 

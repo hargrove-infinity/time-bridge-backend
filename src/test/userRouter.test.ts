@@ -15,6 +15,7 @@ const spyOnUserRoutesCreate = jest.spyOn(userRoutes, "create");
 // Import userRouter AFTER creating a spy
 import { userRouter } from "../routes/userRouter";
 
+import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
 import { verifyCreateUserRequest } from "./utils";
 
 let app: Express;
@@ -38,8 +39,8 @@ afterAll(async () => {
 describe("userRouter.create", () => {
   test("should call validate middleware", async () => {
     await request(app).post(paths.users.base).send({
-      email: "mail@mail.com",
-      password: "password",
+      email: TEST_USER_EMAIL,
+      password: TEST_USER_PASSWORD,
     });
     expect(spyOnValidationMiddleware).toHaveBeenCalled();
   });
@@ -47,14 +48,14 @@ describe("userRouter.create", () => {
   test("should call userRoutes.create", async () => {
     await request(app)
       .post(paths.users.base)
-      .send({ email: "mail@mail.com", password: "password" });
+      .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
     expect(spyOnUserRoutesCreate).toHaveBeenCalled();
   });
 
   test("should receive 200 status code", async () => {
     const response = await request(app)
       .post(paths.users.base)
-      .send({ email: "mail@mail.com", password: "password" });
+      .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
     expect(response.status).toBe(200);
   });
 

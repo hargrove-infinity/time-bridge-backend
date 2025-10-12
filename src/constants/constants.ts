@@ -6,6 +6,8 @@ export const ERROR_MESSAGES = {
   EMAIL_INVALID: "Email invalid",
   PASSWORD_UNDEFINED: "Password undefined",
   PASSWORD_LENGTH: "Password must be 6 chars",
+  USER_CREATE_REPOSITORY: "Some error occurred in user create repository",
+  USER_CREATE_SERVICE: "Some error occurred in user create service",
   USER_CREATE_ROUTE: "Some error occurred in user create route",
   // JWT
   ERROR_SIGNING_TOKEN: "Error during signing token",
@@ -20,9 +22,3 @@ export const ERROR_MESSAGES = {
   ERROR_TOKEN_SIGNATURE_ALGORITHM:
     "algorithm must be a valid string enum value",
 };
-
-export const SUCCESS_MESSAGES = {
-  USER_SUCCESSFULLY_CREATED: "User successfully created",
-};
-
-export const SERVER_TEST_DELAY = 1000;
