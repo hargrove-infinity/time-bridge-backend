@@ -7,6 +7,20 @@ import { userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
 
+function expectToEqualJwtPayload(data: unknown): asserts data is {
+  _id: string;
+  email: string;
+  iat: number;
+  exp: number;
+} {
+  expect(data).toStrictEqual({
+    _id: expect.any(String),
+    email: TEST_USER_EMAIL,
+    iat: expect.any(Number),
+    exp: expect.any(Number),
+  });
+}
+
 beforeAll(async () => {
   await connectDatabase();
 });
@@ -45,18 +59,8 @@ describe("userRoutes.create", () => {
 
     const decoded = jwt.decode(data.payload!);
 
-    expect(typeof decoded).not.toBe("string");
-    expect(typeof decoded).toBe("object");
+    expectToEqualJwtPayload(decoded);
 
-    expect(mongoose.Types.ObjectId.isValid((decoded as JwtPayload)!._id)).toBe(
-      true
-    );
-
-    expect(decoded).toStrictEqual({
-      _id: expect.any(String),
-      email: TEST_USER_EMAIL,
-      iat: expect.any(Number),
-      exp: expect.any(Number),
-    });
+    expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
   });
 });
