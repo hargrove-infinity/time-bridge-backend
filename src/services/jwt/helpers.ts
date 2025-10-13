@@ -20,19 +20,19 @@ export function isExpiresInUndefined(options?: jwt.SignOptions): boolean {
 }
 
 export function isExpiresInWrongFormat(options?: jwt.SignOptions): boolean {
-  return !!(
+  return Boolean(
     options &&
-    options.expiresIn &&
-    ms(options.expiresIn as number) === undefined
+      options.expiresIn &&
+      ms(options.expiresIn as number) === undefined
   );
 }
 
 export function isValidSignTokenPayload(payload: unknown): boolean {
-  return !!(
+  return Boolean(
     payload &&
-    typeof payload === "object" &&
-    "email" in payload &&
-    typeof payload.email === "string" &&
-    payload.email.length
+      typeof payload === "object" &&
+      "email" in payload &&
+      typeof payload.email === "string" &&
+      payload.email.length
   );
 }
