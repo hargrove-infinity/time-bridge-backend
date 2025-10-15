@@ -1,5 +1,10 @@
 import jwt from "jsonwebtoken";
-import { ERROR_MESSAGES } from "../constants";
+import {
+  DEFAULT_ALGORITHM_TOKEN,
+  DEFAULT_EXPIRES_IN_TOKEN_NUMBER,
+  ERROR_MESSAGES,
+  ONE_HOUR_IN_SECONDS,
+} from "../constants";
 import { jwtService } from "../services";
 import {
   TEST_USER_EMAIL,
@@ -34,7 +39,7 @@ describe("jwtService", () => {
       verifySignJwt(result);
       const [token] = result;
       const decoded = jwt.decode(token, { complete: true });
-      expect(decoded?.header.alg).toBe("HS256");
+      expect(decoded?.header.alg).toBe(DEFAULT_ALGORITHM_TOKEN);
     });
 
     test("should use correct expiresIn for signing", () => {
@@ -43,8 +48,8 @@ describe("jwtService", () => {
       const [token] = result;
       const decoded = jwt.decode(token, { json: true });
       expectToEqualJwtPayload(decoded);
-      const expiresInHrs = (decoded.exp - decoded.iat) / 3600;
-      expect(expiresInHrs).toBe(3);
+      const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
+      expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);
     });
 
     test("should return error when expiresIn is negative number", () => {

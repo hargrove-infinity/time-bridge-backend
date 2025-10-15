@@ -1,3 +1,12 @@
+import { Algorithm } from "jsonwebtoken";
+import { StringValue } from "ms";
+
+export const DEFAULT_EXPIRES_IN_TOKEN_STRING: StringValue = "3h";
+export const DEFAULT_EXPIRES_IN_TOKEN_NUMBER = 3;
+export const DEFAULT_ALGORITHM_TOKEN: Algorithm = "HS256";
+
+export const ONE_HOUR_IN_SECONDS = 3600;
+
 export const ERROR_MESSAGES = {
   // USER CREATION
   USER_CREATION_BODY_UNDEFINED: "User creation body undefined",

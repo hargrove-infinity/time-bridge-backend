@@ -4,6 +4,10 @@ import { StringValue } from "ms";
 import { TEST_USER_EMAIL, TEST_USER_ID_STRING } from "../constants";
 import { jwtService, SignTokenResult } from "../../services";
 import { SignTestJwtArgs } from "./types";
+import {
+  DEFAULT_ALGORITHM_TOKEN,
+  DEFAULT_EXPIRES_IN_TOKEN_STRING,
+} from "../../constants";
 
 export function signTestJwt(args?: SignTestJwtArgs): SignTokenResult {
   const defaultPayload = {
@@ -12,8 +16,8 @@ export function signTestJwt(args?: SignTestJwtArgs): SignTokenResult {
   };
 
   const defaultOptions = {
-    algorithm: "HS256" as Algorithm,
-    expiresIn: "3h" as StringValue | number,
+    algorithm: DEFAULT_ALGORITHM_TOKEN as Algorithm,
+    expiresIn: DEFAULT_EXPIRES_IN_TOKEN_STRING as StringValue | number,
   };
 
   const payload = args?.payload

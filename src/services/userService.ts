@@ -1,5 +1,9 @@
 import bcrypt from "bcrypt";
-import { ERROR_MESSAGES } from "../constants";
+import {
+  DEFAULT_ALGORITHM_TOKEN,
+  DEFAULT_EXPIRES_IN_TOKEN_STRING,
+  ERROR_MESSAGES,
+} from "../constants";
 import { userRepository } from "../repositories";
 import { ErrorData } from "../errors";
 import { CreateUserInput } from "../validation";
@@ -21,7 +25,10 @@ async function create(
 
   const [token, errorSignToken] = jwtService.sign({
     payload: { _id: user._id, email: user.email },
-    options: { algorithm: "HS256", expiresIn: "3h" },
+    options: {
+      algorithm: DEFAULT_ALGORITHM_TOKEN,
+      expiresIn: DEFAULT_EXPIRES_IN_TOKEN_STRING,
+    },
   });
 
   if (errorSignToken) {
