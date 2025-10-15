@@ -5,6 +5,12 @@ import { jwtService, userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
 
+function expectToEqualTokenString(data: unknown): asserts data is string {
+  expect(data).toBeDefined();
+  expect(data).not.toBeNull();
+  expect(typeof data).toBe("string");
+}
+
 beforeAll(async () => {
   await connectDatabase();
 });
@@ -69,14 +75,11 @@ describe("userService.create", () => {
       password: TEST_USER_PASSWORD,
     });
 
-    expect(token).toBeDefined();
-    expect(token).not.toBeNull();
-    expect(typeof token).toBe("string");
     expect(errorCreateUser).toBe(null);
 
-    const [verifyResult, errorVerify] = jwtService.verify({
-      token: token as string,
-    });
+    expectToEqualTokenString(token);
+
+    const [verifyResult, errorVerify] = jwtService.verify({ token });
 
     expect(verifyResult).toBeDefined();
     expect(verifyResult).not.toBeNull();
