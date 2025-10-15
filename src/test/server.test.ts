@@ -1,7 +1,7 @@
 import { envVariables } from "../common";
 import { server } from "../server";
 import { SERVER_TEST_DELAY } from "./constants";
-import { sleep } from "./utils";
+import { expectToEqualServerAddressInfo, sleep } from "./utils";
 
 const spy = jest.spyOn(console, "info");
 
@@ -17,17 +17,8 @@ describe("server.ts", () => {
 
   test("server runs on env port", () => {
     const address = server.address();
-
-    if (address === null) {
-      throw new Error("missing address");
-    }
-
-    if (typeof address === "string") {
-      throw new Error("address is a string");
-    }
-
+    expectToEqualServerAddressInfo(address);
     const port = Number(envVariables.port);
-
     expect(address.port).toBe(port);
   });
 
