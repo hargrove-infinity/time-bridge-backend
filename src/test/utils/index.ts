@@ -2,6 +2,7 @@ export * from "./expectToEqualCreatedUser";
 export * from "./expectToEqualJwtPayload";
 export * from "./expectToEqualServerAddressInfo";
 export * from "./expectToEqualTokenString";
+export * from "./expectToMatchUserDocument";
 export * from "./sleep";
 export * from "./testJwtHelpers";
 export * from "./validateDate";

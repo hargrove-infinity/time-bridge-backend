@@ -4,7 +4,7 @@ import { userRepository } from "../repositories";
 import { jwtService, userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
-import { expectToEqualTokenString } from "./utils";
+import { expectToEqualTokenString, expectToMatchUserDocument } from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -39,8 +39,9 @@ describe("userService.create", () => {
 
     const userInDb = await UserModel.findOne({ email: TEST_USER_EMAIL });
 
-    expect(userInDb).not.toBeNull();
-    expect(userInDb?.password).not.toBe(TEST_USER_PASSWORD);
+    expectToMatchUserDocument(userInDb);
+
+    expect(userInDb.password).not.toBe(TEST_USER_PASSWORD);
   });
 
   test("stored password in database and password was sent should match", async () => {
@@ -54,11 +55,11 @@ describe("userService.create", () => {
 
     const userInDb = await UserModel.findOne({ email: TEST_USER_EMAIL });
 
-    expect(userInDb).not.toBeNull();
+    expectToMatchUserDocument(userInDb);
 
     const isPasswordsMatched = await bcrypt.compare(
       TEST_USER_PASSWORD,
-      userInDb!.password
+      userInDb.password
     );
 
     expect(isPasswordsMatched).toBe(true);
