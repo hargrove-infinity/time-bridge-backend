@@ -1,4 +1,4 @@
-export function expectToEqualTokenString(
+export function expectToFulfillTokenString(
   data: unknown
 ): asserts data is string {
   expect(data).toBeDefined();

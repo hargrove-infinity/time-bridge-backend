@@ -3,7 +3,7 @@ import { UserModel } from "../models";
 import { userRepository } from "../repositories";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
-import { expectToEqualCreatedUser, validateDate } from "./utils";
+import { expectToFulfillCreatedUser, validateDate } from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -42,7 +42,7 @@ describe("create user", () => {
       password: TEST_USER_PASSWORD,
     });
 
-    expectToEqualCreatedUser(createdUser);
+    expectToFulfillCreatedUser(createdUser);
 
     expect(mongoose.Types.ObjectId.isValid(createdUser._id)).toBe(true);
 

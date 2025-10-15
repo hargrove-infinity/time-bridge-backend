@@ -30,14 +30,3 @@ export function signTestJwt(args?: SignTestJwtArgs): SignTokenResult {
 
   return jwtService.sign({ payload, options });
 }
-
-export function verifySignJwt(
-  data: SignTokenResult
-): asserts data is [string, null] {
-  const [token, errorSign] = data;
-
-  expect(token).toBeDefined();
-  expect(token).not.toBeNull();
-  expect(typeof token).toBe("string");
-  expect(errorSign).toBe(null);
-}

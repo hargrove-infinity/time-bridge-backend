@@ -4,7 +4,10 @@ import { userRepository } from "../repositories";
 import { jwtService, userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
-import { expectToEqualTokenString, expectToMatchUserDocument } from "./utils";
+import {
+  expectToFulfillTokenString,
+  expectToFulfillUserDocument,
+} from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -39,7 +42,7 @@ describe("userService.create", () => {
 
     const userInDb = await UserModel.findOne({ email: TEST_USER_EMAIL });
 
-    expectToMatchUserDocument(userInDb);
+    expectToFulfillUserDocument(userInDb);
 
     expect(userInDb.password).not.toBe(TEST_USER_PASSWORD);
   });
@@ -55,7 +58,7 @@ describe("userService.create", () => {
 
     const userInDb = await UserModel.findOne({ email: TEST_USER_EMAIL });
 
-    expectToMatchUserDocument(userInDb);
+    expectToFulfillUserDocument(userInDb);
 
     const isPasswordsMatched = await bcrypt.compare(
       TEST_USER_PASSWORD,
@@ -73,7 +76,7 @@ describe("userService.create", () => {
 
     expect(errorCreateUser).toBe(null);
 
-    expectToEqualTokenString(token);
+    expectToFulfillTokenString(token);
 
     const [verifyResult, errorVerify] = jwtService.verify({ token });
 

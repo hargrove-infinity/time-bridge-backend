@@ -12,17 +12,17 @@ import {
   TOKEN_EXPIRED_DELAY,
 } from "./constants";
 import {
-  expectToEqualJwtPayload,
+  expectToFulfillJwtPayload,
+  expectToFulfillSignTokenResult,
   signTestJwt,
   sleep,
-  verifySignJwt,
 } from "./utils";
 
 describe("jwtService", () => {
   describe("jwtService.sign", () => {
     test("should return valid tuple [JWT token, null] when provided with valid arguments", () => {
       const result = signTestJwt();
-      verifySignJwt(result);
+      expectToFulfillSignTokenResult(result);
       const [token] = result;
       const decoded = jwt.decode(token);
 
@@ -36,7 +36,7 @@ describe("jwtService", () => {
 
     test("should use HS256 algorithm for signing", () => {
       const result = signTestJwt();
-      verifySignJwt(result);
+      expectToFulfillSignTokenResult(result);
       const [token] = result;
       const decoded = jwt.decode(token, { complete: true });
       expect(decoded?.header.alg).toBe(DEFAULT_ALGORITHM_TOKEN);
@@ -44,10 +44,10 @@ describe("jwtService", () => {
 
     test("should use correct expiresIn for signing", () => {
       const result = signTestJwt();
-      verifySignJwt(result);
+      expectToFulfillSignTokenResult(result);
       const [token] = result;
       const decoded = jwt.decode(token, { json: true });
-      expectToEqualJwtPayload(decoded);
+      expectToFulfillJwtPayload(decoded);
       const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
       expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);
     });
@@ -76,7 +76,7 @@ describe("jwtService", () => {
   describe("jwtService.verify", () => {
     test("should return valid tuple [JWTPayload, null] when provided with valid arguments", () => {
       const result = signTestJwt();
-      verifySignJwt(result);
+      expectToFulfillSignTokenResult(result);
       const [token] = result;
 
       const [verifyResult, errorVerify] = jwtService.verify({ token });
@@ -120,7 +120,7 @@ describe("jwtService", () => {
 
     test("should return error when token is expired", async () => {
       const result = signTestJwt({ options: { expiresIn: "1ms" } });
-      verifySignJwt(result);
+      expectToFulfillSignTokenResult(result);
       const [token] = result;
 
       await sleep(TOKEN_EXPIRED_DELAY);

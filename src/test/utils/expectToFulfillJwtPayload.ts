@@ -1,6 +1,6 @@
 import { TEST_USER_EMAIL } from "../constants";
 
-export function expectToEqualJwtPayload(data: unknown): asserts data is {
+export function expectToFulfillJwtPayload(data: unknown): asserts data is {
   _id: string;
   email: string;
   iat: number;
