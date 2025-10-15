@@ -6,20 +6,7 @@ import { userRoutes } from "../routes";
 import { userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
-
-function expectToEqualJwtPayload(data: unknown): asserts data is {
-  _id: string;
-  email: string;
-  iat: number;
-  exp: number;
-} {
-  expect(data).toStrictEqual({
-    _id: expect.any(String),
-    email: TEST_USER_EMAIL,
-    iat: expect.any(Number),
-    exp: expect.any(Number),
-  });
-}
+import { expectToEqualJwtPayload } from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
