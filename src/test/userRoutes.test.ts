@@ -1,5 +1,5 @@
 import httpMocks from "node-mocks-http";
-import jwt, { JwtPayload } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import { UserModel } from "../models";
 import { userRoutes } from "../routes";
