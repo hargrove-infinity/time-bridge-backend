@@ -4,12 +4,7 @@ import { userRepository } from "../repositories";
 import { jwtService, userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
-
-function expectToEqualTokenString(data: unknown): asserts data is string {
-  expect(data).toBeDefined();
-  expect(data).not.toBeNull();
-  expect(typeof data).toBe("string");
-}
+import { expectToEqualTokenString } from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
