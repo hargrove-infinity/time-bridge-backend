@@ -6,12 +6,14 @@ import {
   TEST_USER_ID_STRING,
   TOKEN_EXPIRED_DELAY,
 } from "./constants";
-import { signAndVerifyTestJwt, signTestJwt, sleep } from "./utils";
+import { signTestJwt, sleep, verifySignJwt } from "./utils";
 
 describe("jwtService", () => {
   describe("jwtService.sign", () => {
     test("should return valid tuple [JWT token, null] when provided with valid arguments", () => {
-      const [token] = signAndVerifyTestJwt();
+      const result = signTestJwt();
+      verifySignJwt(result);
+      const [token] = result;
       const decoded = jwt.decode(token);
 
       expect(decoded).toStrictEqual({
@@ -23,13 +25,17 @@ describe("jwtService", () => {
     });
 
     test("should use HS256 algorithm for signing", () => {
-      const [token] = signAndVerifyTestJwt();
+      const result = signTestJwt();
+      verifySignJwt(result);
+      const [token] = result;
       const decoded = jwt.decode(token, { complete: true });
       expect(decoded?.header.alg).toBe("HS256");
     });
 
     test("should use correct expiresIn for signing", () => {
-      const [token] = signAndVerifyTestJwt();
+      const result = signTestJwt();
+      verifySignJwt(result);
+      const [token] = result;
       const decoded = jwt.decode(token, { json: true });
 
       expect(typeof decoded?.iat).toBe("number");
@@ -62,7 +68,9 @@ describe("jwtService", () => {
 
   describe("jwtService.verify", () => {
     test("should return valid tuple [JWTPayload, null] when provided with valid arguments", () => {
-      const [token] = signAndVerifyTestJwt();
+      const result = signTestJwt();
+      verifySignJwt(result);
+      const [token] = result;
 
       const [verifyResult, errorVerify] = jwtService.verify({ token });
 
@@ -104,7 +112,9 @@ describe("jwtService", () => {
     });
 
     test("should return error when token is expired", async () => {
-      const [token] = signAndVerifyTestJwt({ options: { expiresIn: "1ms" } });
+      const result = signTestJwt({ options: { expiresIn: "1ms" } });
+      verifySignJwt(result);
+      const [token] = result;
 
       await sleep(TOKEN_EXPIRED_DELAY);
 

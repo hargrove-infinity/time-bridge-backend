@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 import { Algorithm } from "jsonwebtoken";
 import { StringValue } from "ms";
 import { TEST_USER_EMAIL, TEST_USER_ID_STRING } from "../constants";
-import { jwtService } from "../../services";
-import { SignTokenResult } from "../../types";
+import { jwtService, SignTokenResult } from "../../services";
 import { SignTestJwtArgs } from "./types";
 
 export function signTestJwt(args?: SignTestJwtArgs): SignTokenResult {
@@ -28,17 +27,13 @@ export function signTestJwt(args?: SignTestJwtArgs): SignTokenResult {
   return jwtService.sign({ payload, options });
 }
 
-function verifySignJwt(args: SignTokenResult): void {
-  const [token, errorSign] = args;
+export function verifySignJwt(
+  data: SignTokenResult
+): asserts data is [string, null] {
+  const [token, errorSign] = data;
 
   expect(token).toBeDefined();
   expect(token).not.toBeNull();
   expect(typeof token).toBe("string");
   expect(errorSign).toBe(null);
-}
-
-export function signAndVerifyTestJwt(args?: SignTestJwtArgs): SignTokenResult {
-  const result = signTestJwt(args);
-  verifySignJwt(result);
-  return result;
 }

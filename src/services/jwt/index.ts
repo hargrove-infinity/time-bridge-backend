@@ -1,2 +1,2 @@
 export * from "./jwtService";
-export * from "./helpers";
+export * from "./types";
