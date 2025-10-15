@@ -9,6 +9,20 @@ function validateDate(date: NativeDate): boolean {
   return !isNaN(convertedDate.getTime());
 }
 
+function expectToEqualCreatedUser(data: unknown): asserts data is {
+  email: string;
+  _id: object;
+  createdAt: object;
+  updatedAt: object;
+} {
+  expect(data).toMatchObject({
+    email: expect.any(String),
+    _id: expect.any(Object),
+    createdAt: expect.any(Object),
+    updatedAt: expect.any(Object),
+  });
+}
+
 beforeAll(async () => {
   await connectDatabase();
 });
@@ -46,18 +60,16 @@ describe("create user", () => {
       password: TEST_USER_PASSWORD,
     });
 
-    expect(createdUser).toEqual(expect.anything());
+    expectToEqualCreatedUser(createdUser);
 
-    expect(mongoose.Types.ObjectId.isValid(createdUser!._id)).toBe(true);
+    expect(mongoose.Types.ObjectId.isValid(createdUser._id)).toBe(true);
 
-    expect(createdUser?.email).toEqual(TEST_USER_EMAIL);
+    expect(createdUser.email).toEqual(TEST_USER_EMAIL);
 
-    if (createdUser) {
-      const validCreatedAt = validateDate(createdUser.createdAt);
-      expect(validCreatedAt).toBe(true);
+    const validCreatedAt = validateDate(createdUser.createdAt);
+    expect(validCreatedAt).toBe(true);
 
-      const validUpdatedAt = validateDate(createdUser.updatedAt);
-      expect(validUpdatedAt).toBe(true);
-    }
+    const validUpdatedAt = validateDate(createdUser.updatedAt);
+    expect(validUpdatedAt).toBe(true);
   });
 });
