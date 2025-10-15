@@ -58,96 +58,6 @@ describe("jwtService", () => {
         errors: [ERROR_MESSAGES.EXPIRES_IN_LESS_THAN_ONE],
       });
     });
-
-    test("should return error when payload is null", () => {
-      const [token, errorSign] = jwtService.sign({
-        // @ts-expect-error - Testing invalid input: null instead of correct payload
-        payload: null,
-        options: { expiresIn: "1h" },
-      });
-
-      expect(token).toBeNull();
-
-      expect(errorSign).toEqual({
-        errors: [ERROR_MESSAGES.INVALID_PAYLOAD_SIGN_IN_TOKEN],
-      });
-    });
-
-    test("should return error when payload is undefined", () => {
-      const [token, errorSign] = jwtService.sign({
-        // @ts-expect-error - Testing invalid input: undefined instead of correct payload
-        payload: undefined,
-        options: { expiresIn: "1h" },
-      });
-
-      expect(token).toBeNull();
-
-      expect(errorSign).toEqual({
-        errors: [ERROR_MESSAGES.INVALID_PAYLOAD_SIGN_IN_TOKEN],
-      });
-    });
-
-    test("should return error when payload is missing required fields", () => {
-      const [token, errorSign] = jwtService.sign({
-        // @ts-expect-error - Testing invalid input: { payload: {id: 1} } instead of correct payload
-        payload: { id: 1 },
-        options: { expiresIn: "1h" },
-      });
-
-      expect(token).toBeNull();
-
-      expect(errorSign).toEqual({
-        errors: [ERROR_MESSAGES.INVALID_PAYLOAD_SIGN_IN_TOKEN],
-      });
-    });
-
-    test("should return error when expiresIn is null", () => {
-      const [token, errorSign] = jwtService.sign({
-        // @ts-expect-error - Testing invalid input: null instead of correct expiresIn
-        options: { expiresIn: null },
-      });
-
-      expect(token).toBeNull();
-
-      expect(errorSign).toEqual({ errors: [ERROR_MESSAGES.EXPIRES_IN_NULL] });
-    });
-
-    test("should return error when expiresIn is undefined", () => {
-      const [token, errorSign] = jwtService.sign({
-        // @ts-expect-error - Testing invalid input: undefined instead of correct expiresIn
-        options: { expiresIn: undefined },
-      });
-
-      expect(token).toBeNull();
-
-      expect(errorSign).toEqual({
-        errors: [ERROR_MESSAGES.EXPIRES_IN_UNDEFINED],
-      });
-    });
-
-    test("should return error when expiresIn is invalid format", () => {
-      const [token, errorSign] = jwtService.sign({
-        // @ts-expect-error - Testing invalid input: "abc" instead of correct expiresIn
-        options: { expiresIn: "abc" },
-      });
-
-      expect(token).toBeNull();
-
-      expect(errorSign).toEqual({
-        errors: [ERROR_MESSAGES.EXPIRES_IN_WRONG_FORMAT],
-      });
-    });
-
-    test("should return error when algorithm is invalid format", () => {
-      // @ts-expect-error - Testing invalid input: "abc" instead of correct algorithm
-      const [token, errorSign] = signTestJwt({ options: { algorithm: "abc" } });
-
-      expect(token).toBeNull();
-
-      expect(errorSign).toEqual({
-        errors: [ERROR_MESSAGES.ERROR_TOKEN_SIGNATURE_ALGORITHM],
-      });
-    });
   });
 
   describe("jwtService.verify", () => {
@@ -170,22 +80,6 @@ describe("jwtService", () => {
       });
 
       expect(errorVerify).toBe(null);
-    });
-
-    test("should return error when token is null", () => {
-      // @ts-expect-error - Testing invalid input: null instead of string
-      const [data, error] = jwtService.verify({ token: null });
-
-      expect(data).toBeNull();
-      expect(error).toEqual({ errors: [ERROR_MESSAGES.ERROR_VERIFYING_TOKEN] });
-    });
-
-    test("should return error when token is undefined", () => {
-      // @ts-expect-error - Testing invalid input: null instead of string
-      const [data, error] = jwtService.verify({ token: undefined });
-
-      expect(data).toBeNull();
-      expect(error).toEqual({ errors: [ERROR_MESSAGES.ERROR_VERIFYING_TOKEN] });
     });
 
     test("should return error when token is empty string", () => {

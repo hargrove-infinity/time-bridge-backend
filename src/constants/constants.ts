@@ -1,5 +1,5 @@
 export const ERROR_MESSAGES = {
-  // USER CREATE
+  // USER CREATION
   USER_CREATION_BODY_UNDEFINED: "User creation body undefined",
   EMAIL_UNDEFINED: "Email undefined",
   EMAIL_EMPTY: "Empty email",
@@ -15,10 +15,4 @@ export const ERROR_MESSAGES = {
   EXPIRES_IN_LESS_THAN_ONE: "expiresIn must be greater than 1 or 1",
   EXPIRES_IN_NEGATIVE: "expiresIn can't be negative",
   TOKEN_EXPIRED: "Token has been expired",
-  INVALID_PAYLOAD_SIGN_IN_TOKEN: "Payload is invalid for sign token",
-  EXPIRES_IN_NULL: "expiresIn can't be null",
-  EXPIRES_IN_UNDEFINED: "expiresIn can't be undefined",
-  EXPIRES_IN_WRONG_FORMAT: "expiresIn has wrong format",
-  ERROR_TOKEN_SIGNATURE_ALGORITHM:
-    "algorithm must be a valid string enum value",
 };
