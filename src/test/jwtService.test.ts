@@ -12,7 +12,7 @@ describe("jwtService", () => {
   describe("jwtService.sign", () => {
     test("should return valid tuple [JWT token, null] when provided with valid arguments", () => {
       const [token] = signAndVerifyTestJwt();
-      const decoded = jwt.decode(token!);
+      const decoded = jwt.decode(token);
 
       expect(decoded).toStrictEqual({
         _id: TEST_USER_ID_STRING,
@@ -24,13 +24,13 @@ describe("jwtService", () => {
 
     test("should use HS256 algorithm for signing", () => {
       const [token] = signAndVerifyTestJwt();
-      const decoded = jwt.decode(token!, { complete: true });
+      const decoded = jwt.decode(token, { complete: true });
       expect(decoded?.header.alg).toBe("HS256");
     });
 
     test("should use correct expiresIn for signing", () => {
       const [token] = signAndVerifyTestJwt();
-      const decoded = jwt.decode(token!, { json: true });
+      const decoded = jwt.decode(token, { json: true });
 
       expect(typeof decoded?.iat).toBe("number");
       expect(typeof decoded?.exp).toBe("number");
@@ -64,7 +64,7 @@ describe("jwtService", () => {
     test("should return valid tuple [JWTPayload, null] when provided with valid arguments", () => {
       const [token] = signAndVerifyTestJwt();
 
-      const [verifyResult, errorVerify] = jwtService.verify({ token: token! });
+      const [verifyResult, errorVerify] = jwtService.verify({ token });
 
       expect(verifyResult).toBeDefined();
       expect(verifyResult).not.toBeNull();
@@ -108,7 +108,7 @@ describe("jwtService", () => {
 
       await sleep(TOKEN_EXPIRED_DELAY);
 
-      const [verifyResult, errorVerify] = jwtService.verify({ token: token! });
+      const [verifyResult, errorVerify] = jwtService.verify({ token });
 
       expect(verifyResult).toBeNull();
 

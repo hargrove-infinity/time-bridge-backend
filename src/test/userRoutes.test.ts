@@ -44,7 +44,7 @@ describe("userRoutes.create", () => {
 
     expect(typeof data.payload).toBe("string");
 
-    const decoded = jwt.decode(data.payload!);
+    const decoded = jwt.decode(data.payload);
 
     expectToEqualJwtPayload(decoded);
 
