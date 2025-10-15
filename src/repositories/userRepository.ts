@@ -1,6 +1,6 @@
 import { ERROR_MESSAGES } from "../constants";
 import { UserInput, UserDocumentWithoutPassword, UserModel } from "../models";
-import { ErrorData } from "../types";
+import { ErrorData } from "../errors";
 
 async function create(
   args: UserInput

@@ -1,8 +1,12 @@
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { envVariables } from "../../common";
 import { ERROR_MESSAGES } from "../../constants";
-import { SignTokenResult } from "../../types";
-import { SignTokenArgs, VerifyTokenArgs, VerifyTokenResult } from "./types";
+import {
+  SignTokenArgs,
+  SignTokenResult,
+  VerifyTokenArgs,
+  VerifyTokenResult,
+} from "./types";
 import {
   isExpiresInLessThanOne,
   isExpiresInNegative,

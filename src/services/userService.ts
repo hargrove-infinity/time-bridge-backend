@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import { ERROR_MESSAGES } from "../constants";
 import { userRepository } from "../repositories";
-import { ErrorData } from "../types";
+import { ErrorData } from "../errors";
 import { CreateUserInput } from "../validation";
 import { jwtService } from "./jwt";
 
