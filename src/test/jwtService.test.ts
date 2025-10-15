@@ -6,7 +6,12 @@ import {
   TEST_USER_ID_STRING,
   TOKEN_EXPIRED_DELAY,
 } from "./constants";
-import { signTestJwt, sleep, verifySignJwt } from "./utils";
+import {
+  expectToEqualJwtPayload,
+  signTestJwt,
+  sleep,
+  verifySignJwt,
+} from "./utils";
 
 describe("jwtService", () => {
   describe("jwtService.sign", () => {
@@ -37,11 +42,8 @@ describe("jwtService", () => {
       verifySignJwt(result);
       const [token] = result;
       const decoded = jwt.decode(token, { json: true });
-
-      expect(typeof decoded?.iat).toBe("number");
-      expect(typeof decoded?.exp).toBe("number");
-
-      const expiresInHrs = (decoded?.exp! - decoded?.iat!) / 3600;
+      expectToEqualJwtPayload(decoded);
+      const expiresInHrs = (decoded.exp - decoded.iat) / 3600;
       expect(expiresInHrs).toBe(3);
     });
 
