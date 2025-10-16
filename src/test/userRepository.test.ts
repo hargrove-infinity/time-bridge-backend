@@ -25,13 +25,14 @@ describe("create user", () => {
   });
 
   test("should add a user to the database", async () => {
-    const result = await userRepository.create({
+    const [createdUser, errorCreateUser] = await userRepository.create({
       email: MOCK_EMAIL,
       password: MOCK_PASSWORD,
     });
 
     // Assert
-    expect(result).toEqual(expect.anything());
+    expect(createdUser).toEqual(expect.anything());
+    expect(errorCreateUser).toBeNull();
   });
 
   test("should give new users correct email", async () => {
@@ -65,4 +66,42 @@ describe("create user", () => {
       expect(validUpdatedAt).toBe(true);
     }
   });
+
+  // Login
+  // - Happy path: find a user that definitely exists in the database
+  test("should return user when email exists", async () => {
+    const [createdUser, errorCreateUser] = await userRepository.create({
+      email: MOCK_EMAIL,
+      password: MOCK_PASSWORD,
+    });
+
+    // Assert
+    expect(createdUser).toEqual(expect.anything());
+    expect(errorCreateUser).toBeNull();
+
+    const [foundUser, errorFindOneUser] = await userRepository.findOne({
+      email: MOCK_EMAIL,
+    });
+
+    // Assert
+    expect(foundUser).toEqual(expect.anything());
+    expect(errorFindOneUser).toBeNull();
+  });
+
+  // - Edge case: searching for a user that was never created
+  test.todo("should return null when user with given email does not exist");
+  // - Security/correctness: verify the password field is stripped from the result (following pattern from create)
+  test.todo("should return user without password field");
+  // - Validation: ensure the returned user has _id, email, createdAt, updatedAt (matching UserDocumentWithoutPassword type)
+  test.todo("should return correct user data structure");
+  // - Error handling: if something goes wrong (like database connection issues), it should return an error following [null, ErrorData] pattern
+  test.todo("should handle error when database fails");
+  // - Edge case: verify if searching for "TEST@EMAIL.COM" doesn't find "test@email.com" (or define the intended behavior)
+  test.todo("should be case-sensitive for email lookup");
+  // - Correctness: ensure it's matching the exact email you're searching for, not partial matches
+  test.todo("should find user by exact email match");
+  // - Error handling: send custom error response instead of raw db error
+  test.todo("should handle database errors and return appropriate error data");
+  //- Correctness: ensure that calling findOne is a pure read operation — it shouldn’t alter existing users or insert new ones
+  test.todo("should not modify or create any new user in the database");
 });

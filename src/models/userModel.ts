@@ -15,3 +15,5 @@ export type UserInput = Pick<User, "email" | "password">;
 export type UserDocument = ReturnType<(typeof UserModel)["hydrate"]>;
 
 export const UserModel = mongoose.model("User", userSchema);
+
+export type FindOneUserArgs = Parameters<(typeof UserModel)["findOne"]>[0];

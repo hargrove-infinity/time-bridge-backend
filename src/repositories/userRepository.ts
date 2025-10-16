@@ -1,4 +1,4 @@
-import { UserInput, UserDocument, UserModel } from "../models";
+import { UserInput, UserDocument, UserModel, FindOneUserArgs } from "../models";
 
 async function create(
   args: UserInput
@@ -11,4 +11,15 @@ async function create(
   }
 }
 
-export const userRepository = { create } as const;
+async function findOne(
+  args: FindOneUserArgs
+): Promise<[UserDocument | null, null] | [null, unknown]> {
+  try {
+    const foundUser = await UserModel.findOne(args);
+    return [foundUser, null];
+  } catch (error) {
+    return [null, error];
+  }
+}
+
+export const userRepository = { create, findOne } as const;
