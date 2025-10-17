@@ -89,7 +89,19 @@ describe("create user", () => {
   });
 
   // - Edge case: searching for a user that was never created
-  test.todo("should return null when user with given email does not exist");
+  test("should return null when user with given email does not exist", async () => {
+    const [foundUser, errorFindOneUser] = await userRepository.findOne({
+      email: MOCK_EMAIL,
+    });
+
+    console.log("foundUser", foundUser);
+    console.log("errorFindOneUser", errorFindOneUser);
+
+    // Assert
+    expect(foundUser).toBeNull();
+    expect(errorFindOneUser).toBeNull();
+  });
+
   // - Security/correctness: verify the password field is stripped from the result (following pattern from create)
   test.todo("should return user without password field");
   // - Validation: ensure the returned user has _id, email, createdAt, updatedAt (matching UserDocumentWithoutPassword type)
