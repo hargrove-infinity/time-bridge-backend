@@ -5,6 +5,6 @@ export * from "./expectToFulfillServerAddressInfo";
 export * from "./expectToFulfillSignTokenResult";
 export * from "./expectToFulfillTokenString";
 export * from "./expectToFulfillUserDocument";
+export * from "./expectToFulfillValidDate";
 export * from "./signTestJwt";
 export * from "./sleep";
-export * from "./validateDate";

@@ -3,7 +3,7 @@ import { UserModel } from "../models";
 import { userRepository } from "../repositories";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
-import { expectToFulfillCreatedUser, validateDate } from "./utils";
+import { expectToFulfillCreatedUser, expectToFulfillValidDate } from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -48,8 +48,8 @@ describe("create user", () => {
 
     expect(createdUser.email).toEqual(TEST_USER_EMAIL);
 
-    validateDate(createdUser.createdAt);
+    expectToFulfillValidDate(createdUser.createdAt);
 
-    validateDate(createdUser.updatedAt);
+    expectToFulfillValidDate(createdUser.updatedAt);
   });
 });
