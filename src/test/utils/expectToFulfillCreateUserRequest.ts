@@ -6,7 +6,9 @@ import { paths } from "../../constants";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "../constants";
 import { expectToFulfillJwtPayload } from "./expectToFulfillJwtPayload";
 
-export async function verifyCreateUserRequest(app: Express): Promise<void> {
+export async function expectToFulfillCreateUserRequest(
+  app: Express
+): Promise<void> {
   const response = await request(app).post(paths.users.base).send({
     email: TEST_USER_EMAIL,
     password: TEST_USER_PASSWORD,

@@ -1,4 +1,5 @@
 export * from "./expectToFulfillCreatedUser";
+export * from "./expectToFulfillCreateUserRequest";
 export * from "./expectToFulfillJwtPayload";
 export * from "./expectToFulfillServerAddressInfo";
 export * from "./expectToFulfillSignTokenResult";
@@ -7,4 +8,3 @@ export * from "./expectToFulfillUserDocument";
 export * from "./signTestJwt";
 export * from "./sleep";
 export * from "./validateDate";
-export * from "./verifyCreateUserRequest";
