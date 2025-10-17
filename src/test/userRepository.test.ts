@@ -48,10 +48,8 @@ describe("create user", () => {
 
     expect(createdUser.email).toEqual(TEST_USER_EMAIL);
 
-    const validCreatedAt = validateDate(createdUser.createdAt);
-    expect(validCreatedAt).toBe(true);
+    validateDate(createdUser.createdAt);
 
-    const validUpdatedAt = validateDate(createdUser.updatedAt);
-    expect(validUpdatedAt).toBe(true);
+    validateDate(createdUser.updatedAt);
   });
 });

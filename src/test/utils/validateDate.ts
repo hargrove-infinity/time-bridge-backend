@@ -1,4 +1,5 @@
-export function validateDate(date: NativeDate): boolean {
+export function validateDate(date: NativeDate) {
   const convertedDate = new Date(date);
-  return !isNaN(convertedDate.getTime());
+  const isValidDate = !isNaN(convertedDate.getTime());
+  expect(isValidDate).toBe(true);
 }
