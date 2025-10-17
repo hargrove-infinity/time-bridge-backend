@@ -16,8 +16,8 @@ export function signTestJwt(args?: SignTestJwtArgs): SignTokenResult {
   };
 
   const defaultOptions = {
-    algorithm: DEFAULT_ALGORITHM_TOKEN as Algorithm,
-    expiresIn: DEFAULT_EXPIRES_IN_TOKEN_STRING as StringValue | number,
+    algorithm: DEFAULT_ALGORITHM_TOKEN,
+    expiresIn: DEFAULT_EXPIRES_IN_TOKEN_STRING,
   };
 
   const payload = args?.payload
