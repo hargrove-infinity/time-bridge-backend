@@ -20,28 +20,37 @@ afterAll(async () => {
 describe("userRepository", () => {
   describe("userRepository.create", () => {
     test("should add a user to the database", async () => {
-      const result = await userRepository.create({
+      const [createdUser, errorCreateUser] = await userRepository.create({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
 
-      expect(result).toEqual(expect.anything());
+      // Assert
+      expect(createdUser).toEqual(expect.anything());
+      expect(errorCreateUser).toBeNull();
     });
 
     test("should give new users correct email", async () => {
-      const [user] = await userRepository.create({
+      const [createdUser, errorCreateUser] = await userRepository.create({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
 
-      expect(user?.email).toEqual(TEST_USER_EMAIL);
+      // Assert
+      expect(createdUser).toEqual(expect.anything());
+      expect(errorCreateUser).toBeNull();
+      expect(createdUser?.email).toEqual(TEST_USER_EMAIL);
     });
 
     test("should return user", async () => {
-      const [createdUser] = await userRepository.create({
+      const [createdUser, errorCreateUser] = await userRepository.create({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
+
+      // Assert
+      expect(createdUser).toEqual(expect.anything());
+      expect(errorCreateUser).toBeNull();
 
       expectCreatedUser(createdUser);
 
