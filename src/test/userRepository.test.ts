@@ -2,7 +2,11 @@ import mongoose from "mongoose";
 import { UserModel } from "../models";
 import { userRepository } from "../repositories";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
-import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
+import {
+  TEST_USER_EMAIL,
+  TEST_USER_EMAIL_UPPERCASE,
+  TEST_USER_PASSWORD,
+} from "./constants";
 import { expectCreatedUser, expectValidDate } from "./utils";
 
 beforeAll(async () => {
@@ -149,7 +153,25 @@ describe("userRepository", () => {
     });
 
     // - Edge case: verify if searching for "TEST@EMAIL.COM" doesn't find "test@email.com" (or define the intended behavior)
-    test.todo("should be case-sensitive for email lookup");
+    test("should be case-sensitive for email lookup", async () => {
+      const [createdUser, errorCreateUser] = await userRepository.create({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      // Assert
+      expect(createdUser).toEqual(expect.anything());
+      expect(errorCreateUser).toBeNull();
+
+      const [foundUser, errorFindOneUser] = await userRepository.findOne({
+        email: TEST_USER_EMAIL_UPPERCASE,
+      });
+
+      // Assert
+      expect(foundUser).toBeNull();
+      expect(errorFindOneUser).toBeNull();
+    });
+
     // - Correctness: ensure it's matching the exact email you're searching for, not partial matches
     test.todo("should find user by exact email match");
     // - Error handling: if something goes wrong (like database connection issues), it should return an error following [null, ErrorData] pattern
