@@ -80,9 +80,6 @@ describe("create user", () => {
       email: TEST_USER_EMAIL,
     });
 
-    console.log("foundUser", foundUser);
-    console.log("errorFindOneUser", errorFindOneUser);
-
     // Assert
     expect(foundUser).toBeNull();
     expect(errorFindOneUser).toBeNull();
