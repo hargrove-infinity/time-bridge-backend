@@ -110,13 +110,41 @@ describe("userRepository", () => {
     });
 
     // - Validation: ensure the returned user has _id, email, createdAt, updatedAt (matching UserDocumentWithoutPassword type)
-    test.todo("should return correct user data structure");
-    // - Error handling: if something goes wrong (like database connection issues), it should return an error following [null, ErrorData] pattern
-    test.todo("should handle error when database fails");
+    test("should return correct user data structure", async () => {
+      const [createdUser, errorCreateUser] = await userRepository.create({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      // Assert
+      expect(createdUser).toEqual(expect.anything());
+      expect(errorCreateUser).toBeNull();
+
+      const [foundUser, errorFindOneUser] = await userRepository.findOne({
+        email: TEST_USER_EMAIL,
+      });
+
+      // Assert
+      expect(foundUser).toEqual(expect.anything());
+      expect(errorFindOneUser).toBeNull();
+
+      expectCreatedUser(foundUser);
+
+      expect(mongoose.Types.ObjectId.isValid(foundUser._id)).toBe(true);
+
+      expect(foundUser.email).toEqual(TEST_USER_EMAIL);
+
+      expectValidDate(foundUser.createdAt);
+
+      expectValidDate(foundUser.updatedAt);
+    });
+
     // - Edge case: verify if searching for "TEST@EMAIL.COM" doesn't find "test@email.com" (or define the intended behavior)
     test.todo("should be case-sensitive for email lookup");
     // - Correctness: ensure it's matching the exact email you're searching for, not partial matches
     test.todo("should find user by exact email match");
+    // - Error handling: if something goes wrong (like database connection issues), it should return an error following [null, ErrorData] pattern
+    test.todo("should handle error when database fails");
     // - Error handling: send custom error response instead of raw db error
     test.todo(
       "should handle database errors and return appropriate error data"
