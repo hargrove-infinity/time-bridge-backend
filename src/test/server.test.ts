@@ -1,4 +1,7 @@
+import { envVariables } from "../common";
 import { server } from "../server";
+import { SERVER_TEST_DELAY } from "./constants";
+import { expectServerAddressInfo, sleep } from "./utils";
 
 const spy = jest.spyOn(console, "info");
 
@@ -14,25 +17,16 @@ describe("server.ts", () => {
 
   test("server runs on env port", () => {
     const address = server.address();
-
-    if (address === null) {
-      throw new Error("missing address");
-    }
-
-    if (typeof address === "string") {
-      throw new Error("address is a string");
-    }
-
-    const port = Number(process.env.PORT);
-
+    expectServerAddressInfo(address);
+    const port = Number(envVariables.port);
     expect(address.port).toBe(port);
   });
 
   test("server logs start message", async () => {
-    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await sleep(SERVER_TEST_DELAY);
 
     expect(spy).toHaveBeenCalledWith(
-      `Server is running on port ${process.env.PORT}`
+      `Server is running on port ${envVariables.port}`
     );
   });
 });
