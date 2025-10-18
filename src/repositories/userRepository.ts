@@ -3,7 +3,6 @@ import { ErrorData } from "../errors";
 import {
   CreateUserArgs,
   FindOneUserArgs,
-  UserDocument,
   UserDocumentWithoutPassword,
   UserModel,
 } from "../models";
@@ -22,9 +21,15 @@ async function create(
 
 async function findOne(
   args: FindOneUserArgs
-): Promise<[UserDocument | null, null] | [null, unknown]> {
+): Promise<[UserDocumentWithoutPassword | null, null] | [null, unknown]> {
   try {
     const foundUser = await UserModel.findOne(args);
+
+    if (foundUser) {
+      const { password, ...userWithoutPassword } = foundUser.toObject();
+      return [userWithoutPassword, null];
+    }
+
     return [foundUser, null];
   } catch (error) {
     return [null, error];

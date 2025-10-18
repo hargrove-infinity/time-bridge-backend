@@ -11,6 +11,4 @@ export type UserDocumentWithoutPassword = Omit<UserSchema, "password"> & {
   updatedAt: Date;
 };
 
-export type UserDocument = ReturnType<(typeof UserModel)["hydrate"]>;
-
 export type FindOneUserArgs = Parameters<(typeof UserModel)["findOne"]>[0];

@@ -89,7 +89,26 @@ describe("userRepository", () => {
     });
 
     // - Security/correctness: verify the password field is stripped from the result (following pattern from create)
-    test.todo("should return user without password field");
+    test("should return user without password field", async () => {
+      const [createdUser, errorCreateUser] = await userRepository.create({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      // Assert
+      expect(createdUser).toEqual(expect.anything());
+      expect(errorCreateUser).toBeNull();
+
+      const [foundUser, errorFindOneUser] = await userRepository.findOne({
+        email: TEST_USER_EMAIL,
+      });
+
+      // Assert
+      expect(foundUser).toEqual(expect.anything());
+      expect(errorFindOneUser).toBeNull();
+      expect(foundUser).not.toHaveProperty("password");
+    });
+
     // - Validation: ensure the returned user has _id, email, createdAt, updatedAt (matching UserDocumentWithoutPassword type)
     test.todo("should return correct user data structure");
     // - Error handling: if something goes wrong (like database connection issues), it should return an error following [null, ErrorData] pattern
