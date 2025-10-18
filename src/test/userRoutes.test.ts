@@ -1,8 +1,12 @@
 import httpMocks from "node-mocks-http";
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+import { UserModel } from "../models";
 import { userRoutes } from "../routes";
 import { userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
-import { UserModel } from "../models";
+import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
+import { expectJwtPayload } from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -20,19 +24,30 @@ describe("userRoutes.create", () => {
   test("should call userService.create", async () => {
     const spy = jest.spyOn(userService, "create");
     const request = httpMocks.createRequest({
-      body: { email: "mail@mail.com", password: "password" },
+      body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
     });
     const response = httpMocks.createResponse();
     await userRoutes.create(request, response);
     expect(spy).toHaveBeenCalled();
   });
 
-  // TODO Implement test to check validation input
-  test.todo("validate input");
+  test("should return JWT in response", async () => {
+    const request = httpMocks.createRequest({
+      body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
+    });
+    const response = httpMocks.createResponse();
+    await userRoutes.create(request, response);
 
-  // TODO Implement test to check correctness of output
-  test.todo("check correct output");
+    expect(response.statusCode).toBe(200);
 
-  // TODO Implement test to check correctness of status code
-  test.todo("check correct status code");
+    const data = response._getData();
+
+    expect(typeof data.payload).toBe("string");
+
+    const decoded = jwt.decode(data.payload);
+
+    expectJwtPayload(decoded);
+
+    expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
+  });
 });

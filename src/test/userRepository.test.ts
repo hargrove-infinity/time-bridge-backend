@@ -2,67 +2,54 @@ import mongoose from "mongoose";
 import { UserModel } from "../models";
 import { userRepository } from "../repositories";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
+import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
+import { expectCreatedUser, expectValidDate } from "./utils";
 
-const MOCK_EMAIL = "mail@mail.com";
-const MOCK_PASSWORD = "password";
+beforeAll(async () => {
+  await connectDatabase();
+});
 
-function validateDate(date: NativeDate): boolean {
-  const convertedDate = new Date(date);
-  return !isNaN(convertedDate.getTime());
-}
+beforeEach(async () => {
+  await UserModel.deleteMany({});
+});
+
+afterAll(async () => {
+  await closeConnectionDatabase();
+});
 
 describe("create user", () => {
-  beforeAll(async () => {
-    await connectDatabase();
-  });
-
-  beforeEach(async () => {
-    await UserModel.deleteMany({});
-  });
-
-  afterAll(async () => {
-    await closeConnectionDatabase();
-  });
-
   test("should add a user to the database", async () => {
     const result = await userRepository.create({
-      email: MOCK_EMAIL,
-      password: MOCK_PASSWORD,
+      email: TEST_USER_EMAIL,
+      password: TEST_USER_PASSWORD,
     });
 
-    // Assert
     expect(result).toEqual(expect.anything());
   });
 
   test("should give new users correct email", async () => {
     const [user] = await userRepository.create({
-      email: MOCK_EMAIL,
-      password: MOCK_PASSWORD,
+      email: TEST_USER_EMAIL,
+      password: TEST_USER_PASSWORD,
     });
 
-    // Assert
-    expect(user?.email).toEqual(MOCK_EMAIL);
+    expect(user?.email).toEqual(TEST_USER_EMAIL);
   });
 
   test("should return user", async () => {
     const [createdUser] = await userRepository.create({
-      email: MOCK_EMAIL,
-      password: MOCK_PASSWORD,
+      email: TEST_USER_EMAIL,
+      password: TEST_USER_PASSWORD,
     });
 
-    // Assert
-    expect(createdUser).toEqual(expect.anything());
+    expectCreatedUser(createdUser);
 
-    expect(mongoose.Types.ObjectId.isValid(createdUser?.id)).toBe(true);
+    expect(mongoose.Types.ObjectId.isValid(createdUser._id)).toBe(true);
 
-    expect(createdUser?.email).toEqual(MOCK_EMAIL);
+    expect(createdUser.email).toEqual(TEST_USER_EMAIL);
 
-    if (createdUser) {
-      const validCreatedAt = validateDate(createdUser.createdAt);
-      expect(validCreatedAt).toBe(true);
+    expectValidDate(createdUser.createdAt);
 
-      const validUpdatedAt = validateDate(createdUser.updatedAt);
-      expect(validUpdatedAt).toBe(true);
-    }
+    expectValidDate(createdUser.updatedAt);
   });
 });

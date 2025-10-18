@@ -1,11 +1,7 @@
-import "dotenv/config";
 import mongoose from "mongoose";
+import { envVariables } from "../common";
 
 export async function connectDatabase(): Promise<void> {
-  if (!process.env.URI) {
-    throw new Error("URI is not found in process.env");
-  }
-
   if (mongoose.connection.readyState === 1) {
     return;
   }
@@ -14,7 +10,7 @@ export async function connectDatabase(): Promise<void> {
     return;
   }
 
-  await mongoose.connect(process.env.URI);
+  await mongoose.connect(envVariables.databaseUri);
 }
 
 export async function closeConnectionDatabase(): Promise<void> {
