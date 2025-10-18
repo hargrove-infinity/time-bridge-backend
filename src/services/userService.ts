@@ -38,4 +38,8 @@ async function create(
   return [token, null];
 }
 
-export const userService = { create } as const;
+async function login(args: CreateUserInput) {
+  await userRepository.findOne({ email: args.email });
+}
+
+export const userService = { create, login } as const;

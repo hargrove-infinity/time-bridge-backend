@@ -21,10 +21,12 @@ afterAll(async () => {
 describe("userService.create", () => {
   test("should call userRepository.create", async () => {
     const spy = jest.spyOn(userRepository, "create");
+
     await userService.create({
       email: TEST_USER_EMAIL,
       password: TEST_USER_PASSWORD,
     });
+
     expect(spy).toHaveBeenCalled();
   });
 
@@ -90,5 +92,16 @@ describe("userService.create", () => {
     });
 
     expect(errorVerify).toBe(null);
+  });
+
+  test("should call userRepository.findOne", async () => {
+    const spy = jest.spyOn(userRepository, "findOne");
+
+    await userService.login({
+      email: TEST_USER_EMAIL,
+      password: TEST_USER_PASSWORD,
+    });
+
+    expect(spy).toHaveBeenCalled();
   });
 });
