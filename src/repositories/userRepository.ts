@@ -1,15 +1,15 @@
 import { ERROR_MESSAGES } from "../constants";
+import { ErrorData } from "../errors";
 import {
-  UserInput,
+  CreateUserArgs,
+  FindOneUserArgs,
   UserDocument,
   UserDocumentWithoutPassword,
   UserModel,
-  FindOneUserArgs,
 } from "../models";
-import { ErrorData } from "../errors";
 
 async function create(
-  args: UserInput
+  args: CreateUserArgs
 ): Promise<[UserDocumentWithoutPassword, null] | [null, ErrorData]> {
   try {
     const createdUser = await UserModel.create(args);
