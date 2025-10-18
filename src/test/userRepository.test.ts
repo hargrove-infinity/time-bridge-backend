@@ -4,6 +4,7 @@ import { userRepository } from "../repositories";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import {
   TEST_USER_EMAIL,
+  TEST_USER_EMAIL_PARTIAL,
   TEST_USER_EMAIL_UPPERCASE,
   TEST_USER_PASSWORD,
 } from "./constants";
@@ -173,7 +174,25 @@ describe("userRepository", () => {
     });
 
     // - Correctness: ensure it's matching the exact email you're searching for, not partial matches
-    test.todo("should find user by exact email match");
+    test("should find user by exact email match", async () => {
+      const [createdUser, errorCreateUser] = await userRepository.create({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      // Assert
+      expect(createdUser).toEqual(expect.anything());
+      expect(errorCreateUser).toBeNull();
+
+      const [foundUser, errorFindOneUser] = await userRepository.findOne({
+        email: TEST_USER_EMAIL_PARTIAL,
+      });
+
+      // Assert
+      expect(foundUser).toBeNull();
+      expect(errorFindOneUser).toBeNull();
+    });
+
     // - Error handling: if something goes wrong (like database connection issues), it should return an error following [null, ErrorData] pattern
     test.todo("should handle error when database fails");
     // - Error handling: send custom error response instead of raw db error
