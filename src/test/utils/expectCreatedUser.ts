@@ -1,6 +1,6 @@
 import { TEST_USER_EMAIL } from "../constants";
 
-export function expectToFulfillCreatedUser(data: unknown): asserts data is {
+export function expectCreatedUser(data: unknown): asserts data is {
   email: string;
   _id: object;
   createdAt: object;

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-export function expectToFulfillUserDocument(
+export function expectUserDocument(
   data: unknown
 ): asserts data is mongoose.Document & {
   email: string;

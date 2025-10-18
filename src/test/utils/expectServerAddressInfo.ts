@@ -1,6 +1,4 @@
-export function expectToFulfillServerAddressInfo(
-  data: unknown
-): asserts data is {
+export function expectServerAddressInfo(data: unknown): asserts data is {
   address: string;
   family: string;
   port: number;

@@ -1,6 +1,6 @@
 import { SignTokenResult } from "../../services";
 
-export function expectToFulfillSignTokenResult(
+export function expectSignTokenResult(
   data: SignTokenResult
 ): asserts data is [string, null] {
   const [token, errorSign] = data;

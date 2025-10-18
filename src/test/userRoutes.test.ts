@@ -6,7 +6,7 @@ import { userRoutes } from "../routes";
 import { userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
-import { expectToFulfillJwtPayload } from "./utils";
+import { expectJwtPayload } from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -46,7 +46,7 @@ describe("userRoutes.create", () => {
 
     const decoded = jwt.decode(data.payload);
 
-    expectToFulfillJwtPayload(decoded);
+    expectJwtPayload(decoded);
 
     expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
   });

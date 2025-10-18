@@ -16,7 +16,7 @@ const spyOnUserRoutesCreate = jest.spyOn(userRoutes, "create");
 import { userRouter } from "../routes/userRouter";
 
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
-import { expectToFulfillCreateUserRequest } from "./utils";
+import { expectCreateUserRequest } from "./utils";
 
 let app: Express;
 
@@ -60,6 +60,6 @@ describe("userRouter.create", () => {
   });
 
   test("should respond with confirmation message when correct input is provided", async () => {
-    await expectToFulfillCreateUserRequest(app);
+    await expectCreateUserRequest(app);
   });
 });
