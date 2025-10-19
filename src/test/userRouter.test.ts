@@ -36,30 +36,34 @@ afterAll(async () => {
   await closeConnectionDatabase();
 });
 
-describe("userRouter.create", () => {
-  test("should call validate middleware", async () => {
-    await request(app).post(paths.users.base).send({
-      email: TEST_USER_EMAIL,
-      password: TEST_USER_PASSWORD,
+describe("userRouter", () => {
+  describe("userRouter.create", () => {
+    test("should call validate middleware", async () => {
+      await request(app).post(paths.users.base).send({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+      expect(spyOnValidationMiddleware).toHaveBeenCalled();
     });
-    expect(spyOnValidationMiddleware).toHaveBeenCalled();
+
+    test("should call userRoutes.create", async () => {
+      await request(app)
+        .post(paths.users.base)
+        .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
+      expect(spyOnUserRoutesCreate).toHaveBeenCalled();
+    });
+
+    test("should receive 200 status code", async () => {
+      const response = await request(app)
+        .post(paths.users.base)
+        .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
+      expect(response.status).toBe(200);
+    });
+
+    test("should respond with confirmation message when correct input is provided", async () => {
+      await expectCreateUserRequest(app);
+    });
   });
 
-  test("should call userRoutes.create", async () => {
-    await request(app)
-      .post(paths.users.base)
-      .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
-    expect(spyOnUserRoutesCreate).toHaveBeenCalled();
-  });
-
-  test("should receive 200 status code", async () => {
-    const response = await request(app)
-      .post(paths.users.base)
-      .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
-    expect(response.status).toBe(200);
-  });
-
-  test("should respond with confirmation message when correct input is provided", async () => {
-    await expectCreateUserRequest(app);
-  });
+  describe("userRouter.login", () => {});
 });
