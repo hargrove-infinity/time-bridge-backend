@@ -1,6 +1,10 @@
 import httpMocks from "node-mocks-http";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
+import {
+  DEFAULT_EXPIRES_IN_TOKEN_NUMBER,
+  ONE_HOUR_IN_SECONDS,
+} from "../constants";
 import { UserModel } from "../models";
 import { userRoutes } from "../routes";
 import { userService } from "../services";
@@ -101,7 +105,47 @@ describe("userRoutes", () => {
       expect(mongoose.Types.ObjectId.isValid(decodedLoginUser._id)).toBe(true);
     });
 
-    test.todo("should return a JWT token with with correct expiration time");
+    test("should return a JWT token with with correct expiration time", async () => {
+      const requestCreateUser = httpMocks.createRequest({
+        body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
+      });
+      const responseCreateUser = httpMocks.createResponse();
+      await userRoutes.create(requestCreateUser, responseCreateUser);
+
+      expect(responseCreateUser.statusCode).toBe(200);
+
+      const dataCreateUser = responseCreateUser._getData();
+
+      expect(typeof dataCreateUser.payload).toBe("string");
+
+      const decodedCreateUser = jwt.decode(dataCreateUser.payload);
+
+      expectJwtPayload(decodedCreateUser);
+
+      expect(mongoose.Types.ObjectId.isValid(decodedCreateUser._id)).toBe(true);
+
+      const requestLoginUser = httpMocks.createRequest({
+        body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
+      });
+      const responseLoginUser = httpMocks.createResponse();
+      await userRoutes.login(requestLoginUser, responseLoginUser);
+
+      expect(responseLoginUser.statusCode).toBe(200);
+
+      const dataLoginUser = responseLoginUser._getData();
+
+      expect(typeof dataLoginUser.payload).toBe("string");
+
+      const decodedLoginUser = jwt.decode(dataLoginUser.payload);
+
+      expectJwtPayload(decodedLoginUser);
+
+      expect(mongoose.Types.ObjectId.isValid(decodedLoginUser._id)).toBe(true);
+
+      const expiresInHrs =
+        (decodedLoginUser.exp - decodedLoginUser.iat) / ONE_HOUR_IN_SECONDS;
+      expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);
+    });
 
     test.todo("should return 200 status code on successful login");
 
