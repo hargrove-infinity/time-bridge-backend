@@ -1,7 +1,11 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { ERROR_MESSAGES } from "../constants";
+import {
+  DEFAULT_EXPIRES_IN_TOKEN_NUMBER,
+  ERROR_MESSAGES,
+  ONE_HOUR_IN_SECONDS,
+} from "../constants";
 import { UserModel } from "../models";
 import { userRepository } from "../repositories";
 import { jwtService, userService } from "../services";
@@ -177,7 +181,33 @@ describe("userService", () => {
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
     });
 
-    test.todo("should return a JWT token with correct expiration time");
+    test("should return a JWT token with correct expiration time", async () => {
+      const [tokenCreateUser, errorCreateUser] = await userService.create({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      expect(errorCreateUser).toBe(null);
+
+      expectTokenString(tokenCreateUser);
+
+      const resultUserLogin = await userService.login({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      expectSignTokenResult(resultUserLogin);
+      const [token] = resultUserLogin;
+      const decoded = jwt.decode(token);
+
+      expectJwtPayload(decoded);
+
+      expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
+
+      const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
+      expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);
+    });
+
     test.todo(
       "should ensure password comparison function is called with correct arguments"
     );
