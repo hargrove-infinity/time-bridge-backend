@@ -22,6 +22,7 @@ export const ERROR_MESSAGES = {
   // USER LOGIN
   USER_EMAIL_NOT_EXIST: "User with provided email does not exist",
   USER_PASSWORD_WRONG: "Provided password is wrong",
+  USER_LOGIN_SERVICE: "Some error occurred in user login service",
 
   // JWT
   ERROR_SIGNING_TOKEN: "Error during signing token",

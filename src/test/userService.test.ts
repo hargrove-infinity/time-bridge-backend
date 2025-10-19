@@ -1,4 +1,6 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import { ERROR_MESSAGES } from "../constants";
 import { UserModel } from "../models";
 import { userRepository } from "../repositories";
@@ -9,7 +11,12 @@ import {
   TEST_USER_EMAIL,
   TEST_USER_PASSWORD,
 } from "./constants";
-import { expectTokenString, expectUserDocument } from "./utils";
+import {
+  expectJwtPayload,
+  expectSignTokenResult,
+  expectTokenString,
+  expectUserDocument,
+} from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -146,8 +153,30 @@ describe("userService", () => {
       });
     });
 
-    test.todo("should return a JWT token when email and password are valid");
-    test.todo("should return a JWT token with correct payload (userId, email)");
+    test("should return a JWT token with correct payload", async () => {
+      const [tokenCreateUser, errorCreateUser] = await userService.create({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      expect(errorCreateUser).toBe(null);
+
+      expectTokenString(tokenCreateUser);
+
+      const resultUserLogin = await userService.login({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      expectSignTokenResult(resultUserLogin);
+      const [token] = resultUserLogin;
+      const decoded = jwt.decode(token);
+
+      expectJwtPayload(decoded);
+
+      expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
+    });
+
     test.todo("should return a JWT token with correct expiration time");
     test.todo(
       "should ensure password comparison function is called with correct arguments"

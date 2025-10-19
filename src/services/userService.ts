@@ -62,7 +62,19 @@ async function login(
     return [null, { errors: [ERROR_MESSAGES.USER_PASSWORD_WRONG] }];
   }
 
-  return ["token", null];
+  const [token, errorSignToken] = jwtService.sign({
+    payload: { _id: foundUser._id, email: foundUser.email },
+    options: {
+      algorithm: DEFAULT_ALGORITHM_TOKEN,
+      expiresIn: DEFAULT_EXPIRES_IN_TOKEN_STRING,
+    },
+  });
+
+  if (errorSignToken) {
+    return [null, { errors: [ERROR_MESSAGES.USER_LOGIN_SERVICE] }];
+  }
+
+  return [token, null];
 }
 
 export const userService = { create, login } as const;
