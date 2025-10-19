@@ -53,11 +53,17 @@ describe("userRoutes", () => {
     });
   });
   describe("userRoutes.login", () => {
-    test.todo("should call userService.login");
+    test("should call userService.login", async () => {
+      const spy = jest.spyOn(userService, "login");
+      const request = httpMocks.createRequest({
+        body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
+      });
+      const response = httpMocks.createResponse();
+      await userRoutes.login(request, response);
+      expect(spy).toHaveBeenCalled();
+    });
 
-    test.todo(
-      "should return a JWT token with correct payload in response when credentials are valid"
-    );
+    test.todo("should return a JWT token with correct payload");
 
     test.todo("should return a JWT token with with correct expiration time");
 

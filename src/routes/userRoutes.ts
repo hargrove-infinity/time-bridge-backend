@@ -19,4 +19,13 @@ async function create(
   res.status(200).send({ payload: token });
 }
 
-export const userRoutes = { create } as const;
+async function login(
+  req: Request<{}, {}, CreateUserInput>,
+  res: Response
+): Promise<void> {
+  const { body } = req;
+
+  await userService.login(body);
+}
+
+export const userRoutes = { create, login } as const;
