@@ -84,5 +84,17 @@ describe("userRouter", () => {
 
       expect(spyOnUserRoutesLogin).toHaveBeenCalled();
     });
+
+    test("should receive 200 status code", async () => {
+      const responseCreateUser = await request(app)
+        .post(paths.users.base)
+        .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
+      expect(responseCreateUser.status).toBe(200);
+
+      const responseLoginUser = await request(app)
+        .post(`${paths.users.base}${paths.users.login}`)
+        .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
+      expect(responseLoginUser.status).toBe(200);
+    });
   });
 });
