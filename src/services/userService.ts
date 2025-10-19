@@ -53,6 +53,15 @@ async function login(
     return [null, { errors: [ERROR_MESSAGES.USER_EMAIL_NOT_EXIST] }];
   }
 
+  const isPasswordsMatched = await bcrypt.compare(
+    args.password,
+    foundUser.password
+  );
+
+  if (!isPasswordsMatched) {
+    return [null, { errors: [ERROR_MESSAGES.USER_PASSWORD_WRONG] }];
+  }
+
   return ["token", null];
 }
 

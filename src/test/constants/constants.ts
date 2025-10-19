@@ -5,4 +5,5 @@ export const TEST_USER_EMAIL = "mail@mail.com";
 export const TEST_USER_EMAIL_UPPERCASE = "MAIL@MAIL.COM";
 export const TEST_USER_EMAIL_PARTIAL = "mail@mail";
 export const TEST_USER_PASSWORD = "password";
+export const TEST_USER_ALTERNATIVE_PASSWORD = "password1";
 export const TEST_USER_ID_STRING = "68ebd190b3622e4aa75ca9b0";

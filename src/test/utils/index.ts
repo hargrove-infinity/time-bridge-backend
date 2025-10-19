@@ -1,5 +1,6 @@
+export * from "./expectCreatedUserWithPassword";
+export * from "./expectCreatedUserWithoutPassword";
 export * from "./expectCreateUserRequest";
-export * from "./expectCreatedUser";
 export * from "./expectJwtPayload";
 export * from "./expectServerAddressInfo";
 export * from "./expectSignTokenResult";

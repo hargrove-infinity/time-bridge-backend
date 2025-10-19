@@ -8,7 +8,11 @@ import {
   TEST_USER_EMAIL_UPPERCASE,
   TEST_USER_PASSWORD,
 } from "./constants";
-import { expectCreatedUser, expectValidDate } from "./utils";
+import {
+  expectCreatedUserWithPassword,
+  expectCreatedUserWithoutPassword,
+  expectValidDate,
+} from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -57,7 +61,7 @@ describe("userRepository", () => {
       expect(createdUser).toEqual(expect.anything());
       expect(errorCreateUser).toBeNull();
 
-      expectCreatedUser(createdUser);
+      expectCreatedUserWithoutPassword(createdUser);
 
       expect(mongoose.Types.ObjectId.isValid(createdUser._id)).toBe(true);
 
@@ -102,27 +106,6 @@ describe("userRepository", () => {
       expect(errorFindOneUser).toBeNull();
     });
 
-    // - Security/correctness: verify the password field is stripped from the result (following pattern from create)
-    test("should return user without password field", async () => {
-      const [createdUser, errorCreateUser] = await userRepository.create({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      // Assert
-      expect(createdUser).toEqual(expect.anything());
-      expect(errorCreateUser).toBeNull();
-
-      const [foundUser, errorFindOneUser] = await userRepository.findOne({
-        email: TEST_USER_EMAIL,
-      });
-
-      // Assert
-      expect(foundUser).toEqual(expect.anything());
-      expect(errorFindOneUser).toBeNull();
-      expect(foundUser).not.toHaveProperty("password");
-    });
-
     // - Validation: ensure the returned user has _id, email, createdAt, updatedAt (matching UserDocumentWithoutPassword type)
     test("should return correct user data structure", async () => {
       const [createdUser, errorCreateUser] = await userRepository.create({
@@ -142,7 +125,7 @@ describe("userRepository", () => {
       expect(foundUser).toEqual(expect.anything());
       expect(errorFindOneUser).toBeNull();
 
-      expectCreatedUser(foundUser);
+      expectCreatedUserWithPassword(foundUser);
 
       expect(mongoose.Types.ObjectId.isValid(foundUser._id)).toBe(true);
 

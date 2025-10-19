@@ -4,7 +4,11 @@ import { UserModel } from "../models";
 import { userRepository } from "../repositories";
 import { jwtService, userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
-import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
+import {
+  TEST_USER_ALTERNATIVE_PASSWORD,
+  TEST_USER_EMAIL,
+  TEST_USER_PASSWORD,
+} from "./constants";
 import { expectTokenString, expectUserDocument } from "./utils";
 
 beforeAll(async () => {
@@ -121,7 +125,27 @@ describe("userService", () => {
       });
     });
 
-    test.todo("should throw an error when password is incorrect");
+    test("should throw an error when password is incorrect", async () => {
+      const [tokenCreateUser, errorCreateUser] = await userService.create({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      expect(errorCreateUser).toBe(null);
+
+      expectTokenString(tokenCreateUser);
+
+      const [tokenLoginUser, errorLoginUser] = await userService.login({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_ALTERNATIVE_PASSWORD,
+      });
+
+      expect(tokenLoginUser).toBeNull();
+      expect(errorLoginUser).toEqual({
+        errors: [ERROR_MESSAGES.USER_PASSWORD_WRONG],
+      });
+    });
+
     test.todo("should return a JWT token when email and password are valid");
     test.todo("should return a JWT token with correct payload (userId, email)");
     test.todo("should return a JWT token with correct expiration time");

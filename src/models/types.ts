@@ -5,6 +5,8 @@ type UserSchema = InferSchemaType<typeof userSchema>;
 
 export type CreateUserArgs = Pick<UserSchema, "email" | "password">;
 
+export type UserDocument = ReturnType<(typeof UserModel)["hydrate"]>;
+
 export type UserDocumentWithoutPassword = Omit<UserSchema, "password"> & {
   _id: mongoose.Types.ObjectId;
   createdAt: Date;
