@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import { ERROR_MESSAGES } from "../constants";
 import { UserModel } from "../models";
 import { userRepository } from "../repositories";
 import { jwtService, userService } from "../services";
@@ -107,5 +108,25 @@ describe("userService", () => {
 
       expect(spy).toHaveBeenCalled();
     });
+
+    test("should throw an error when email does not exist", async () => {
+      const [token, errorLoginUser] = await userService.login({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      expect(token).toBeNull();
+      expect(errorLoginUser).toEqual({
+        errors: [ERROR_MESSAGES.USER_EMAIL_NOT_EXIST],
+      });
+    });
+
+    test.todo("should throw an error when password is incorrect");
+    test.todo("should return a JWT token when email and password are valid");
+    test.todo("should return a JWT token with correct payload (userId, email)");
+    test.todo("should return a JWT token with correct expiration time");
+    test.todo(
+      "should ensure password comparison function is called with correct arguments"
+    );
   });
 });

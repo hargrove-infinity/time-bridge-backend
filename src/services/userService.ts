@@ -38,8 +38,22 @@ async function create(
   return [token, null];
 }
 
-async function login(args: CreateUserInput) {
-  await userRepository.findOne({ email: args.email });
+async function login(
+  args: CreateUserInput
+): Promise<[string, null] | [null, ErrorData]> {
+  const [foundUser, errorFindUser] = await userRepository.findOne({
+    email: args.email,
+  });
+
+  if (errorFindUser) {
+    return [null, { errors: [ERROR_MESSAGES.INTERNAL_SERVER_ERROR] }];
+  }
+
+  if (!foundUser) {
+    return [null, { errors: [ERROR_MESSAGES.USER_EMAIL_NOT_EXIST] }];
+  }
+
+  return ["token", null];
 }
 
 export const userService = { create, login } as const;

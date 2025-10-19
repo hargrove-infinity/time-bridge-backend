@@ -24,4 +24,8 @@ export const ERROR_MESSAGES = {
   EXPIRES_IN_LESS_THAN_ONE: "expiresIn must be greater than 1 or 1",
   EXPIRES_IN_NEGATIVE: "expiresIn can't be negative",
   TOKEN_EXPIRED: "Token has been expired",
+  // LOGIN
+  USER_EMAIL_NOT_EXIST: "User with provided email does not exist",
+  // MISC
+  INTERNAL_SERVER_ERROR: "Internal server error",
 };
