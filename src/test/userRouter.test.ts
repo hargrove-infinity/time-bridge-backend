@@ -10,8 +10,11 @@ const spyOnValidationMiddleware = jest.spyOn(middlewares, "validate");
 
 // Import and spy on userRoutes.create
 import { userRoutes } from "../routes/userRoutes";
+
 // Create the spy at module level, BEFORE userRouter is imported
 const spyOnUserRoutesCreate = jest.spyOn(userRoutes, "create");
+const spyOnUserRoutesLogin = jest.spyOn(userRoutes, "login");
+
 // Import userRouter AFTER creating a spy
 import { userRouter } from "../routes/userRouter";
 
@@ -65,5 +68,21 @@ describe("userRouter", () => {
     });
   });
 
-  describe("userRouter.login", () => {});
+  describe("userRouter.login", () => {
+    test("should call validate middleware", async () => {
+      await request(app).post(paths.users.login).send({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+      expect(spyOnValidationMiddleware).toHaveBeenCalled();
+    });
+
+    test("should call userRoutes.login", async () => {
+      await request(app)
+        .post(`${paths.users.base}${paths.users.login}`)
+        .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
+
+      expect(spyOnUserRoutesLogin).toHaveBeenCalled();
+    });
+  });
 });
