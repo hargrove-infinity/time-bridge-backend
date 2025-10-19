@@ -25,7 +25,14 @@ async function login(
 ): Promise<void> {
   const { body } = req;
 
-  await userService.login(body);
+  const [token, error] = await userService.login(body);
+
+  if (error) {
+    res.status(400).send({ errors: [ERROR_MESSAGES.USER_LOGIN_ROUTE] });
+    return;
+  }
+
+  res.status(200).send({ payload: token });
 }
 
 export const userRoutes = { create, login } as const;
