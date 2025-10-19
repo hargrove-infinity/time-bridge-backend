@@ -10,7 +10,11 @@ import { UserModel } from "../models";
 import { userRoutes } from "../routes";
 import { userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
-import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
+import {
+  TEST_USER_ALTERNATIVE_PASSWORD,
+  TEST_USER_EMAIL,
+  TEST_USER_PASSWORD,
+} from "./constants";
 import { expectJwtPayload } from "./utils";
 
 beforeAll(async () => {
@@ -164,6 +168,41 @@ describe("userRoutes", () => {
       });
     });
 
-    test.todo("should return error message when password is incorrect");
+    test("should return error message when password is incorrect", async () => {
+      const requestCreateUser = httpMocks.createRequest({
+        body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
+      });
+      const responseCreateUser = httpMocks.createResponse();
+      await userRoutes.create(requestCreateUser, responseCreateUser);
+
+      expect(responseCreateUser.statusCode).toBe(200);
+
+      const dataCreateUser = responseCreateUser._getData();
+
+      expect(typeof dataCreateUser.payload).toBe("string");
+
+      const decodedCreateUser = jwt.decode(dataCreateUser.payload);
+
+      expectJwtPayload(decodedCreateUser);
+
+      expect(mongoose.Types.ObjectId.isValid(decodedCreateUser._id)).toBe(true);
+
+      const requestLoginUser = httpMocks.createRequest({
+        body: {
+          email: TEST_USER_EMAIL,
+          password: TEST_USER_ALTERNATIVE_PASSWORD,
+        },
+      });
+      const responseLoginUser = httpMocks.createResponse();
+      await userRoutes.login(requestLoginUser, responseLoginUser);
+
+      expect(responseLoginUser.statusCode).toBe(400);
+
+      const dataLoginUser = responseLoginUser._getData();
+
+      expect(dataLoginUser).toEqual({
+        errors: [ERROR_MESSAGES.USER_PASSWORD_WRONG],
+      });
+    });
   });
 });
