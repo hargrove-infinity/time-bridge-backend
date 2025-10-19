@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import {
   DEFAULT_EXPIRES_IN_TOKEN_NUMBER,
+  ERROR_MESSAGES,
   ONE_HOUR_IN_SECONDS,
 } from "../constants";
 import { UserModel } from "../models";
@@ -147,14 +148,22 @@ describe("userRoutes", () => {
       expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);
     });
 
-    test.todo("should return 200 status code on successful login");
+    test("should return error message when email does not exist", async () => {
+      const requestLoginUser = httpMocks.createRequest({
+        body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
+      });
+      const responseLoginUser = httpMocks.createResponse();
+      await userRoutes.login(requestLoginUser, responseLoginUser);
 
-    test.todo("should return error message when email does not exist");
+      expect(responseLoginUser.statusCode).toBe(400);
 
-    test.todo("should return 400 status code when email does not exist");
+      const dataLoginUser = responseLoginUser._getData();
+
+      expect(dataLoginUser).toEqual({
+        errors: [ERROR_MESSAGES.USER_EMAIL_NOT_EXIST],
+      });
+    });
 
     test.todo("should return error message when password is incorrect");
-
-    test.todo("should return 400 status code when password is incorrect");
   });
 });

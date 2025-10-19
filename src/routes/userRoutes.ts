@@ -12,7 +12,7 @@ async function create(
   const [token, error] = await userService.create(body);
 
   if (error) {
-    res.status(400).send({ errors: [ERROR_MESSAGES.USER_CREATE_ROUTE] });
+    res.status(400).send(error);
     return;
   }
 
@@ -28,7 +28,7 @@ async function login(
   const [token, error] = await userService.login(body);
 
   if (error) {
-    res.status(400).send({ errors: [ERROR_MESSAGES.USER_LOGIN_ROUTE] });
+    res.status(400).send(error);
     return;
   }
 
