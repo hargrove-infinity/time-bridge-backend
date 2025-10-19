@@ -20,34 +20,55 @@ afterAll(async () => {
   await closeConnectionDatabase();
 });
 
-describe("userRoutes.create", () => {
-  test("should call userService.create", async () => {
-    const spy = jest.spyOn(userService, "create");
-    const request = httpMocks.createRequest({
-      body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
+describe("userRoutes", () => {
+  describe("userRoutes.create", () => {
+    test("should call userService.create", async () => {
+      const spy = jest.spyOn(userService, "create");
+      const request = httpMocks.createRequest({
+        body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
+      });
+      const response = httpMocks.createResponse();
+      await userRoutes.create(request, response);
+      expect(spy).toHaveBeenCalled();
     });
-    const response = httpMocks.createResponse();
-    await userRoutes.create(request, response);
-    expect(spy).toHaveBeenCalled();
+
+    test("should return JWT in response", async () => {
+      const request = httpMocks.createRequest({
+        body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
+      });
+      const response = httpMocks.createResponse();
+      await userRoutes.create(request, response);
+
+      expect(response.statusCode).toBe(200);
+
+      const data = response._getData();
+
+      expect(typeof data.payload).toBe("string");
+
+      const decoded = jwt.decode(data.payload);
+
+      expectJwtPayload(decoded);
+
+      expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
+    });
   });
+  describe("userRoutes.login", () => {
+    test.todo("should call userService.login");
 
-  test("should return JWT in response", async () => {
-    const request = httpMocks.createRequest({
-      body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
-    });
-    const response = httpMocks.createResponse();
-    await userRoutes.create(request, response);
+    test.todo(
+      "should return a JWT token with correct payload in response when credentials are valid"
+    );
 
-    expect(response.statusCode).toBe(200);
+    test.todo("should return a JWT token with with correct expiration time");
 
-    const data = response._getData();
+    test.todo("should return 200 status code on successful login");
 
-    expect(typeof data.payload).toBe("string");
+    test.todo("should return error message when email does not exist");
 
-    const decoded = jwt.decode(data.payload);
+    test.todo("should return 400 status code when email does not exist");
 
-    expectJwtPayload(decoded);
+    test.todo("should return error message when password is incorrect");
 
-    expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
+    test.todo("should return 400 status code when password is incorrect");
   });
 });
