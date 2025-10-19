@@ -1,4 +1,6 @@
 import express, { Express } from "express";
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 import request from "supertest";
 import { paths } from "../constants";
 import { UserModel } from "../models";
@@ -19,7 +21,7 @@ const spyOnUserRoutesLogin = jest.spyOn(userRoutes, "login");
 import { userRouter } from "../routes/userRouter";
 
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
-import { expectCreateUserRequest } from "./utils";
+import { expectCreateUserRequest, expectJwtPayload } from "./utils";
 
 let app: Express;
 
@@ -63,7 +65,7 @@ describe("userRouter", () => {
       expect(response.status).toBe(200);
     });
 
-    test("should respond with confirmation message when correct input is provided", async () => {
+    test("should respond with correct payload", async () => {
       await expectCreateUserRequest(app);
     });
   });
@@ -95,6 +97,25 @@ describe("userRouter", () => {
         .post(`${paths.users.base}${paths.users.login}`)
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
       expect(responseLoginUser.status).toBe(200);
+    });
+
+    test("should respond with correct payload", async () => {
+      await expectCreateUserRequest(app);
+
+      const response = await request(app)
+        .post(`${paths.users.base}${paths.users.login}`)
+        .send({
+          email: TEST_USER_EMAIL,
+          password: TEST_USER_PASSWORD,
+        });
+
+      expect(response.body).toStrictEqual({ payload: expect.any(String) });
+
+      const decoded = jwt.decode(response.body.payload);
+
+      expectJwtPayload(decoded);
+
+      expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
     });
   });
 });
