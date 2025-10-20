@@ -38,52 +38,37 @@ describe("userRepository", () => {
 
     test("should return user", async () => {
       const createdUser = await expectCreateUserInDb();
-
       expect(mongoose.Types.ObjectId.isValid(createdUser._id)).toBe(true);
-
       expect(createdUser.email).toEqual(TEST_USER_EMAIL);
-
       expectValidDate(createdUser.createdAt);
-
       expectValidDate(createdUser.updatedAt);
     });
   });
 
   describe("userRepository.findOne", () => {
-    // Login
-    // - Happy path: find a user that definitely exists in the database
     test("should return user when email exists", async () => {
       await expectCreateUserInDb();
       await expectFindOneUserInDb();
     });
 
-    // - Edge case: searching for a user that was never created
     test("should return null when user with given email does not exist", async () => {
       const [foundUser, errorFindOneUser] = await userRepository.findOne({
         email: TEST_USER_EMAIL,
       });
 
-      // Assert
       expect(foundUser).toBeNull();
       expect(errorFindOneUser).toBeNull();
     });
 
-    // - Validation: ensure the returned user has _id, email, createdAt, updatedAt (matching UserDocumentWithoutPassword type)
     test("should return correct user data structure", async () => {
       await expectCreateUserInDb();
-
       const foundUser = await expectFindOneUserInDb();
-
       expect(mongoose.Types.ObjectId.isValid(foundUser._id)).toBe(true);
-
       expect(foundUser.email).toEqual(TEST_USER_EMAIL);
-
       expectValidDate(foundUser.createdAt);
-
       expectValidDate(foundUser.updatedAt);
     });
 
-    // - Edge case: verify if searching for "TEST@EMAIL.COM" doesn't find "test@email.com" (or define the intended behavior)
     test("should be case-sensitive for email lookup", async () => {
       await expectCreateUserInDb();
 
@@ -91,12 +76,10 @@ describe("userRepository", () => {
         email: TEST_USER_EMAIL_UPPERCASE,
       });
 
-      // Assert
       expect(foundUser).toBeNull();
       expect(errorFindOneUser).toBeNull();
     });
 
-    // - Correctness: ensure it's matching the exact email you're searching for, not partial matches
     test("should find user by exact email match", async () => {
       await expectCreateUserInDb();
 
@@ -104,7 +87,6 @@ describe("userRepository", () => {
         email: TEST_USER_EMAIL_PARTIAL,
       });
 
-      // Assert
       expect(foundUser).toBeNull();
       expect(errorFindOneUser).toBeNull();
     });
