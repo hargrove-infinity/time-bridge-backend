@@ -76,7 +76,7 @@ describe("userRouter", () => {
 
   describe("userRouter.login", () => {
     test("should call validate middleware", async () => {
-      await request(app).post(paths.users.login).send({
+      await request(app).post(`${paths.users.base}${paths.users.login}`).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
