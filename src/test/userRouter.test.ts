@@ -20,7 +20,11 @@ const spyOnUserRoutesLogin = jest.spyOn(userRoutes, "login");
 // Import userRouter AFTER creating a spy
 import { userRouter } from "../routes/userRouter";
 
-import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
+import {
+  TEST_USER_ALTERNATIVE_PASSWORD,
+  TEST_USER_EMAIL,
+  TEST_USER_PASSWORD,
+} from "./constants";
 import { expectCreateUserRequest, expectJwtPayload } from "./utils";
 
 let app: Express;
@@ -133,6 +137,20 @@ describe("userRouter", () => {
       });
     });
 
-    test.todo("should return 400 when password is incorrect");
+    test("should return 400 when password is incorrect", async () => {
+      await expectCreateUserRequest(app);
+
+      const response = await request(app)
+        .post(`${paths.users.base}${paths.users.login}`)
+        .send({
+          email: TEST_USER_EMAIL,
+          password: TEST_USER_ALTERNATIVE_PASSWORD,
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        errors: [ERROR_MESSAGES.USER_PASSWORD_WRONG],
+      });
+    });
   });
 });
