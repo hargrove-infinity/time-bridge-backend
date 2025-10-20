@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import {
   DEFAULT_EXPIRES_IN_TOKEN_NUMBER,
@@ -17,10 +16,9 @@ import {
 } from "./constants";
 import {
   expectCreateUserInService,
-  expectJwtPayload,
-  expectSignTokenResult,
   expectTokenString,
   expectUserDocument,
+  expectUserServiceLoginReturnsValidJwt,
 } from "./utils";
 
 beforeAll(async () => {
@@ -153,37 +151,14 @@ describe("userService", () => {
 
     test("should return a JWT token with correct payload", async () => {
       await expectCreateUserInService();
-
-      const resultUserLogin = await userService.login({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      expectSignTokenResult(resultUserLogin);
-      const [token] = resultUserLogin;
-      const decoded = jwt.decode(token);
-
-      expectJwtPayload(decoded);
-
+      const decoded = await expectUserServiceLoginReturnsValidJwt();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
     });
 
     test("should return a JWT token with correct expiration time", async () => {
       await expectCreateUserInService();
-
-      const resultUserLogin = await userService.login({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      expectSignTokenResult(resultUserLogin);
-      const [token] = resultUserLogin;
-      const decoded = jwt.decode(token);
-
-      expectJwtPayload(decoded);
-
+      const decoded = await expectUserServiceLoginReturnsValidJwt();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
-
       const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
       expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);
     });

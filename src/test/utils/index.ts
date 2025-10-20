@@ -9,6 +9,7 @@ export * from "./expectServerAddressInfo";
 export * from "./expectSignTokenResult";
 export * from "./expectTokenString";
 export * from "./expectUserDocument";
+export * from "./expectUserServiceLoginReturnsValidJwt";
 export * from "./expectValidDate";
 export * from "./signTestJwt";
 export * from "./sleep";
