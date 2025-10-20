@@ -18,7 +18,7 @@ import {
   expectCreateUserInService,
   expectTokenString,
   expectUserDocument,
-  expectUserServiceLoginReturnsValidJwt,
+  expectLoginUserServiceReturnsValidJwt,
 } from "./utils";
 
 beforeAll(async () => {
@@ -151,13 +151,13 @@ describe("userService", () => {
 
     test("should return a JWT token with correct payload", async () => {
       await expectCreateUserInService();
-      const decoded = await expectUserServiceLoginReturnsValidJwt();
+      const decoded = await expectLoginUserServiceReturnsValidJwt();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
     });
 
     test("should return a JWT token with correct expiration time", async () => {
       await expectCreateUserInService();
-      const decoded = await expectUserServiceLoginReturnsValidJwt();
+      const decoded = await expectLoginUserServiceReturnsValidJwt();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
       const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
       expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);

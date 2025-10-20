@@ -4,7 +4,7 @@ import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "../constants";
 import { expectSignTokenResult } from "./expectSignTokenResult";
 import { expectJwtPayload } from "./expectJwtPayload";
 
-export async function expectUserServiceLoginReturnsValidJwt(): Promise<{
+export async function expectLoginUserServiceReturnsValidJwt(): Promise<{
   _id: string;
   email: string;
   iat: number;
