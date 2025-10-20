@@ -8,10 +8,9 @@ import {
   TEST_USER_EMAIL_UPPERCASE,
 } from "./constants";
 import {
-  expectCreatedUserWithPassword,
-  expectCreatedUserWithoutPassword,
   expectValidDate,
   expectCreateUserInDb,
+  expectFindOneUserInDb,
 } from "./utils";
 
 beforeAll(async () => {
@@ -40,8 +39,6 @@ describe("userRepository", () => {
     test("should return user", async () => {
       const createdUser = await expectCreateUserInDb();
 
-      expectCreatedUserWithoutPassword(createdUser);
-
       expect(mongoose.Types.ObjectId.isValid(createdUser._id)).toBe(true);
 
       expect(createdUser.email).toEqual(TEST_USER_EMAIL);
@@ -57,14 +54,7 @@ describe("userRepository", () => {
     // - Happy path: find a user that definitely exists in the database
     test("should return user when email exists", async () => {
       await expectCreateUserInDb();
-
-      const [foundUser, errorFindOneUser] = await userRepository.findOne({
-        email: TEST_USER_EMAIL,
-      });
-
-      // Assert
-      expect(foundUser).toEqual(expect.anything());
-      expect(errorFindOneUser).toBeNull();
+      await expectFindOneUserInDb();
     });
 
     // - Edge case: searching for a user that was never created
@@ -82,15 +72,7 @@ describe("userRepository", () => {
     test("should return correct user data structure", async () => {
       await expectCreateUserInDb();
 
-      const [foundUser, errorFindOneUser] = await userRepository.findOne({
-        email: TEST_USER_EMAIL,
-      });
-
-      // Assert
-      expect(foundUser).toEqual(expect.anything());
-      expect(errorFindOneUser).toBeNull();
-
-      expectCreatedUserWithPassword(foundUser?.toObject());
+      const foundUser = await expectFindOneUserInDb();
 
       expect(mongoose.Types.ObjectId.isValid(foundUser._id)).toBe(true);
 
