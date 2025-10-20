@@ -2,7 +2,7 @@ import express, { Express } from "express";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import request from "supertest";
-import { paths } from "../constants";
+import { ERROR_MESSAGES, paths } from "../constants";
 import { UserModel } from "../models";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 
@@ -109,6 +109,7 @@ describe("userRouter", () => {
           password: TEST_USER_PASSWORD,
         });
 
+      expect(response.status).toBe(200);
       expect(response.body).toStrictEqual({ payload: expect.any(String) });
 
       const decoded = jwt.decode(response.body.payload);
@@ -118,7 +119,19 @@ describe("userRouter", () => {
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
     });
 
-    test.todo("should return 400 when email does not exist");
+    test("should return 400 when email does not exist", async () => {
+      const response = await request(app)
+        .post(`${paths.users.base}${paths.users.login}`)
+        .send({
+          email: TEST_USER_EMAIL,
+          password: TEST_USER_PASSWORD,
+        });
+
+      expect(response.status).toBe(400);
+      expect(response.body).toEqual({
+        errors: [ERROR_MESSAGES.USER_EMAIL_NOT_EXIST],
+      });
+    });
 
     test.todo("should return 400 when password is incorrect");
   });
