@@ -91,13 +91,6 @@ describe("userRepository", () => {
       expect(errorFindOneUser).toBeNull();
     });
 
-    // - Error handling: if something goes wrong (like database connection issues), it should return an error following [null, ErrorData] pattern
-    test.todo("should handle error when database fails");
-    // - Error handling: send custom error response instead of raw db error
-    test.todo(
-      "should handle database errors and return appropriate error data"
-    );
-    //- Correctness: ensure that calling findOne is a pure read operation — it shouldn’t alter existing users or insert new ones
     test.todo("should not modify or create any new user in the database");
   });
 });

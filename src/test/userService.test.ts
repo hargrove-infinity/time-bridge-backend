@@ -162,9 +162,5 @@ describe("userService", () => {
       const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
       expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);
     });
-
-    test.todo(
-      "should ensure password comparison function is called with correct arguments"
-    );
   });
 });
