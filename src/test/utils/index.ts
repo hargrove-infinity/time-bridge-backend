@@ -6,6 +6,7 @@ export * from "./expectCreateUserRequest";
 export * from "./expectCreateUserRouteReturnsValidJwt";
 export * from "./expectFindOneUserInDb";
 export * from "./expectJwtPayload";
+export * from "./expectLoginUserRouteReturnsValidJwt";
 export * from "./expectLoginUserServiceReturnsValidJwt";
 export * from "./expectServerAddressInfo";
 export * from "./expectSignTokenResult";
