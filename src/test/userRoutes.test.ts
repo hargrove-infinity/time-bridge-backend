@@ -15,7 +15,10 @@ import {
   TEST_USER_EMAIL,
   TEST_USER_PASSWORD,
 } from "./constants";
-import { expectJwtPayload, expectUserRouteLoginReturnsValidJwt } from "./utils";
+import {
+  expectJwtPayload,
+  expectCreateUserRouteReturnsValidJwt,
+} from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -73,7 +76,7 @@ describe("userRoutes", () => {
     });
 
     test("should return a JWT token with correct payload", async () => {
-      await expectUserRouteLoginReturnsValidJwt();
+      await expectCreateUserRouteReturnsValidJwt();
 
       const requestLoginUser = httpMocks.createRequest({
         body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
@@ -95,7 +98,7 @@ describe("userRoutes", () => {
     });
 
     test("should return a JWT token with with correct expiration time", async () => {
-      await expectUserRouteLoginReturnsValidJwt();
+      await expectCreateUserRouteReturnsValidJwt();
 
       const requestLoginUser = httpMocks.createRequest({
         body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
@@ -137,7 +140,7 @@ describe("userRoutes", () => {
     });
 
     test("should return error message when password is incorrect", async () => {
-      await expectUserRouteLoginReturnsValidJwt();
+      await expectCreateUserRouteReturnsValidJwt();
 
       const requestLoginUser = httpMocks.createRequest({
         body: {

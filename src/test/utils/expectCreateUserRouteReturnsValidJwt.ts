@@ -5,7 +5,7 @@ import { userRoutes } from "../../routes";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "../constants";
 import { expectJwtPayload } from "./expectJwtPayload";
 
-export async function expectUserRouteLoginReturnsValidJwt(): Promise<void> {
+export async function expectCreateUserRouteReturnsValidJwt(): Promise<void> {
   const requestCreateUser = httpMocks.createRequest({
     body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
   });
