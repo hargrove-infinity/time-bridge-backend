@@ -16,6 +16,7 @@ import {
   TEST_USER_PASSWORD,
 } from "./constants";
 import {
+  expectCreateUserInService,
   expectJwtPayload,
   expectSignTokenResult,
   expectTokenString,
@@ -137,14 +138,7 @@ describe("userService", () => {
     });
 
     test("should throw an error when password is incorrect", async () => {
-      const [tokenCreateUser, errorCreateUser] = await userService.create({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      expect(errorCreateUser).toBe(null);
-
-      expectTokenString(tokenCreateUser);
+      await expectCreateUserInService();
 
       const [tokenLoginUser, errorLoginUser] = await userService.login({
         email: TEST_USER_EMAIL,
@@ -158,14 +152,7 @@ describe("userService", () => {
     });
 
     test("should return a JWT token with correct payload", async () => {
-      const [tokenCreateUser, errorCreateUser] = await userService.create({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      expect(errorCreateUser).toBe(null);
-
-      expectTokenString(tokenCreateUser);
+      await expectCreateUserInService();
 
       const resultUserLogin = await userService.login({
         email: TEST_USER_EMAIL,
@@ -182,14 +169,7 @@ describe("userService", () => {
     });
 
     test("should return a JWT token with correct expiration time", async () => {
-      const [tokenCreateUser, errorCreateUser] = await userService.create({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      expect(errorCreateUser).toBe(null);
-
-      expectTokenString(tokenCreateUser);
+      await expectCreateUserInService();
 
       const resultUserLogin = await userService.login({
         email: TEST_USER_EMAIL,

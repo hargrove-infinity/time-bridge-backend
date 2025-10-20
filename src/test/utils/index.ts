@@ -1,6 +1,7 @@
 export * from "./expectCreatedUserWithPassword";
 export * from "./expectCreatedUserWithoutPassword";
 export * from "./expectCreateUserInDb";
+export * from "./expectCreateUserInService";
 export * from "./expectCreateUserRequest";
 export * from "./expectFindOneUserInDb";
 export * from "./expectJwtPayload";
