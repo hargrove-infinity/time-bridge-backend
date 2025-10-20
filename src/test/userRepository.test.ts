@@ -125,7 +125,7 @@ describe("userRepository", () => {
       expect(foundUser).toEqual(expect.anything());
       expect(errorFindOneUser).toBeNull();
 
-      expectCreatedUserWithPassword(foundUser);
+      expectCreatedUserWithPassword(foundUser?.toObject());
 
       expect(mongoose.Types.ObjectId.isValid(foundUser._id)).toBe(true);
 

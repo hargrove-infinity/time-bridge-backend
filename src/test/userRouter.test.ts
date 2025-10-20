@@ -117,5 +117,9 @@ describe("userRouter", () => {
 
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
     });
+
+    test.todo("should return 400 when email does not exist");
+
+    test.todo("should return 400 when password is incorrect");
   });
 });
