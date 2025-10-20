@@ -15,7 +15,7 @@ import {
   TEST_USER_EMAIL,
   TEST_USER_PASSWORD,
 } from "./constants";
-import { expectJwtPayload } from "./utils";
+import { expectJwtPayload, expectUserRouteLoginReturnsValidJwt } from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -73,23 +73,7 @@ describe("userRoutes", () => {
     });
 
     test("should return a JWT token with correct payload", async () => {
-      const requestCreateUser = httpMocks.createRequest({
-        body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
-      });
-      const responseCreateUser = httpMocks.createResponse();
-      await userRoutes.create(requestCreateUser, responseCreateUser);
-
-      expect(responseCreateUser.statusCode).toBe(200);
-
-      const dataCreateUser = responseCreateUser._getData();
-
-      expect(typeof dataCreateUser.payload).toBe("string");
-
-      const decodedCreateUser = jwt.decode(dataCreateUser.payload);
-
-      expectJwtPayload(decodedCreateUser);
-
-      expect(mongoose.Types.ObjectId.isValid(decodedCreateUser._id)).toBe(true);
+      await expectUserRouteLoginReturnsValidJwt();
 
       const requestLoginUser = httpMocks.createRequest({
         body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
@@ -111,23 +95,7 @@ describe("userRoutes", () => {
     });
 
     test("should return a JWT token with with correct expiration time", async () => {
-      const requestCreateUser = httpMocks.createRequest({
-        body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
-      });
-      const responseCreateUser = httpMocks.createResponse();
-      await userRoutes.create(requestCreateUser, responseCreateUser);
-
-      expect(responseCreateUser.statusCode).toBe(200);
-
-      const dataCreateUser = responseCreateUser._getData();
-
-      expect(typeof dataCreateUser.payload).toBe("string");
-
-      const decodedCreateUser = jwt.decode(dataCreateUser.payload);
-
-      expectJwtPayload(decodedCreateUser);
-
-      expect(mongoose.Types.ObjectId.isValid(decodedCreateUser._id)).toBe(true);
+      await expectUserRouteLoginReturnsValidJwt();
 
       const requestLoginUser = httpMocks.createRequest({
         body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
@@ -169,23 +137,7 @@ describe("userRoutes", () => {
     });
 
     test("should return error message when password is incorrect", async () => {
-      const requestCreateUser = httpMocks.createRequest({
-        body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
-      });
-      const responseCreateUser = httpMocks.createResponse();
-      await userRoutes.create(requestCreateUser, responseCreateUser);
-
-      expect(responseCreateUser.statusCode).toBe(200);
-
-      const dataCreateUser = responseCreateUser._getData();
-
-      expect(typeof dataCreateUser.payload).toBe("string");
-
-      const decodedCreateUser = jwt.decode(dataCreateUser.payload);
-
-      expectJwtPayload(decodedCreateUser);
-
-      expect(mongoose.Types.ObjectId.isValid(decodedCreateUser._id)).toBe(true);
+      await expectUserRouteLoginReturnsValidJwt();
 
       const requestLoginUser = httpMocks.createRequest({
         body: {
