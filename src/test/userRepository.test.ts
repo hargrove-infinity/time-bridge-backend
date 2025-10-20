@@ -6,12 +6,12 @@ import {
   TEST_USER_EMAIL,
   TEST_USER_EMAIL_PARTIAL,
   TEST_USER_EMAIL_UPPERCASE,
-  TEST_USER_PASSWORD,
 } from "./constants";
 import {
   expectCreatedUserWithPassword,
   expectCreatedUserWithoutPassword,
   expectValidDate,
+  expectCreateUserInDb,
 } from "./utils";
 
 beforeAll(async () => {
@@ -29,37 +29,16 @@ afterAll(async () => {
 describe("userRepository", () => {
   describe("userRepository.create", () => {
     test("should add a user to the database", async () => {
-      const [createdUser, errorCreateUser] = await userRepository.create({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      // Assert
-      expect(createdUser).toEqual(expect.anything());
-      expect(errorCreateUser).toBeNull();
+      await expectCreateUserInDb();
     });
 
     test("should give new users correct email", async () => {
-      const [createdUser, errorCreateUser] = await userRepository.create({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      // Assert
-      expect(createdUser).toEqual(expect.anything());
-      expect(errorCreateUser).toBeNull();
-      expect(createdUser?.email).toEqual(TEST_USER_EMAIL);
+      const createdUser = await expectCreateUserInDb();
+      expect(createdUser.email).toEqual(TEST_USER_EMAIL);
     });
 
     test("should return user", async () => {
-      const [createdUser, errorCreateUser] = await userRepository.create({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      // Assert
-      expect(createdUser).toEqual(expect.anything());
-      expect(errorCreateUser).toBeNull();
+      const createdUser = await expectCreateUserInDb();
 
       expectCreatedUserWithoutPassword(createdUser);
 
@@ -77,14 +56,7 @@ describe("userRepository", () => {
     // Login
     // - Happy path: find a user that definitely exists in the database
     test("should return user when email exists", async () => {
-      const [createdUser, errorCreateUser] = await userRepository.create({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      // Assert
-      expect(createdUser).toEqual(expect.anything());
-      expect(errorCreateUser).toBeNull();
+      await expectCreateUserInDb();
 
       const [foundUser, errorFindOneUser] = await userRepository.findOne({
         email: TEST_USER_EMAIL,
@@ -108,14 +80,7 @@ describe("userRepository", () => {
 
     // - Validation: ensure the returned user has _id, email, createdAt, updatedAt (matching UserDocumentWithoutPassword type)
     test("should return correct user data structure", async () => {
-      const [createdUser, errorCreateUser] = await userRepository.create({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      // Assert
-      expect(createdUser).toEqual(expect.anything());
-      expect(errorCreateUser).toBeNull();
+      await expectCreateUserInDb();
 
       const [foundUser, errorFindOneUser] = await userRepository.findOne({
         email: TEST_USER_EMAIL,
@@ -138,14 +103,7 @@ describe("userRepository", () => {
 
     // - Edge case: verify if searching for "TEST@EMAIL.COM" doesn't find "test@email.com" (or define the intended behavior)
     test("should be case-sensitive for email lookup", async () => {
-      const [createdUser, errorCreateUser] = await userRepository.create({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      // Assert
-      expect(createdUser).toEqual(expect.anything());
-      expect(errorCreateUser).toBeNull();
+      await expectCreateUserInDb();
 
       const [foundUser, errorFindOneUser] = await userRepository.findOne({
         email: TEST_USER_EMAIL_UPPERCASE,
@@ -158,14 +116,7 @@ describe("userRepository", () => {
 
     // - Correctness: ensure it's matching the exact email you're searching for, not partial matches
     test("should find user by exact email match", async () => {
-      const [createdUser, errorCreateUser] = await userRepository.create({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-
-      // Assert
-      expect(createdUser).toEqual(expect.anything());
-      expect(errorCreateUser).toBeNull();
+      await expectCreateUserInDb();
 
       const [foundUser, errorFindOneUser] = await userRepository.findOne({
         email: TEST_USER_EMAIL_PARTIAL,
