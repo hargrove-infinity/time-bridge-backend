@@ -10,8 +10,11 @@ describe("validate middleware", () => {
     const response = httpMocks.createResponse();
     const next = jest.fn();
 
-    const middleware = middlewares.validate({ schema: userValidationSchema });
-    middleware(request, response, next);
+    const middleware = middlewares.createValidateMiddleware({
+      schema: userValidationSchema,
+    });
+
+    middleware.validateMiddleware(request, response, next);
 
     expect(response.statusCode).toBe(400);
 
@@ -32,10 +35,11 @@ describe("validate middleware", () => {
     const response = httpMocks.createResponse();
     const next = jest.fn();
 
-    const middleware = middlewares.validate({
+    const middleware = middlewares.createValidateMiddleware({
       schema: userValidationSchema,
     });
-    middleware(request, response, next);
+
+    middleware.validateMiddleware(request, response, next);
 
     expect(response.statusCode).toBe(400);
 
@@ -56,10 +60,11 @@ describe("validate middleware", () => {
     const response = httpMocks.createResponse();
     const next = jest.fn();
 
-    const middleware = middlewares.validate({
+    const middleware = middlewares.createValidateMiddleware({
       schema: userValidationSchema,
     });
-    middleware(request, response, next);
+
+    middleware.validateMiddleware(request, response, next);
 
     expect(response.statusCode).toBe(400);
 
@@ -75,10 +80,11 @@ describe("validate middleware", () => {
     const response = httpMocks.createResponse();
     const next = jest.fn();
 
-    const middleware = middlewares.validate({
+    const middleware = middlewares.createValidateMiddleware({
       schema: userValidationSchema,
     });
-    middleware(request, response, next);
+
+    middleware.validateMiddleware(request, response, next);
 
     expect(response.statusCode).toBe(400);
 
@@ -94,10 +100,11 @@ describe("validate middleware", () => {
     const response = httpMocks.createResponse();
     const next = jest.fn();
 
-    const middleware = middlewares.validate({
+    const middleware = middlewares.createValidateMiddleware({
       schema: userValidationSchema,
     });
-    middleware(request, response, next);
+
+    middleware.validateMiddleware(request, response, next);
 
     expect(response.statusCode).toBe(400);
 
@@ -113,10 +120,11 @@ describe("validate middleware", () => {
     const response = httpMocks.createResponse();
     const next = jest.fn();
 
-    const middleware = middlewares.validate({
+    const middleware = middlewares.createValidateMiddleware({
       schema: userValidationSchema,
     });
-    middleware(request, response, next);
+
+    middleware.validateMiddleware(request, response, next);
 
     expect(response.statusCode).toBe(200);
     expect(next).toHaveBeenCalled();

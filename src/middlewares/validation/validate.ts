@@ -1,11 +1,15 @@
 import { Request, Response, NextFunction } from "express";
-import { ValidateArgs, ValidateReturn } from "./types";
+import { ValidateArgs } from "./types";
 
-export function validate<T>({
+export function createValidateMiddleware<T>({
   schema,
   key = "body",
-}: ValidateArgs): ValidateReturn<T> {
-  return (req: Request<T>, res: Response, next: NextFunction): void => {
+}: ValidateArgs) {
+  function validateMiddleware(
+    req: Request<T>,
+    res: Response,
+    next: NextFunction
+  ): void {
     const result = schema.safeParse(req[key]);
 
     if (!result.success) {
@@ -16,5 +20,7 @@ export function validate<T>({
 
     req[key] = result.data;
     next();
-  };
+  }
+
+  return { validateMiddleware };
 }

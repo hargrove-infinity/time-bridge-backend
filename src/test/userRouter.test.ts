@@ -5,20 +5,38 @@ import request from "supertest";
 import { ERROR_MESSAGES, paths } from "../constants";
 import { UserModel } from "../models";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
-
-// Import and spy on validation middleware
-import { middlewares } from "../middlewares";
-const spyOnValidationMiddleware = jest.spyOn(middlewares, "validate");
-
-// Import and spy on userRoutes.create
 import { userRoutes } from "../routes/userRoutes";
 
 // Create the spy at module level, BEFORE userRouter is imported
 const spyOnUserRoutesCreate = jest.spyOn(userRoutes, "create");
 const spyOnUserRoutesLogin = jest.spyOn(userRoutes, "login");
 
-// Import userRouter AFTER creating a spy
-import { userRouter } from "../routes/userRouter";
+// Import middleware and router setup BEFORE spying
+import { middlewares } from "../middlewares";
+import { userValidationSchema } from "../validation";
+
+// Create and spy on middleware instances BEFORE router imports them
+const validateForCreate = middlewares.createValidateMiddleware({
+  schema: userValidationSchema,
+});
+
+const spyOnValidateForCreate = jest.spyOn(
+  validateForCreate,
+  "validateMiddleware"
+);
+
+const validateForLogin = middlewares.createValidateMiddleware({
+  schema: userValidationSchema,
+});
+
+const spyOnValidateForLogin = jest.spyOn(
+  validateForLogin,
+  "validateMiddleware"
+);
+
+// NOW import and create the router with our spied middleware instances
+import { createUserRouter } from "../routes/userRouter";
+const userRouter = createUserRouter(validateForCreate, validateForLogin);
 
 import {
   TEST_USER_ALTERNATIVE_PASSWORD,
@@ -39,6 +57,7 @@ beforeAll(async () => {
 
 afterEach(async () => {
   await UserModel.deleteMany({});
+  jest.clearAllMocks();
 });
 
 afterAll(async () => {
@@ -48,11 +67,14 @@ afterAll(async () => {
 describe("userRouter", () => {
   describe("userRouter.create", () => {
     test("should call validate middleware", async () => {
-      await request(app).post(paths.users.base).send({
+      const res = await request(app).post(paths.users.base).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
-      expect(spyOnValidationMiddleware).toHaveBeenCalled();
+
+      expect(spyOnValidateForCreate).toHaveBeenCalled();
+      // @ts-ignore
+      expect(res.res.req.path).toBe(paths.users.base);
     });
 
     test("should call userRoutes.create", async () => {
@@ -76,11 +98,16 @@ describe("userRouter", () => {
 
   describe("userRouter.login", () => {
     test("should call validate middleware", async () => {
-      await request(app).post(`${paths.users.base}${paths.users.login}`).send({
-        email: TEST_USER_EMAIL,
-        password: TEST_USER_PASSWORD,
-      });
-      expect(spyOnValidationMiddleware).toHaveBeenCalled();
+      const res = await request(app)
+        .post(`${paths.users.base}${paths.users.login}`)
+        .send({
+          email: TEST_USER_EMAIL,
+          password: TEST_USER_PASSWORD,
+        });
+
+      expect(spyOnValidateForLogin).toHaveBeenCalled();
+      // @ts-ignore
+      expect(res.res.req.path).toBe(`${paths.users.base}${paths.users.login}`);
     });
 
     test("should call userRoutes.login", async () => {

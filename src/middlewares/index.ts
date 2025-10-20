@@ -1,3 +1,3 @@
-import { validate } from "./validation";
+import { createValidateMiddleware } from "./validation";
 
-export const middlewares = { validate } as const;
+export const middlewares = { createValidateMiddleware } as const;
