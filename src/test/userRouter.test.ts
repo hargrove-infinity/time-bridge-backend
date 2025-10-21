@@ -1,4 +1,4 @@
-import express, { Express } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import request from "supertest";
@@ -6,18 +6,25 @@ import { ERROR_MESSAGES, paths } from "../constants";
 import { UserModel } from "../models";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 
-// Import and spy on validation middleware
 import { middlewares } from "../middlewares";
-const spyOnValidationMiddleware = jest.spyOn(middlewares, "validate");
 
-// Import and spy on userRoutes.create
+let validationMiddlewareCallCount = 0;
+
+const originalValidate = middlewares.validate;
+jest.spyOn(middlewares, "validate").mockImplementation((...args) => {
+  const middleware = originalValidate(...args);
+  
+  return (req, res, next) => {
+    validationMiddlewareCallCount++;
+    middleware(req, res, next);
+  };
+});
+
 import { userRoutes } from "../routes/userRoutes";
 
-// Create the spy at module level, BEFORE userRouter is imported
 const spyOnUserRoutesCreate = jest.spyOn(userRoutes, "create");
 const spyOnUserRoutesLogin = jest.spyOn(userRoutes, "login");
 
-// Import userRouter AFTER creating a spy
 import { userRouter } from "../routes/userRouter";
 
 import {
@@ -48,11 +55,12 @@ afterAll(async () => {
 describe("userRouter", () => {
   describe("userRouter.create", () => {
     test("should call validate middleware", async () => {
+      const initialCount = validationMiddlewareCallCount;
       await request(app).post(paths.users.base).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
-      expect(spyOnValidationMiddleware).toHaveBeenCalled();
+      expect(validationMiddlewareCallCount).toBeGreaterThan(initialCount);
     });
 
     test("should call userRoutes.create", async () => {
@@ -76,11 +84,12 @@ describe("userRouter", () => {
 
   describe("userRouter.login", () => {
     test("should call validate middleware", async () => {
+      const initialCount = validationMiddlewareCallCount;
       await request(app).post(`${paths.users.base}${paths.users.login}`).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
-      expect(spyOnValidationMiddleware).toHaveBeenCalled();
+      expect(validationMiddlewareCallCount).toBeGreaterThan(initialCount);
     });
 
     test("should call userRoutes.login", async () => {
