@@ -1,11 +1,19 @@
 import { envVariables } from "../common";
-import { server } from "../server";
+import { startServer } from "../server";
+import { closeConnectionDatabase } from "../utils";
 import { SERVER_TEST_DELAY } from "./constants";
 import { expectServerAddressInfo, sleep } from "./utils";
 
 const spy = jest.spyOn(console, "info");
 
-afterAll(() => {
+let server: import("http").Server;
+
+beforeAll(async () => {
+  server = await startServer();
+});
+
+afterAll(async () => {
+  await closeConnectionDatabase();
   server.close();
   spy.mockRestore();
 });

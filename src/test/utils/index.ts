@@ -1,3 +1,4 @@
+export * from "./expectConnectDatabase";
 export * from "./expectCreateUserRequest";
 export * from "./expectCreatedUser";
 export * from "./expectJwtPayload";
