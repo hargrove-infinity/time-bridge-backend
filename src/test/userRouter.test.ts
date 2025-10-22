@@ -14,7 +14,7 @@ const originalValidate = middlewares.validate;
 jest.spyOn(middlewares, "validate").mockImplementation((...args) => {
   const middleware = originalValidate(...args);
   
-  return (req: any, res: any, next: any) => {
+  return (req, res, next) => {
     validateCount += 1;
     return middleware(req, res, next);
   };
