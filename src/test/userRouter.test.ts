@@ -6,6 +6,7 @@ import { ERROR_MESSAGES, paths } from "../constants";
 import { UserModel } from "../models";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 
+// Import and spy on validation middleware
 import { middlewares } from "../middlewares";
 
 const validateSpy = jest.fn();
@@ -20,11 +21,14 @@ jest.spyOn(middlewares, "validate").mockImplementation((...args) => {
   };
 });
 
+// Import and spy on userRoutes
 import { userRoutes } from "../routes/userRoutes";
 
+// Create spies at module level, BEFORE userRouter is imported
 const spyOnUserRoutesCreate = jest.spyOn(userRoutes, "create");
 const spyOnUserRoutesLogin = jest.spyOn(userRoutes, "login");
 
+// Import userRouter AFTER creating spies
 import { userRouter } from "../routes/userRouter";
 
 import {
