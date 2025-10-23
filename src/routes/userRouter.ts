@@ -11,3 +11,9 @@ userRouter.post(
   middlewares.validate({ schema: userValidationSchema }),
   userRoutes.create
 );
+
+userRouter.post(
+  paths.users.login,
+  middlewares.validate({ schema: userValidationSchema }),
+  userRoutes.login
+);
