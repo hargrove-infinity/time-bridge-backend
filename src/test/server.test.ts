@@ -1,13 +1,25 @@
+import { connection } from "mongoose";
 import { envVariables } from "../common";
-import { server } from "../server";
+import { startServer } from "../server";
+import { closeConnectionDatabase } from "../utils";
 import { SERVER_TEST_DELAY } from "./constants";
 import { expectServerAddressInfo, sleep } from "./utils";
+import * as databaseUtils from "../utils/database";
 
-const spy = jest.spyOn(console, "info");
+const spyOnConsoleInfo = jest.spyOn(console, "info");
+const spyOnConnectDatabase = jest.spyOn(databaseUtils, "connectDatabase");
 
-afterAll(() => {
+let server: import("http").Server;
+
+beforeAll(async () => {
+  server = await startServer();
+});
+
+afterAll(async () => {
+  await closeConnectionDatabase();
   server.close();
-  spy.mockRestore();
+  spyOnConsoleInfo.mockRestore();
+  spyOnConnectDatabase.mockRestore();
 });
 
 describe("server.ts", () => {
@@ -22,10 +34,15 @@ describe("server.ts", () => {
     expect(address.port).toBe(port);
   });
 
+  test("should connect to database inside startServer function", async () => {
+    expect(spyOnConnectDatabase).toHaveBeenCalled();
+    expect(connection.readyState).toBe(1);
+  });
+
   test("server logs start message", async () => {
     await sleep(SERVER_TEST_DELAY);
 
-    expect(spy).toHaveBeenCalledWith(
+    expect(spyOnConsoleInfo).toHaveBeenCalledWith(
       `Server is running on port ${envVariables.port}`
     );
   });
