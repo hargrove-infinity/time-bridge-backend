@@ -38,4 +38,43 @@ async function create(
   return [token, null];
 }
 
-export const userService = { create } as const;
+async function login(
+  args: CreateUserInput
+): Promise<[string, null] | [null, ErrorData]> {
+  const [foundUser, errorFindUser] = await userRepository.findOne({
+    email: args.email,
+  });
+
+  if (errorFindUser) {
+    return [null, { errors: [ERROR_MESSAGES.INTERNAL_SERVER_ERROR] }];
+  }
+
+  if (!foundUser) {
+    return [null, { errors: [ERROR_MESSAGES.USER_EMAIL_NOT_EXIST] }];
+  }
+
+  const isPasswordsMatched = await bcrypt.compare(
+    args.password,
+    foundUser.password
+  );
+
+  if (!isPasswordsMatched) {
+    return [null, { errors: [ERROR_MESSAGES.USER_PASSWORD_WRONG] }];
+  }
+
+  const [token, errorSignToken] = jwtService.sign({
+    payload: { _id: foundUser._id, email: foundUser.email },
+    options: {
+      algorithm: DEFAULT_ALGORITHM_TOKEN,
+      expiresIn: DEFAULT_EXPIRES_IN_TOKEN_STRING,
+    },
+  });
+
+  if (errorSignToken) {
+    return [null, { errors: [ERROR_MESSAGES.USER_LOGIN_SERVICE] }];
+  }
+
+  return [token, null];
+}
+
+export const userService = { create, login } as const;

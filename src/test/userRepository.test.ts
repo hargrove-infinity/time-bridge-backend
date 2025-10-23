@@ -2,8 +2,16 @@ import mongoose from "mongoose";
 import { UserModel } from "../models";
 import { userRepository } from "../repositories";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
-import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
-import { expectCreatedUser, expectValidDate } from "./utils";
+import {
+  TEST_USER_EMAIL,
+  TEST_USER_EMAIL_PARTIAL,
+  TEST_USER_EMAIL_UPPERCASE,
+} from "./constants";
+import {
+  expectValidDate,
+  expectCreateUserInDb,
+  expectFindOneUserInDb,
+} from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -17,39 +25,70 @@ afterAll(async () => {
   await closeConnectionDatabase();
 });
 
-describe("create user", () => {
-  test("should add a user to the database", async () => {
-    const result = await userRepository.create({
-      email: TEST_USER_EMAIL,
-      password: TEST_USER_PASSWORD,
+describe("userRepository", () => {
+  describe("userRepository.create", () => {
+    test("should add a user to the database", async () => {
+      await expectCreateUserInDb();
     });
 
-    expect(result).toEqual(expect.anything());
+    test("should give new users correct email", async () => {
+      const createdUser = await expectCreateUserInDb();
+      expect(createdUser.email).toEqual(TEST_USER_EMAIL);
+    });
+
+    test("should return user", async () => {
+      const createdUser = await expectCreateUserInDb();
+      expect(mongoose.Types.ObjectId.isValid(createdUser._id)).toBe(true);
+      expect(createdUser.email).toEqual(TEST_USER_EMAIL);
+      expectValidDate(createdUser.createdAt);
+      expectValidDate(createdUser.updatedAt);
+    });
   });
 
-  test("should give new users correct email", async () => {
-    const [user] = await userRepository.create({
-      email: TEST_USER_EMAIL,
-      password: TEST_USER_PASSWORD,
+  describe("userRepository.findOne", () => {
+    test("should return user when email exists", async () => {
+      await expectCreateUserInDb();
+      await expectFindOneUserInDb();
     });
 
-    expect(user?.email).toEqual(TEST_USER_EMAIL);
-  });
+    test("should return null when user with given email does not exist", async () => {
+      const [foundUser, errorFindOneUser] = await userRepository.findOne({
+        email: TEST_USER_EMAIL,
+      });
 
-  test("should return user", async () => {
-    const [createdUser] = await userRepository.create({
-      email: TEST_USER_EMAIL,
-      password: TEST_USER_PASSWORD,
+      expect(foundUser).toBeNull();
+      expect(errorFindOneUser).toBeNull();
     });
 
-    expectCreatedUser(createdUser);
+    test("should return correct user data structure", async () => {
+      await expectCreateUserInDb();
+      const foundUser = await expectFindOneUserInDb();
+      expect(mongoose.Types.ObjectId.isValid(foundUser._id)).toBe(true);
+      expect(foundUser.email).toEqual(TEST_USER_EMAIL);
+      expectValidDate(foundUser.createdAt);
+      expectValidDate(foundUser.updatedAt);
+    });
 
-    expect(mongoose.Types.ObjectId.isValid(createdUser._id)).toBe(true);
+    test("should be case-sensitive for email lookup", async () => {
+      await expectCreateUserInDb();
 
-    expect(createdUser.email).toEqual(TEST_USER_EMAIL);
+      const [foundUser, errorFindOneUser] = await userRepository.findOne({
+        email: TEST_USER_EMAIL_UPPERCASE,
+      });
 
-    expectValidDate(createdUser.createdAt);
+      expect(foundUser).toBeNull();
+      expect(errorFindOneUser).toBeNull();
+    });
 
-    expectValidDate(createdUser.updatedAt);
+    test("should find user by exact email match", async () => {
+      await expectCreateUserInDb();
+
+      const [foundUser, errorFindOneUser] = await userRepository.findOne({
+        email: TEST_USER_EMAIL_PARTIAL,
+      });
+
+      expect(foundUser).toBeNull();
+      expect(errorFindOneUser).toBeNull();
+    });
   });
 });
