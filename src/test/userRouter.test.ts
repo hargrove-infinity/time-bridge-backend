@@ -1,4 +1,4 @@
-import express, { Express, NextFunction, Request, Response } from "express";
+import express, { Express } from "express";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import request from "supertest";
@@ -8,14 +8,14 @@ import { closeConnectionDatabase, connectDatabase } from "../utils";
 
 import { middlewares } from "../middlewares";
 
-let validateCount = 0
+const validateSpy = jest.fn();
 
 const originalValidate = middlewares.validate;
 jest.spyOn(middlewares, "validate").mockImplementation((...args) => {
   const middleware = originalValidate(...args);
-  
+
   return (req, res, next) => {
-    validateCount += 1;
+    validateSpy(req, res, next);
     return middleware(req, res, next);
   };
 });
@@ -46,6 +46,7 @@ beforeAll(async () => {
 
 afterEach(async () => {
   await UserModel.deleteMany({});
+  validateSpy.mockClear();
 });
 
 afterAll(async () => {
@@ -55,12 +56,12 @@ afterAll(async () => {
 describe("userRouter", () => {
   describe("userRouter.create", () => {
     test("should call validate middleware", async () => {
-      const initialCount = validateCount;
       await request(app).post(paths.users.base).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
-      expect(validateCount).toBe(initialCount + 1);
+
+      expect(validateSpy).toHaveBeenCalledTimes(1);
     });
 
     test("should call userRoutes.create", async () => {
@@ -84,12 +85,12 @@ describe("userRouter", () => {
 
   describe("userRouter.login", () => {
     test("should call validate middleware", async () => {
-      const initialCount = validateCount;
       await request(app).post(`${paths.users.base}${paths.users.login}`).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
-      expect(validateCount).toBe(initialCount + 1);
+
+      expect(validateSpy).toHaveBeenCalledTimes(1);
     });
 
     test("should call userRoutes.login", async () => {
@@ -163,4 +164,3 @@ describe("userRouter", () => {
     });
   });
 });
-
