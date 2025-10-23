@@ -90,7 +90,5 @@ describe("userRepository", () => {
       expect(foundUser).toBeNull();
       expect(errorFindOneUser).toBeNull();
     });
-
-    test.todo("should not modify or create any new user in the database");
   });
 });
