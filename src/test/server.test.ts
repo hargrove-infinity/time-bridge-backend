@@ -7,6 +7,15 @@ import { expectServerAddressInfo, sleep } from "./utils";
 import * as databaseUtils from "../utils/database";
 
 const spyOnConsoleInfo = jest.spyOn(console, "info");
+
+const spyOnConsoleErrorMockImpl = jest
+  .spyOn(console, "error")
+  .mockImplementation();
+
+const spyOnProcessExitMockImpl = jest
+  .spyOn(process, "exit")
+  .mockImplementation();
+
 const spyOnConnectDatabase = jest.spyOn(databaseUtils, "connectDatabase");
 
 let server: import("http").Server;
@@ -19,6 +28,8 @@ afterAll(async () => {
   await closeConnectionDatabase();
   server.close();
   spyOnConsoleInfo.mockRestore();
+  spyOnConsoleErrorMockImpl.mockRestore();
+  spyOnConnectDatabase.mockRestore();
   spyOnConnectDatabase.mockRestore();
 });
 
@@ -45,5 +56,20 @@ describe("server.ts", () => {
     expect(spyOnConsoleInfo).toHaveBeenCalledWith(
       `Server is running on port ${envVariables.port}`
     );
+  });
+
+  test("should handle database connection failure and log error message", async () => {
+    const mockError = new Error("Database connection failed");
+
+    spyOnConnectDatabase.mockRejectedValueOnce(mockError);
+
+    await startServer();
+
+    expect(spyOnConsoleErrorMockImpl).toHaveBeenCalledWith(
+      "🚫 Failed to start server:",
+      mockError
+    );
+
+    expect(spyOnProcessExitMockImpl).toHaveBeenCalledWith(1);
   });
 });
