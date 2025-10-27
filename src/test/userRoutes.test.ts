@@ -34,14 +34,14 @@ afterAll(async () => {
 });
 
 describe("userRoutes", () => {
-  describe("userRoutes.create", () => {
-    test("should call userService.create", async () => {
-      const spy = jest.spyOn(userService, "create");
+  describe("userRoutes.register", () => {
+    test("should call userService.register", async () => {
+      const spy = jest.spyOn(userService, "register");
       const request = httpMocks.createRequest({
         body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
       });
       const response = httpMocks.createResponse();
-      await userRoutes.create(request, response);
+      await userRoutes.register(request, response);
       expect(spy).toHaveBeenCalled();
     });
 
@@ -50,7 +50,7 @@ describe("userRoutes", () => {
         body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
       });
       const response = httpMocks.createResponse();
-      await userRoutes.create(request, response);
+      await userRoutes.register(request, response);
 
       expect(response.statusCode).toBe(200);
 

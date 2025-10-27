@@ -7,7 +7,7 @@ import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "../constants";
 import { expectJwtPayload } from "./expectJwtPayload";
 
 export async function expectCreateUserRequest(app: Express): Promise<void> {
-  const response = await request(app).post(paths.users.base).send({
+  const response = await request(app).post(paths.auth.register).send({
     email: TEST_USER_EMAIL,
     password: TEST_USER_PASSWORD,
   });

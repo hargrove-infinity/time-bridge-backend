@@ -7,13 +7,13 @@ import { userRoutes } from "./userRoutes";
 export const userRouter = Router();
 
 userRouter.post(
-  paths.common.base,
+  paths.auth.register,
   middlewares.validate({ schema: userValidationSchema }),
-  userRoutes.create
+  userRoutes.register
 );
 
 userRouter.post(
-  paths.users.login,
+  paths.auth.login,
   middlewares.validate({ schema: userValidationSchema }),
   userRoutes.login
 );

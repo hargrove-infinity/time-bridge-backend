@@ -25,7 +25,7 @@ jest.spyOn(middlewares, "validate").mockImplementation((...args) => {
 import { userRoutes } from "../routes/userRoutes";
 
 // Create spies at module level, BEFORE userRouter is imported
-const spyOnUserRoutesCreate = jest.spyOn(userRoutes, "create");
+const spyOnUserRoutesRegister = jest.spyOn(userRoutes, "register");
 const spyOnUserRoutesLogin = jest.spyOn(userRoutes, "login");
 
 // Import userRouter AFTER creating spies
@@ -45,7 +45,7 @@ beforeAll(async () => {
 
   app = express();
   app.use(express.json());
-  app.use(paths.users.base, userRouter);
+  app.use(userRouter);
 });
 
 afterEach(async () => {
@@ -58,9 +58,9 @@ afterAll(async () => {
 });
 
 describe("userRouter", () => {
-  describe("userRouter.create", () => {
+  describe("userRouter.register", () => {
     test("should call validate middleware", async () => {
-      await request(app).post(paths.users.base).send({
+      await request(app).post(paths.auth.register).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
@@ -68,16 +68,16 @@ describe("userRouter", () => {
       expect(validateSpy).toHaveBeenCalledTimes(1);
     });
 
-    test("should call userRoutes.create", async () => {
+    test("should call userRoutes.register", async () => {
       await request(app)
-        .post(paths.users.base)
+        .post(paths.auth.register)
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
-      expect(spyOnUserRoutesCreate).toHaveBeenCalled();
+      expect(spyOnUserRoutesRegister).toHaveBeenCalled();
     });
 
     test("should receive 200 status code", async () => {
       const response = await request(app)
-        .post(paths.users.base)
+        .post(paths.auth.register)
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
       expect(response.status).toBe(200);
     });
@@ -89,7 +89,7 @@ describe("userRouter", () => {
 
   describe("userRouter.login", () => {
     test("should call validate middleware", async () => {
-      await request(app).post(`${paths.users.base}${paths.users.login}`).send({
+      await request(app).post(paths.auth.login).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
@@ -99,7 +99,7 @@ describe("userRouter", () => {
 
     test("should call userRoutes.login", async () => {
       await request(app)
-        .post(`${paths.users.base}${paths.users.login}`)
+        .post(paths.auth.login)
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
 
       expect(spyOnUserRoutesLogin).toHaveBeenCalled();
@@ -107,12 +107,12 @@ describe("userRouter", () => {
 
     test("should receive 200 status code", async () => {
       const responseCreateUser = await request(app)
-        .post(paths.users.base)
+        .post(paths.auth.register)
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
       expect(responseCreateUser.status).toBe(200);
 
       const responseLoginUser = await request(app)
-        .post(`${paths.users.base}${paths.users.login}`)
+        .post(paths.auth.login)
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
       expect(responseLoginUser.status).toBe(200);
     });
@@ -120,12 +120,10 @@ describe("userRouter", () => {
     test("should respond with correct payload", async () => {
       await expectCreateUserRequest(app);
 
-      const response = await request(app)
-        .post(`${paths.users.base}${paths.users.login}`)
-        .send({
-          email: TEST_USER_EMAIL,
-          password: TEST_USER_PASSWORD,
-        });
+      const response = await request(app).post(paths.auth.login).send({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
 
       expect(response.status).toBe(200);
       expect(response.body).toStrictEqual({ payload: expect.any(String) });
@@ -138,12 +136,10 @@ describe("userRouter", () => {
     });
 
     test("should return 400 when email does not exist", async () => {
-      const response = await request(app)
-        .post(`${paths.users.base}${paths.users.login}`)
-        .send({
-          email: TEST_USER_EMAIL,
-          password: TEST_USER_PASSWORD,
-        });
+      const response = await request(app).post(paths.auth.login).send({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
 
       expect(response.status).toBe(400);
       expect(response.body).toEqual({
@@ -154,12 +150,10 @@ describe("userRouter", () => {
     test("should return 400 when password is incorrect", async () => {
       await expectCreateUserRequest(app);
 
-      const response = await request(app)
-        .post(`${paths.users.base}${paths.users.login}`)
-        .send({
-          email: TEST_USER_EMAIL,
-          password: TEST_USER_ALTERNATIVE_PASSWORD,
-        });
+      const response = await request(app).post(paths.auth.login).send({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_ALTERNATIVE_PASSWORD,
+      });
 
       expect(response.status).toBe(400);
       expect(response.body).toEqual({

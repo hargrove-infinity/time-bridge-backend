@@ -34,11 +34,11 @@ afterAll(async () => {
 });
 
 describe("userService", () => {
-  describe("userService.create", () => {
+  describe("userService.register", () => {
     test("should call userRepository.create", async () => {
       const spy = jest.spyOn(userRepository, "create");
 
-      await userService.create({
+      await userService.register({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
@@ -47,7 +47,7 @@ describe("userService", () => {
     });
 
     test("should not store user's password as plain text", async () => {
-      const [user, error] = await userService.create({
+      const [user, error] = await userService.register({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
@@ -63,7 +63,7 @@ describe("userService", () => {
     });
 
     test("stored password in database and password was sent should match", async () => {
-      const [user, error] = await userService.create({
+      const [user, error] = await userService.register({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
@@ -84,7 +84,7 @@ describe("userService", () => {
     });
 
     test("should return JWT", async () => {
-      const [token, errorCreateUser] = await userService.create({
+      const [token, errorCreateUser] = await userService.register({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });

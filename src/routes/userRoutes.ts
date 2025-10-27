@@ -2,13 +2,13 @@ import { Request, Response } from "express";
 import { userService } from "../services";
 import { CreateUserInput } from "../validation";
 
-async function create(
+async function register(
   req: Request<{}, {}, CreateUserInput>,
   res: Response
 ): Promise<void> {
   const { body } = req;
 
-  const [token, error] = await userService.create(body);
+  const [token, error] = await userService.register(body);
 
   if (error) {
     res.status(400).send(error);
@@ -34,4 +34,4 @@ async function login(
   res.status(200).send({ payload: token });
 }
 
-export const userRoutes = { create, login } as const;
+export const userRoutes = { register, login } as const;
