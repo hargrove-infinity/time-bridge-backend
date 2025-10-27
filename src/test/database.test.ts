@@ -2,24 +2,23 @@ import mongoose from "mongoose";
 import {
   CONNECTED_TO_DATABASE_FAILED,
   CONNECTED_TO_DATABASE_SUCCESSFULLY,
+  DISCONNECTED_FROM_DATABASE_FAILED,
   DISCONNECTED_FROM_DATABASE_SUCCESSFULLY,
 } from "../constants";
 import { connectDatabase, closeConnectionDatabase } from "../utils";
 import { expectConnectDatabase } from "./utils";
 
 const spyOnConsoleInfo = jest.spyOn(console, "info");
-
-const spyOnConsoleErrorMockImpl = jest
-  .spyOn(console, "error")
-  .mockImplementation();
+let spyOnConsoleError = jest.spyOn(console, "error");
 
 afterEach(async () => {
   await closeConnectionDatabase();
+  jest.clearAllMocks();
 });
 
 afterAll(async () => {
   spyOnConsoleInfo.mockRestore();
-  spyOnConsoleErrorMockImpl.mockRestore();
+  spyOnConsoleError.mockRestore();
 });
 
 describe("database connection / disconnection", () => {
@@ -48,17 +47,48 @@ describe("database connection / disconnection", () => {
   test("should handle mongoose connection failure", async () => {
     const mockError = new Error("Database connection failed");
 
+    spyOnConsoleError.mockImplementation(() => {});
+
     const spyOnMongooseConnect = jest
       .spyOn(mongoose, "connect")
       .mockRejectedValueOnce(mockError);
 
     await expect(connectDatabase()).rejects.toThrow(mockError);
 
-    expect(spyOnConsoleErrorMockImpl).toHaveBeenCalledWith(
+    expect(spyOnConsoleError).toHaveBeenCalledWith(
       CONNECTED_TO_DATABASE_FAILED,
       mockError
     );
 
     spyOnMongooseConnect.mockRestore();
+
+    spyOnConsoleError.mockRestore();
+
+    spyOnConsoleError = jest.spyOn(console, "error");
+  });
+
+  test("should handle mongoose disconnection failure", async () => {
+    const mockError = new Error("Database disconnection failed");
+
+    await expectConnectDatabase();
+
+    spyOnConsoleError.mockImplementation(() => {});
+
+    const spyOnMongooseConnect = jest
+      .spyOn(mongoose.connection, "close")
+      .mockRejectedValueOnce(mockError);
+
+    await closeConnectionDatabase();
+
+    expect(spyOnConsoleError).toHaveBeenCalledWith(
+      DISCONNECTED_FROM_DATABASE_FAILED,
+      mockError
+    );
+
+    spyOnMongooseConnect.mockRestore();
+
+    spyOnConsoleError.mockRestore();
+
+    spyOnConsoleError = jest.spyOn(console, "error");
   });
 });
