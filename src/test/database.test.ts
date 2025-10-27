@@ -1,9 +1,16 @@
-import { connection } from "mongoose";
-import { CONNECTED_TO_DATABASE_SUCCESSFULLY } from "../constants";
+import mongoose from "mongoose";
+import {
+  CONNECTED_TO_DATABASE_FAILED,
+  CONNECTED_TO_DATABASE_SUCCESSFULLY,
+} from "../constants";
 import { connectDatabase, closeConnectionDatabase } from "../utils";
 import { expectConnectDatabase } from "./utils";
 
 const spyOnConsoleInfo = jest.spyOn(console, "info");
+
+const spyOnConsoleErrorMockImpl = jest
+  .spyOn(console, "error")
+  .mockImplementation();
 
 afterEach(async () => {
   await closeConnectionDatabase();
@@ -11,6 +18,7 @@ afterEach(async () => {
 
 afterAll(async () => {
   spyOnConsoleInfo.mockRestore();
+  spyOnConsoleErrorMockImpl.mockRestore();
 });
 
 describe("database connection / disconnection", () => {
@@ -24,12 +32,29 @@ describe("database connection / disconnection", () => {
   test("closeConnectionDatabase() closes the connection", async () => {
     await expectConnectDatabase();
     await closeConnectionDatabase();
-    expect(connection.readyState).toBe(0);
+    expect(mongoose.connection.readyState).toBe(0);
   });
 
   test("connectDatabase() is idempotent if called multiple times", async () => {
     await expectConnectDatabase();
     await connectDatabase();
-    expect(connection.readyState).toBe(1);
+    expect(mongoose.connection.readyState).toBe(1);
+  });
+
+  test("should handle mongoose connection failure", async () => {
+    const mockError = new Error("Database connection failed");
+
+    const spyOnMongooseConnect = jest
+      .spyOn(mongoose, "connect")
+      .mockRejectedValueOnce(mockError);
+
+    await expect(connectDatabase()).rejects.toThrow(mockError);
+
+    expect(spyOnConsoleErrorMockImpl).toHaveBeenCalledWith(
+      CONNECTED_TO_DATABASE_FAILED,
+      mockError
+    );
+
+    spyOnMongooseConnect.mockRestore();
   });
 });
