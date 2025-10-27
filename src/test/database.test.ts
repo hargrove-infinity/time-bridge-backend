@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import {
   CONNECTED_TO_DATABASE_FAILED,
   CONNECTED_TO_DATABASE_SUCCESSFULLY,
+  DISCONNECTED_FROM_DATABASE_SUCCESSFULLY,
 } from "../constants";
 import { connectDatabase, closeConnectionDatabase } from "../utils";
 import { expectConnectDatabase } from "./utils";
@@ -33,6 +34,9 @@ describe("database connection / disconnection", () => {
     await expectConnectDatabase();
     await closeConnectionDatabase();
     expect(mongoose.connection.readyState).toBe(0);
+    expect(spyOnConsoleInfo).toHaveBeenCalledWith(
+      DISCONNECTED_FROM_DATABASE_SUCCESSFULLY
+    );
   });
 
   test("connectDatabase() is idempotent if called multiple times", async () => {
