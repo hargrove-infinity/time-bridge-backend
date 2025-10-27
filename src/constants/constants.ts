@@ -1,6 +1,15 @@
 import { Algorithm } from "jsonwebtoken";
 import { StringValue } from "ms";
 
+export const CONNECTED_TO_DATABASE_SUCCESSFULLY = "✅ Connected to MongoDB";
+export const CONNECTED_TO_DATABASE_FAILED = "❌ Failed to connect to MongoDB:";
+export const DISCONNECTED_FROM_DATABASE_SUCCESSFULLY =
+  "🔌 Disconnected from MongoDB";
+export const DISCONNECTED_FROM_DATABASE_FAILED =
+  "🛑 Failed to close MongoDB connection:";
+export const SERVER_STARTED_SUCCESSFULLY = "Server is running on port";
+export const SERVER_START_FAILED = "🚫 Failed to start server:";
+
 export const DEFAULT_EXPIRES_IN_TOKEN_STRING: StringValue = "3h";
 export const DEFAULT_EXPIRES_IN_TOKEN_NUMBER = 3;
 export const DEFAULT_ALGORITHM_TOKEN: Algorithm = "HS256";

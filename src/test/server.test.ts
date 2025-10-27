@@ -1,5 +1,6 @@
 import { connection } from "mongoose";
 import { envVariables } from "../common";
+import { SERVER_START_FAILED, SERVER_STARTED_SUCCESSFULLY } from "../constants";
 import { startServer } from "../server";
 import { closeConnectionDatabase } from "../utils";
 import { SERVER_TEST_DELAY } from "./constants";
@@ -54,7 +55,7 @@ describe("server.ts", () => {
     await sleep(SERVER_TEST_DELAY);
 
     expect(spyOnConsoleInfo).toHaveBeenCalledWith(
-      `Server is running on port ${envVariables.port}`
+      `${SERVER_STARTED_SUCCESSFULLY} ${envVariables.port}`
     );
   });
 
@@ -66,7 +67,7 @@ describe("server.ts", () => {
     await startServer();
 
     expect(spyOnConsoleErrorMockImpl).toHaveBeenCalledWith(
-      "🚫 Failed to start server:",
+      SERVER_START_FAILED,
       mockError
     );
 
