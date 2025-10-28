@@ -1,5 +1,6 @@
 import { app } from "./app";
 import { envVariables } from "./common";
+import { SERVER_START_FAILED, SERVER_STARTED_SUCCESSFULLY } from "./constants";
 import { connectDatabase } from "./utils";
 
 async function startServer() {
@@ -7,12 +8,12 @@ async function startServer() {
     await connectDatabase();
 
     const server = app.listen(envVariables.port, () => {
-      console.info(`Server is running on port ${envVariables.port}`);
+      console.info(`${SERVER_STARTED_SUCCESSFULLY} ${envVariables.port}`);
     });
 
     return server;
   } catch (error) {
-    console.error("🚫 Failed to start server:", error);
+    console.error(SERVER_START_FAILED, error);
     process.exit(1);
   }
 }

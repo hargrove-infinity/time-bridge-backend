@@ -1,3 +1,4 @@
+export * from "./expectConnectDatabase";
 export * from "./expectCreatedUserWithPassword";
 export * from "./expectCreatedUserWithoutPassword";
 export * from "./expectCreateUserInDb";
