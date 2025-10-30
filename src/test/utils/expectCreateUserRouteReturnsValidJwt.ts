@@ -10,7 +10,7 @@ export async function expectCreateUserRouteReturnsValidJwt(): Promise<void> {
     body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
   });
   const responseCreateUser = httpMocks.createResponse();
-  await userRoutes.create(requestCreateUser, responseCreateUser);
+  await userRoutes.register(requestCreateUser, responseCreateUser);
 
   expect(responseCreateUser.statusCode).toBe(200);
 

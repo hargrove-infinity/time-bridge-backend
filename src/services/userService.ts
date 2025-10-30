@@ -9,7 +9,7 @@ import { ErrorData } from "../errors";
 import { CreateUserInput } from "../validation";
 import { jwtService } from "./jwt";
 
-async function create(
+async function register(
   args: CreateUserInput
 ): Promise<[string, null] | [null, ErrorData]> {
   const hashedPassword = await bcrypt.hash(args.password, 10);
@@ -77,4 +77,4 @@ async function login(
   return [token, null];
 }
 
-export const userService = { create, login } as const;
+export const userService = { register, login } as const;

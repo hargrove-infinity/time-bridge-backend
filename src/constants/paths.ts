@@ -1,7 +1,7 @@
 export const paths = {
   common: { base: "/" },
-  users: {
-    base: "/users",
+  auth: {
+    register: "/register",
     login: "/login",
   },
 } as const;
