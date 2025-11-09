@@ -1,8 +1,10 @@
 {
   "name": "time-bridge-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
+    "dev": "npx tsc && node dist/server.js",
+    "watch": "npx onchange -i -k \"**/*.ts\" -e \"dist/**\" -- npm run dev",
     "test": "npx jest --verbose --runInBand"
   },
   "keywords": [],
