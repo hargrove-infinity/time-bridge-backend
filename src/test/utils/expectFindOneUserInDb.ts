@@ -8,8 +8,6 @@ export async function expectFindOneUserInDb(): Promise<UserDocument> {
     email: TEST_USER_EMAIL,
   });
 
-  // expect(foundUser).toEqual(expect.anything());
-
   expectCreatedUserWithPassword(foundUser?.toObject());
 
   expect(errorFindOneUser).toBeNull();

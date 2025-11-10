@@ -16,6 +16,8 @@ export const DEFAULT_ALGORITHM_TOKEN: Algorithm = "HS256";
 
 export const ONE_HOUR_IN_SECONDS = 3600;
 
+export const DEFAULT_HASHING_ROUNDS = 10;
+
 export const ERROR_MESSAGES = {
   // USER CREATION
   USER_CREATION_BODY_UNDEFINED: "User creation body undefined",
@@ -40,6 +42,13 @@ export const ERROR_MESSAGES = {
   EXPIRES_IN_LESS_THAN_ONE: "expiresIn must be greater than 1 or 1",
   EXPIRES_IN_NEGATIVE: "expiresIn can't be negative",
   TOKEN_EXPIRED: "Token has been expired",
+
+  // BCRYPT
+  INVALID_SALT_HASHING_STRING: "Invalid salt for hashing string",
+  ROUNDS_NEGATIVE: "Rounds can't be negative number",
+  ROUNDS_LESS_THAN_ONE: "Rounds can't be less than one",
+  ERROR_HASHING_STRING: "Error during hashing string",
+  ERROR_COMPARING_HASH_STRING: "Error during comparing data with encrypted",
 
   // MISC
   INTERNAL_SERVER_ERROR: "Internal server error",

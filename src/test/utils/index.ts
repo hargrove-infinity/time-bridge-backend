@@ -1,3 +1,5 @@
+export * from "./expectBcryptCompareResult";
+export * from "./expectBcryptCorrectHashResult";
 export * from "./expectConnectDatabase";
 export * from "./expectCreatedUserWithPassword";
 export * from "./expectCreatedUserWithoutPassword";
