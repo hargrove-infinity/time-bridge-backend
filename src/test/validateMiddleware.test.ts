@@ -18,8 +18,16 @@ describe("validate middleware", () => {
     const data = response._getData();
 
     expect(data.errors).toEqual([
-      { code: ERROR_DEFINITIONS.EMAIL_UNDEFINED.code },
-      { code: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.code },
+      {
+        code: ERROR_DEFINITIONS.EMAIL_UNDEFINED.code,
+        data: [],
+        description: ERROR_DEFINITIONS.EMAIL_UNDEFINED.description,
+      },
+      {
+        code: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.code,
+        data: [],
+        description: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.description,
+      },
     ]);
 
     expect(next).not.toHaveBeenCalled();
@@ -42,8 +50,16 @@ describe("validate middleware", () => {
     const data = response._getData();
 
     expect(data.errors).toEqual([
-      { code: ERROR_DEFINITIONS.EMAIL_EMPTY.code },
-      { code: ERROR_DEFINITIONS.EMAIL_INVALID.code },
+      {
+        code: ERROR_DEFINITIONS.EMAIL_EMPTY.code,
+        data: [],
+        description: ERROR_DEFINITIONS.EMAIL_EMPTY.description,
+      },
+      {
+        code: ERROR_DEFINITIONS.EMAIL_INVALID.code,
+        data: [],
+        description: ERROR_DEFINITIONS.EMAIL_INVALID.description,
+      },
     ]);
 
     expect(next).not.toHaveBeenCalled();
@@ -66,7 +82,11 @@ describe("validate middleware", () => {
     const data = response._getData();
 
     expect(data.errors).toEqual([
-      { code: ERROR_DEFINITIONS.EMAIL_INVALID.code },
+      {
+        code: ERROR_DEFINITIONS.EMAIL_INVALID.code,
+        data: ["abc"],
+        description: ERROR_DEFINITIONS.EMAIL_INVALID.description,
+      },
     ]);
   });
 
@@ -87,7 +107,11 @@ describe("validate middleware", () => {
     const data = response._getData();
 
     expect(data.errors).toEqual([
-      { code: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.code },
+      {
+        code: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.code,
+        data: [],
+        description: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.description,
+      },
     ]);
   });
 
@@ -108,7 +132,11 @@ describe("validate middleware", () => {
     const data = response._getData();
 
     expect(data.errors).toEqual([
-      { code: ERROR_DEFINITIONS.PASSWORD_LENGTH.code },
+      {
+        code: ERROR_DEFINITIONS.PASSWORD_LENGTH.code,
+        data: ["pass"],
+        description: ERROR_DEFINITIONS.PASSWORD_LENGTH.description,
+      },
     ]);
   });
 
