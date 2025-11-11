@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { ValidateArgs, ValidateReturn } from "./types";
+import { buildValidationErrorsPayload } from "./helpers";
 
 export function validate<T>({
   schema,
@@ -9,8 +10,12 @@ export function validate<T>({
     const result = schema.safeParse(req[key]);
 
     if (!result.success) {
-      const errorMessages = result.error.issues.map((errItm) => errItm.message);
-      res.status(400).send({ errors: errorMessages });
+      const errorsPayload = buildValidationErrorsPayload({
+        issues: result.error.issues,
+        body: req.body,
+      });
+
+      res.status(400).send({ errors: errorsPayload });
       return;
     }
 

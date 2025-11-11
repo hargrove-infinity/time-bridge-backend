@@ -1,5 +1,5 @@
 import httpMocks from "node-mocks-http";
-import { ERROR_MESSAGES } from "../constants";
+import { ERROR_DEFINITIONS } from "../constants";
 import { middlewares } from "../middlewares";
 import { userValidationSchema } from "../validation";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "./constants";
@@ -18,8 +18,8 @@ describe("validate middleware", () => {
     const data = response._getData();
 
     expect(data.errors).toEqual([
-      ERROR_MESSAGES.EMAIL_UNDEFINED,
-      ERROR_MESSAGES.PASSWORD_UNDEFINED,
+      { code: ERROR_DEFINITIONS.EMAIL_UNDEFINED.code },
+      { code: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.code },
     ]);
 
     expect(next).not.toHaveBeenCalled();
@@ -42,8 +42,8 @@ describe("validate middleware", () => {
     const data = response._getData();
 
     expect(data.errors).toEqual([
-      ERROR_MESSAGES.EMAIL_EMPTY,
-      ERROR_MESSAGES.EMAIL_INVALID,
+      { code: ERROR_DEFINITIONS.EMAIL_EMPTY.code },
+      { code: ERROR_DEFINITIONS.EMAIL_INVALID.code },
     ]);
 
     expect(next).not.toHaveBeenCalled();
@@ -65,7 +65,9 @@ describe("validate middleware", () => {
 
     const data = response._getData();
 
-    expect(data.errors).toEqual([ERROR_MESSAGES.EMAIL_INVALID]);
+    expect(data.errors).toEqual([
+      { code: ERROR_DEFINITIONS.EMAIL_INVALID.code },
+    ]);
   });
 
   test("should fail: email is valid, password is undefined", async () => {
@@ -84,7 +86,9 @@ describe("validate middleware", () => {
 
     const data = response._getData();
 
-    expect(data.errors).toEqual([ERROR_MESSAGES.PASSWORD_UNDEFINED]);
+    expect(data.errors).toEqual([
+      { code: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.code },
+    ]);
   });
 
   test("should fail: email is valid, password is invalid", async () => {
@@ -103,7 +107,9 @@ describe("validate middleware", () => {
 
     const data = response._getData();
 
-    expect(data.errors).toEqual([ERROR_MESSAGES.PASSWORD_LENGTH]);
+    expect(data.errors).toEqual([
+      { code: ERROR_DEFINITIONS.PASSWORD_LENGTH.code },
+    ]);
   });
 
   test("should pass: email and password are valid", () => {
