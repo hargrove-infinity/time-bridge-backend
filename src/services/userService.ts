@@ -8,15 +8,20 @@ import { userRepository } from "../repositories";
 import { ErrorData } from "../errors";
 import { CreateUserInput } from "../validation";
 import { jwtService } from "./jwt";
+import { bcryptService } from "./bcrypt";
 
 async function register(
   args: CreateUserInput
 ): Promise<[string, null] | [null, ErrorData]> {
-  const hashedPassword = await bcrypt.hash(args.password, 10);
+  const [hash, errorHash] = await bcryptService.hash({ data: args.password });
+
+  if (errorHash) {
+    return [null, errorHash];
+  }
 
   const [user, errorCreateUser] = await userRepository.create({
     email: args.email,
-    password: hashedPassword,
+    password: hash,
   });
 
   if (errorCreateUser) {
@@ -53,12 +58,16 @@ async function login(
     return [null, { errors: [ERROR_MESSAGES.USER_EMAIL_NOT_EXIST] }];
   }
 
-  const isPasswordsMatched = await bcrypt.compare(
-    args.password,
-    foundUser.password
-  );
+  const [isMatched, errorCompare] = await bcryptService.compare({
+    data: args.password,
+    encrypted: foundUser.password,
+  });
 
-  if (!isPasswordsMatched) {
+  if (errorCompare) {
+    return [null, errorCompare];
+  }
+
+  if (!isMatched) {
     return [null, { errors: [ERROR_MESSAGES.USER_PASSWORD_WRONG] }];
   }
 

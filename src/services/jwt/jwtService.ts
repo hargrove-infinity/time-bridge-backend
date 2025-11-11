@@ -9,7 +9,7 @@ import {
 } from "./types";
 import { isExpiresInLessThanOne, isExpiresInNegative } from "./helpers";
 
-export function sign(args: SignTokenArgs): SignTokenResult {
+function sign(args: SignTokenArgs): SignTokenResult {
   const { options, payload } = args;
 
   try {
@@ -28,7 +28,7 @@ export function sign(args: SignTokenArgs): SignTokenResult {
   }
 }
 
-export function verify(args: VerifyTokenArgs): VerifyTokenResult {
+function verify(args: VerifyTokenArgs): VerifyTokenResult {
   const { options, token } = args;
 
   try {
