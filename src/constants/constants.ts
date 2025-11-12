@@ -20,12 +20,6 @@ export const DEFAULT_HASHING_ROUNDS = 10;
 
 export const ERROR_MESSAGES = {
   // USER CREATION
-  USER_CREATION_BODY_UNDEFINED: "User creation body undefined",
-  EMAIL_UNDEFINED: "Email undefined",
-  EMAIL_EMPTY: "Empty email",
-  EMAIL_INVALID: "Email invalid",
-  PASSWORD_UNDEFINED: "Password undefined",
-  PASSWORD_LENGTH: "Password must be 6 chars",
   USER_CREATE_REPOSITORY: "Some error occurred in user create repository",
   USER_CREATE_SERVICE: "Some error occurred in user create service",
   USER_CREATE_ROUTE: "Some error occurred in user create route",
@@ -52,4 +46,43 @@ export const ERROR_MESSAGES = {
 
   // MISC
   INTERNAL_SERVER_ERROR: "Internal server error",
+};
+
+const ERROR_DEFINITIONS_MISC = {
+  UNKNOWN_ERROR: {
+    code: "UNKNOWN_ERROR",
+    description: "Error without certain definition",
+  },
+};
+
+const ERROR_DEFINITIONS_AUTH = {
+  AUTH_BODY_UNDEFINED: {
+    code: "AUTH_BODY_UNDEFINED",
+    description: "Validation error. Request body is not passed.",
+  },
+  EMAIL_UNDEFINED: {
+    code: "EMAIL_UNDEFINED",
+    description: "Validation error. Email field is missing.",
+  },
+  EMAIL_EMPTY: {
+    code: "EMAIL_EMPTY",
+    description: "Validation error. Email field is empty string.",
+  },
+  EMAIL_INVALID: {
+    code: "EMAIL_INVALID",
+    description: "Validation error. Email field is invalid.",
+  },
+  PASSWORD_UNDEFINED: {
+    code: "PASSWORD_UNDEFINED",
+    description: "Validation error. Password field is missing.",
+  },
+  PASSWORD_LENGTH: {
+    code: "PASSWORD_LENGTH",
+    description: "Validation error. Password field is less than 6 characters.",
+  },
+};
+
+export const ERROR_DEFINITIONS = {
+  ...ERROR_DEFINITIONS_MISC,
+  ...ERROR_DEFINITIONS_AUTH,
 };
