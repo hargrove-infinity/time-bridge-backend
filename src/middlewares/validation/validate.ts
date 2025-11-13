@@ -10,6 +10,8 @@ export function validate<T>({
     const result = schema.safeParse(req[key]);
 
     if (!result.success) {
+      console.log('result', result)
+      console.log('result.error.issues', result.error.issues)
       const errorsPayload = buildValidationErrorsPayload({
         issues: result.error.issues,
         body: req.body,
