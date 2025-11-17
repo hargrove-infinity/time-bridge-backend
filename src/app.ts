@@ -1,6 +1,7 @@
-import express, { Request, Response, NextFunction } from "express";
+import express from "express";
 import cors from "cors";
 import { userRouter } from "./routes";
+import { errorHandler } from "./middlewares";
 
 const app = express();
 
@@ -9,15 +10,6 @@ app.use(express.json());
 
 app.use(userRouter);
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    if (err instanceof SyntaxError && 'body' in err) {
-        console.error(err);
-        return res.status(400).send({ status: 400, message: err.message })
-    }
-    
-    console.error(err)
-    res.status(500).send({ status: 500, message: "Internal Server Error" })
-    next()
-})
+app.use(errorHandler);
 
 export { app };
