@@ -11,9 +11,7 @@ async function register(
   const [token, error] = await userService.register(body);
 
   if (error) {
-    res
-      .status(error.httpStatusCode)
-      .send({ errors: error.buildErrorPayload() });
+    res.status(error.statusCode).send({ errors: error.buildErrorPayload() });
     return;
   }
 

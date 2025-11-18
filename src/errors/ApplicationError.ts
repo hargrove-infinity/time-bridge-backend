@@ -17,10 +17,6 @@ export class ApplicationError extends Error {
     this.data = options.data || [];
   }
 
-  get httpStatusCode() {
-    return this.statusCode;
-  }
-
   buildErrorPayload() {
     return [
       {
