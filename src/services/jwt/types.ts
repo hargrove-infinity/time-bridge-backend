@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 import jwt, { Jwt, JwtPayload, VerifyOptions } from "jsonwebtoken";
-import { ErrorData } from "../../errors";
+import { ApplicationError, ErrorData } from "../../errors";
 
 interface SignAuthTokenPayload {
   email: string;
@@ -12,7 +12,7 @@ export interface SignTokenArgs {
   options?: jwt.SignOptions;
 }
 
-export type SignTokenResult = [string, null] | [null, ErrorData];
+export type SignTokenResult = [string, null] | [null, ApplicationError];
 
 export interface VerifyTokenArgs {
   token: string;

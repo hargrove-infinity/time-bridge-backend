@@ -1,6 +1,7 @@
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { envVariables } from "../../common";
-import { ERROR_MESSAGES } from "../../constants";
+import { ERROR_DEFINITIONS, ERROR_MESSAGES } from "../../constants";
+import { ApplicationError } from "../../errors";
 import {
   SignTokenArgs,
   SignTokenResult,
@@ -14,17 +15,39 @@ function sign(args: SignTokenArgs): SignTokenResult {
 
   try {
     if (isExpiresInLessThanOne(options)) {
-      return [null, { errors: [ERROR_MESSAGES.EXPIRES_IN_LESS_THAN_ONE] }];
+      return [
+        null,
+        new ApplicationError({
+          errorCode: ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE.code,
+          errorDescription:
+            ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE.description,
+          statusCode: 500,
+        }),
+      ];
     }
 
     if (isExpiresInNegative(options)) {
-      return [null, { errors: [ERROR_MESSAGES.EXPIRES_IN_NEGATIVE] }];
+      return [
+        null,
+        new ApplicationError({
+          errorCode: ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE.code,
+          errorDescription: ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE.description,
+          statusCode: 500,
+        }),
+      ];
     }
 
     const token = jwt.sign(payload, envVariables.jwtSecretKey, options);
     return [token, null];
   } catch (error) {
-    return [null, { errors: [ERROR_MESSAGES.ERROR_SIGNING_TOKEN] }];
+    return [
+      null,
+      new ApplicationError({
+        errorCode: ERROR_DEFINITIONS.ERROR_SIGNING_TOKEN.code,
+        errorDescription: ERROR_DEFINITIONS.ERROR_SIGNING_TOKEN.description,
+        statusCode: 500,
+      }),
+    ];
   }
 }
 
