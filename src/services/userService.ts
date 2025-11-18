@@ -1,18 +1,18 @@
-import bcrypt from "bcrypt";
 import {
   DEFAULT_ALGORITHM_TOKEN,
   DEFAULT_EXPIRES_IN_TOKEN_STRING,
+  ERROR_DEFINITIONS,
   ERROR_MESSAGES,
 } from "../constants";
 import { userRepository } from "../repositories";
-import { ErrorData } from "../errors";
+import { ApplicationError, ErrorData } from "../errors";
 import { CreateUserInput } from "../validation";
 import { jwtService } from "./jwt";
 import { bcryptService } from "./bcrypt";
 
 async function register(
   args: CreateUserInput
-): Promise<[string, null] | [null, ErrorData]> {
+): Promise<[string, null] | [null, ApplicationError]> {
   const [hash, errorHash] = await bcryptService.hash({ data: args.password });
 
   if (errorHash) {
@@ -25,7 +25,14 @@ async function register(
   });
 
   if (errorCreateUser) {
-    return [null, { errors: [ERROR_MESSAGES.USER_CREATE_SERVICE] }];
+    return [
+      null,
+      new ApplicationError({
+        errorCode: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.code,
+        errorDescription: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.description,
+        statusCode: 500,
+      }),
+    ];
   }
 
   const [token, errorSignToken] = jwtService.sign({
@@ -37,7 +44,7 @@ async function register(
   });
 
   if (errorSignToken) {
-    return [null, { errors: [ERROR_MESSAGES.USER_CREATE_SERVICE] }];
+    return [null, errorSignToken];
   }
 
   return [token, null];

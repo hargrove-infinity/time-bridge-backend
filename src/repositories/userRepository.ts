@@ -1,5 +1,5 @@
-import { ERROR_MESSAGES } from "../constants";
-import { ErrorData } from "../errors";
+import { ERROR_DEFINITIONS } from "../constants";
+import { ApplicationError } from "../errors";
 import {
   CreateUserArgs,
   FindOneUserArgs,
@@ -10,13 +10,26 @@ import {
 
 async function create(
   args: CreateUserArgs
-): Promise<[UserDocumentWithoutPassword, null] | [null, ErrorData]> {
+): Promise<[UserDocumentWithoutPassword, null] | [null, ApplicationError]> {
   try {
-    const createdUser = await UserModel.create(args);
+    // ! Tmp passed password as an object to cause mongodb error
+    // TODO Should be removed
+    const createdUser = await UserModel.create({
+      ...args,
+      password: { key: 1 },
+    });
     const { password, ...userWithoutPassword } = createdUser.toObject();
     return [userWithoutPassword, null];
   } catch (error) {
-    return [null, { errors: [ERROR_MESSAGES.USER_CREATE_REPOSITORY] }];
+    return [
+      null,
+      new ApplicationError({
+        errorCode: ERROR_DEFINITIONS.CREATE_USER_DATABASE_ERROR.code,
+        errorDescription:
+          ERROR_DEFINITIONS.CREATE_USER_DATABASE_ERROR.description,
+        statusCode: 500,
+      }),
+    ];
   }
 }
 

@@ -22,29 +22,16 @@ export const ZOD_ISSUE_MESSAGE_EXPECTED_OBJECT_UNDEFINED =
   "expected object, received undefined";
 
 export const ERROR_MESSAGES = {
-  // USER CREATION
-  USER_CREATE_REPOSITORY: "Some error occurred in user create repository",
-  USER_CREATE_SERVICE: "Some error occurred in user create service",
-  USER_CREATE_ROUTE: "Some error occurred in user create route",
-
   // USER LOGIN
   USER_EMAIL_NOT_EXIST: "User with provided email does not exist",
   USER_PASSWORD_WRONG: "Provided password is wrong",
   USER_LOGIN_SERVICE: "Some error occurred in user login service",
-  USER_LOGIN_ROUTE: "Some error occurred in user login route",
 
   // JWT
-  ERROR_SIGNING_TOKEN: "Error during signing token",
   ERROR_VERIFYING_TOKEN: "Error during verifying token",
-  EXPIRES_IN_LESS_THAN_ONE: "expiresIn must be greater than 1 or 1",
-  EXPIRES_IN_NEGATIVE: "expiresIn can't be negative",
   TOKEN_EXPIRED: "Token has been expired",
 
   // BCRYPT
-  INVALID_SALT_HASHING_STRING: "Invalid salt for hashing string",
-  ROUNDS_NEGATIVE: "Rounds can't be negative number",
-  ROUNDS_LESS_THAN_ONE: "Rounds can't be less than one",
-  ERROR_HASHING_STRING: "Error during hashing string",
   ERROR_COMPARING_HASH_STRING: "Error during comparing data with encrypted",
 
   // MISC
@@ -67,6 +54,55 @@ const ERROR_DEFINITIONS_MISC = {
   INTERNAL_SERVER_ERROR: {
     code: "INTERNAL_SERVER_ERROR",
     description: "Internal Server Error",
+  },
+};
+
+const ERROR_DEFINITIONS_BCRYPT = {
+  INVALID_SALT_HASHING_STRING: {
+    code: "INVALID_SALT_HASHING_STRING",
+    description: "Invalid salt for hashing string",
+  },
+  ROUNDS_NEGATIVE: {
+    code: "ROUNDS_NEGATIVE",
+    description: "Rounds can't be negative number",
+  },
+  ROUNDS_LESS_THAN_ONE: {
+    code: "ROUNDS_LESS_THAN_ONE",
+    description: "Rounds can't be less than one",
+  },
+  ERROR_HASHING_STRING: {
+    code: "ERROR_HASHING_STRING",
+    description: "Error during hashing string",
+  },
+};
+
+const ERROR_DEFINITIONS_JWT = {
+  ERROR_SIGNING_TOKEN: {
+    code: "ERROR_SIGNING_TOKEN",
+    description: "Error during signing token",
+  },
+  ERROR_VERIFYING_TOKEN: {
+    code: "ERROR_VERIFYING_TOKEN",
+    description: "Error during verifying token",
+  },
+  EXPIRES_IN_LESS_THAN_ONE: {
+    code: "EXPIRES_IN_LESS_THAN_ONE",
+    description: "expiresIn must be greater than 1 or 1",
+  },
+  EXPIRES_IN_NEGATIVE: {
+    code: "EXPIRES_IN_NEGATIVE",
+    description: "expiresIn can't be negative",
+  },
+  TOKEN_EXPIRED: {
+    code: "TOKEN_EXPIRED",
+    description: "Token has been expired",
+  },
+};
+
+const ERROR_DEFINITIONS_USER_REPOSITORY = {
+  CREATE_USER_DATABASE_ERROR: {
+    code: "CREATE_USER_DATABASE_ERROR",
+    description: "Error during creation user in database",
   },
 };
 
@@ -99,5 +135,8 @@ const ERROR_DEFINITIONS_AUTH = {
 
 export const ERROR_DEFINITIONS = {
   ...ERROR_DEFINITIONS_MISC,
+  ...ERROR_DEFINITIONS_BCRYPT,
+  ...ERROR_DEFINITIONS_JWT,
+  ...ERROR_DEFINITIONS_USER_REPOSITORY,
   ...ERROR_DEFINITIONS_AUTH,
 };
