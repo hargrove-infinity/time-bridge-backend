@@ -18,6 +18,9 @@ export const ONE_HOUR_IN_SECONDS = 3600;
 
 export const DEFAULT_HASHING_ROUNDS = 10;
 
+export const ZOD_ISSUE_MESSAGE_EXPECTED_OBJECT_UNDEFINED =
+  "expected object, received undefined";
+
 export const ERROR_MESSAGES = {
   // USER CREATION
   USER_CREATE_REPOSITORY: "Some error occurred in user create repository",
@@ -52,6 +55,18 @@ const ERROR_DEFINITIONS_MISC = {
   UNKNOWN_ERROR: {
     code: "UNKNOWN_ERROR",
     description: "Error without certain definition",
+  },
+  UNKNOWN_ERROR_KEY: {
+    code: "UNKNOWN_ERROR_KEY",
+    description: "Error without defined error key",
+  },
+  REQUEST_BODY_MISSING: {
+    code: "REQUEST_BODY_MISSING",
+    description: "Request body is missing in case when it is required",
+  },
+  INTERNAL_SERVER_ERROR: {
+    code: "INTERNAL_SERVER_ERROR",
+    description: "Internal Server Error",
   },
 };
 
