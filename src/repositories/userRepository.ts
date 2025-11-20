@@ -19,9 +19,7 @@ async function create(
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.CREATE_USER_DATABASE_ERROR.code,
-        errorDescription:
-          ERROR_DEFINITIONS.CREATE_USER_DATABASE_ERROR.description,
+        errorDefinition: ERROR_DEFINITIONS.CREATE_USER_DATABASE_ERROR,
         statusCode: 500,
       }),
     ];
@@ -43,9 +41,7 @@ async function findOne(
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.FIND_ONE_USER_DATABASE_ERROR.code,
-        errorDescription:
-          ERROR_DEFINITIONS.FIND_ONE_USER_DATABASE_ERROR.description,
+        errorDefinition: ERROR_DEFINITIONS.FIND_ONE_USER_DATABASE_ERROR,
         statusCode: 500,
       }),
     ];

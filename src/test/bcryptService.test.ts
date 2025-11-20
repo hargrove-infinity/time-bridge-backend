@@ -35,8 +35,8 @@ describe("bcryptService", () => {
       expect(hash).toBeNull();
 
       expect(error).toBeInstanceOf(ApplicationError);
-      expect(error?.errorCode).toBe(
-        ERROR_DEFINITIONS.INVALID_SALT_HASHING_STRING.code
+      expect(error?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.INVALID_SALT_HASHING_STRING
       );
     });
 
@@ -49,7 +49,7 @@ describe("bcryptService", () => {
       expect(hash).toBeNull();
 
       expect(error).toBeInstanceOf(ApplicationError);
-      expect(error?.errorCode).toBe(ERROR_DEFINITIONS.ROUNDS_NEGATIVE.code);
+      expect(error?.errorDefinition).toEqual(ERROR_DEFINITIONS.ROUNDS_NEGATIVE);
     });
 
     test("should return error when rounds is less than one", async () => {
@@ -61,8 +61,8 @@ describe("bcryptService", () => {
       expect(hash).toBeNull();
 
       expect(error).toBeInstanceOf(ApplicationError);
-      expect(error?.errorCode).toBe(
-        ERROR_DEFINITIONS.ROUNDS_LESS_THAN_ONE.code
+      expect(error?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.ROUNDS_LESS_THAN_ONE
       );
     });
   });

@@ -59,8 +59,8 @@ describe("jwtService", () => {
       expect(token).toBeNull();
 
       expect(errorSign).toBeInstanceOf(ApplicationError);
-      expect(errorSign?.errorCode).toBe(
-        ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE.code
+      expect(errorSign?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE
       );
     });
 
@@ -70,8 +70,8 @@ describe("jwtService", () => {
       expect(token).toBeNull();
 
       expect(errorSign).toBeInstanceOf(ApplicationError);
-      expect(errorSign?.errorCode).toBe(
-        ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE.code
+      expect(errorSign?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE
       );
     });
   });
@@ -106,8 +106,8 @@ describe("jwtService", () => {
       expect(data).toBeNull();
 
       expect(error).toBeInstanceOf(ApplicationError);
-      expect(error?.errorCode).toBe(
-        ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN.code
+      expect(error?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN
       );
     });
 
@@ -117,8 +117,8 @@ describe("jwtService", () => {
       expect(data).toBeNull();
 
       expect(error).toBeInstanceOf(ApplicationError);
-      expect(error?.errorCode).toBe(
-        ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN.code
+      expect(error?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN
       );
     });
 
@@ -128,8 +128,8 @@ describe("jwtService", () => {
       expect(data).toBeNull();
 
       expect(error).toBeInstanceOf(ApplicationError);
-      expect(error?.errorCode).toBe(
-        ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN.code
+      expect(error?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN
       );
     });
 
@@ -145,7 +145,9 @@ describe("jwtService", () => {
       expect(verifyResult).toBeNull();
 
       expect(errorVerify).toBeInstanceOf(ApplicationError);
-      expect(errorVerify?.errorCode).toBe(ERROR_DEFINITIONS.TOKEN_EXPIRED.code);
+      expect(errorVerify?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.TOKEN_EXPIRED
+      );
     });
   });
 });

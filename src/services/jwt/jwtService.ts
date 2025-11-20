@@ -18,9 +18,7 @@ function sign(args: SignTokenArgs): SignTokenResult {
       return [
         null,
         new ApplicationError({
-          errorCode: ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE.code,
-          errorDescription:
-            ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE.description,
+          errorDefinition: ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE,
           statusCode: 500,
         }),
       ];
@@ -30,8 +28,7 @@ function sign(args: SignTokenArgs): SignTokenResult {
       return [
         null,
         new ApplicationError({
-          errorCode: ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE.code,
-          errorDescription: ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE.description,
+          errorDefinition: ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE,
           statusCode: 500,
         }),
       ];
@@ -43,8 +40,7 @@ function sign(args: SignTokenArgs): SignTokenResult {
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.ERROR_SIGNING_TOKEN.code,
-        errorDescription: ERROR_DEFINITIONS.ERROR_SIGNING_TOKEN.description,
+        errorDefinition: ERROR_DEFINITIONS.ERROR_SIGNING_TOKEN,
         statusCode: 500,
       }),
     ];
@@ -62,8 +58,7 @@ function verify(args: VerifyTokenArgs): VerifyTokenResult {
       return [
         null,
         new ApplicationError({
-          errorCode: ERROR_DEFINITIONS.TOKEN_EXPIRED.code,
-          errorDescription: ERROR_DEFINITIONS.TOKEN_EXPIRED.description,
+          errorDefinition: ERROR_DEFINITIONS.TOKEN_EXPIRED,
           statusCode: 500,
         }),
       ];
@@ -72,8 +67,7 @@ function verify(args: VerifyTokenArgs): VerifyTokenResult {
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN.code,
-        errorDescription: ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN.description,
+        errorDefinition: ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN,
         statusCode: 500,
       }),
     ];

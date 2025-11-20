@@ -1,27 +1,30 @@
 export class ApplicationError extends Error {
   public statusCode: number;
-  public errorCode: string;
-  public errorDescription: string;
+  public errorDefinition: {
+    code: string;
+    description: string;
+  };
   public data: string[] = [];
 
   constructor(options: {
     statusCode: number;
-    errorCode: string;
-    errorDescription: string;
+    errorDefinition: {
+      code: string;
+      description: string;
+    };
     data?: string[];
   }) {
     super();
     this.statusCode = options.statusCode;
-    this.errorCode = options.errorCode;
-    this.errorDescription = options.errorDescription;
+    this.errorDefinition = options.errorDefinition;
     this.data = options.data || [];
   }
 
   buildErrorPayload() {
     return [
       {
-        code: this.errorCode,
-        description: this.errorDescription,
+        code: this.errorDefinition.code,
+        description: this.errorDefinition.description,
         data: this.data,
       },
     ];

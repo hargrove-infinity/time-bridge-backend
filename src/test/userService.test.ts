@@ -133,8 +133,8 @@ describe("userService", () => {
       expect(token).toBeNull();
 
       expect(errorLoginUser).toBeInstanceOf(ApplicationError);
-      expect(errorLoginUser?.errorCode).toBe(
-        ERROR_DEFINITIONS.LOGIN_FAILED.code
+      expect(errorLoginUser?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.LOGIN_FAILED
       );
     });
 
@@ -149,8 +149,8 @@ describe("userService", () => {
       expect(tokenLoginUser).toBeNull();
 
       expect(errorLoginUser).toBeInstanceOf(ApplicationError);
-      expect(errorLoginUser?.errorCode).toBe(
-        ERROR_DEFINITIONS.LOGIN_FAILED.code
+      expect(errorLoginUser?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.LOGIN_FAILED
       );
     });
 

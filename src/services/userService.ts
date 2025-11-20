@@ -18,8 +18,7 @@ async function register(
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.code,
-        errorDescription: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.description,
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
         statusCode: 500,
       }),
     ];
@@ -34,8 +33,7 @@ async function register(
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.code,
-        errorDescription: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.description,
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
         statusCode: 500,
       }),
     ];
@@ -53,8 +51,7 @@ async function register(
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.code,
-        errorDescription: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.description,
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
         statusCode: 500,
       }),
     ];
@@ -74,8 +71,7 @@ async function login(
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.code,
-        errorDescription: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.description,
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
         statusCode: 500,
       }),
     ];
@@ -85,8 +81,7 @@ async function login(
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.LOGIN_FAILED.code,
-        errorDescription: ERROR_DEFINITIONS.LOGIN_FAILED.description,
+        errorDefinition: ERROR_DEFINITIONS.LOGIN_FAILED,
         statusCode: 400,
       }),
     ];
@@ -105,8 +100,7 @@ async function login(
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.LOGIN_FAILED.code,
-        errorDescription: ERROR_DEFINITIONS.LOGIN_FAILED.description,
+        errorDefinition: ERROR_DEFINITIONS.LOGIN_FAILED,
         statusCode: 400,
       }),
     ];

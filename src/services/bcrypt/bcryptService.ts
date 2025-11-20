@@ -14,8 +14,7 @@ async function hash({ data, saltOrRounds }: BcryptHashArgs): BcryptHashResult {
       return [
         null,
         new ApplicationError({
-          errorCode: ERROR_DEFINITIONS.ROUNDS_NEGATIVE.code,
-          errorDescription: ERROR_DEFINITIONS.ROUNDS_NEGATIVE.description,
+          errorDefinition: ERROR_DEFINITIONS.ROUNDS_NEGATIVE,
           statusCode: 500,
         }),
       ];
@@ -25,8 +24,7 @@ async function hash({ data, saltOrRounds }: BcryptHashArgs): BcryptHashResult {
       return [
         null,
         new ApplicationError({
-          errorCode: ERROR_DEFINITIONS.ROUNDS_LESS_THAN_ONE.code,
-          errorDescription: ERROR_DEFINITIONS.ROUNDS_LESS_THAN_ONE.description,
+          errorDefinition: ERROR_DEFINITIONS.ROUNDS_LESS_THAN_ONE,
           statusCode: 500,
         }),
       ];
@@ -45,9 +43,7 @@ async function hash({ data, saltOrRounds }: BcryptHashArgs): BcryptHashResult {
       return [
         null,
         new ApplicationError({
-          errorCode: ERROR_DEFINITIONS.INVALID_SALT_HASHING_STRING.code,
-          errorDescription:
-            ERROR_DEFINITIONS.INVALID_SALT_HASHING_STRING.description,
+          errorDefinition: ERROR_DEFINITIONS.INVALID_SALT_HASHING_STRING,
           statusCode: 500,
         }),
       ];
@@ -56,8 +52,7 @@ async function hash({ data, saltOrRounds }: BcryptHashArgs): BcryptHashResult {
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.ERROR_HASHING_STRING.code,
-        errorDescription: ERROR_DEFINITIONS.ERROR_HASHING_STRING.description,
+        errorDefinition: ERROR_DEFINITIONS.ERROR_HASHING_STRING,
         statusCode: 500,
       }),
     ];
@@ -75,9 +70,7 @@ async function compare({
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.ERROR_COMPARING_HASH_STRING.code,
-        errorDescription:
-          ERROR_DEFINITIONS.ERROR_COMPARING_HASH_STRING.description,
+        errorDefinition: ERROR_DEFINITIONS.ERROR_COMPARING_HASH_STRING,
         statusCode: 500,
       }),
     ];
