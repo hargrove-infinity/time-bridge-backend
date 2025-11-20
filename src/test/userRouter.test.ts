@@ -2,7 +2,7 @@ import express, { Express } from "express";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import request from "supertest";
-import { ERROR_MESSAGES, paths } from "../constants";
+import { ERROR_DEFINITIONS, paths } from "../constants";
 import { UserModel } from "../models";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 
@@ -143,7 +143,13 @@ describe("userRouter", () => {
 
       expect(response.status).toBe(400);
       expect(response.body).toEqual({
-        errors: [ERROR_MESSAGES.USER_EMAIL_NOT_EXIST],
+        errors: [
+          {
+            code: ERROR_DEFINITIONS.LOGIN_FAILED.code,
+            description: ERROR_DEFINITIONS.LOGIN_FAILED.description,
+            data: [],
+          },
+        ],
       });
     });
 
@@ -157,7 +163,13 @@ describe("userRouter", () => {
 
       expect(response.status).toBe(400);
       expect(response.body).toEqual({
-        errors: [ERROR_MESSAGES.USER_PASSWORD_WRONG],
+        errors: [
+          {
+            code: ERROR_DEFINITIONS.LOGIN_FAILED.code,
+            description: ERROR_DEFINITIONS.LOGIN_FAILED.description,
+            data: [],
+          },
+        ],
       });
     });
   });

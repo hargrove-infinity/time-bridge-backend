@@ -2,10 +2,9 @@ import {
   DEFAULT_ALGORITHM_TOKEN,
   DEFAULT_EXPIRES_IN_TOKEN_STRING,
   ERROR_DEFINITIONS,
-  ERROR_MESSAGES,
 } from "../constants";
 import { userRepository } from "../repositories";
-import { ApplicationError, ErrorData } from "../errors";
+import { ApplicationError } from "../errors";
 import { CreateUserInput } from "../validation";
 import { jwtService } from "./jwt";
 import { bcryptService } from "./bcrypt";
@@ -16,7 +15,14 @@ async function register(
   const [hash, errorHash] = await bcryptService.hash({ data: args.password });
 
   if (errorHash) {
-    return [null, errorHash];
+    return [
+      null,
+      new ApplicationError({
+        errorCode: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.code,
+        errorDescription: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.description,
+        statusCode: 500,
+      }),
+    ];
   }
 
   const [user, errorCreateUser] = await userRepository.create({
@@ -44,7 +50,14 @@ async function register(
   });
 
   if (errorSignToken) {
-    return [null, errorSignToken];
+    return [
+      null,
+      new ApplicationError({
+        errorCode: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.code,
+        errorDescription: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.description,
+        statusCode: 500,
+      }),
+    ];
   }
 
   return [token, null];
@@ -52,17 +65,31 @@ async function register(
 
 async function login(
   args: CreateUserInput
-): Promise<[string, null] | [null, ErrorData]> {
+): Promise<[string, null] | [null, ApplicationError]> {
   const [foundUser, errorFindUser] = await userRepository.findOne({
     email: args.email,
   });
 
   if (errorFindUser) {
-    return [null, { errors: [ERROR_MESSAGES.INTERNAL_SERVER_ERROR] }];
+    return [
+      null,
+      new ApplicationError({
+        errorCode: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.code,
+        errorDescription: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR.description,
+        statusCode: 500,
+      }),
+    ];
   }
 
   if (!foundUser) {
-    return [null, { errors: [ERROR_MESSAGES.USER_EMAIL_NOT_EXIST] }];
+    return [
+      null,
+      new ApplicationError({
+        errorCode: ERROR_DEFINITIONS.LOGIN_FAILED.code,
+        errorDescription: ERROR_DEFINITIONS.LOGIN_FAILED.description,
+        statusCode: 400,
+      }),
+    ];
   }
 
   const [isMatched, errorCompare] = await bcryptService.compare({
@@ -75,7 +102,14 @@ async function login(
   }
 
   if (!isMatched) {
-    return [null, { errors: [ERROR_MESSAGES.USER_PASSWORD_WRONG] }];
+    return [
+      null,
+      new ApplicationError({
+        errorCode: ERROR_DEFINITIONS.LOGIN_FAILED.code,
+        errorDescription: ERROR_DEFINITIONS.LOGIN_FAILED.description,
+        statusCode: 400,
+      }),
+    ];
   }
 
   const [token, errorSignToken] = jwtService.sign({
@@ -87,7 +121,7 @@ async function login(
   });
 
   if (errorSignToken) {
-    return [null, { errors: [ERROR_MESSAGES.USER_LOGIN_SERVICE] }];
+    return [null, errorSignToken];
   }
 
   return [token, null];

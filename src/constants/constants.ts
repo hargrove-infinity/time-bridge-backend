@@ -21,23 +21,6 @@ export const DEFAULT_HASHING_ROUNDS = 10;
 export const ZOD_ISSUE_MESSAGE_EXPECTED_OBJECT_UNDEFINED =
   "expected object, received undefined";
 
-export const ERROR_MESSAGES = {
-  // USER LOGIN
-  USER_EMAIL_NOT_EXIST: "User with provided email does not exist",
-  USER_PASSWORD_WRONG: "Provided password is wrong",
-  USER_LOGIN_SERVICE: "Some error occurred in user login service",
-
-  // JWT
-  ERROR_VERIFYING_TOKEN: "Error during verifying token",
-  TOKEN_EXPIRED: "Token has been expired",
-
-  // BCRYPT
-  ERROR_COMPARING_HASH_STRING: "Error during comparing data with encrypted",
-
-  // MISC
-  INTERNAL_SERVER_ERROR: "Internal server error",
-};
-
 const ERROR_DEFINITIONS_MISC = {
   UNKNOWN_ERROR: {
     code: "UNKNOWN_ERROR",
@@ -74,6 +57,10 @@ const ERROR_DEFINITIONS_BCRYPT = {
     code: "ERROR_HASHING_STRING",
     description: "Error during hashing string",
   },
+  ERROR_COMPARING_HASH_STRING: {
+    code: "ERROR_COMPARING_HASH_STRING",
+    description: "Error during comparing data with encrypted",
+  },
 };
 
 const ERROR_DEFINITIONS_JWT = {
@@ -103,6 +90,17 @@ const ERROR_DEFINITIONS_USER_REPOSITORY = {
   CREATE_USER_DATABASE_ERROR: {
     code: "CREATE_USER_DATABASE_ERROR",
     description: "Error during creation user in database",
+  },
+  FIND_ONE_USER_DATABASE_ERROR: {
+    code: "FIND_ONE_USER_DATABASE_ERROR",
+    description: "Error during find one user in database",
+  },
+};
+
+const ERROR_DEFINITIONS_USER_SERVICE = {
+  LOGIN_FAILED: {
+    code: "LOGIN_FAILED",
+    description: "Login failed. Please check your credentials.",
   },
 };
 
@@ -138,5 +136,6 @@ export const ERROR_DEFINITIONS = {
   ...ERROR_DEFINITIONS_BCRYPT,
   ...ERROR_DEFINITIONS_JWT,
   ...ERROR_DEFINITIONS_USER_REPOSITORY,
+  ...ERROR_DEFINITIONS_USER_SERVICE,
   ...ERROR_DEFINITIONS_AUTH,
 };

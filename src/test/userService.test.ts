@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import { ApplicationError } from "../errors";
 import {
   DEFAULT_EXPIRES_IN_TOKEN_NUMBER,
-  ERROR_MESSAGES,
+  ERROR_DEFINITIONS,
   ONE_HOUR_IN_SECONDS,
 } from "../constants";
 import { UserModel } from "../models";
@@ -130,9 +131,11 @@ describe("userService", () => {
       });
 
       expect(token).toBeNull();
-      expect(errorLoginUser).toEqual({
-        errors: [ERROR_MESSAGES.USER_EMAIL_NOT_EXIST],
-      });
+
+      expect(errorLoginUser).toBeInstanceOf(ApplicationError);
+      expect(errorLoginUser?.errorCode).toBe(
+        ERROR_DEFINITIONS.LOGIN_FAILED.code
+      );
     });
 
     test("should throw an error when password is incorrect", async () => {
@@ -144,9 +147,11 @@ describe("userService", () => {
       });
 
       expect(tokenLoginUser).toBeNull();
-      expect(errorLoginUser).toEqual({
-        errors: [ERROR_MESSAGES.USER_PASSWORD_WRONG],
-      });
+
+      expect(errorLoginUser).toBeInstanceOf(ApplicationError);
+      expect(errorLoginUser?.errorCode).toBe(
+        ERROR_DEFINITIONS.LOGIN_FAILED.code
+      );
     });
 
     test("should return a JWT token with correct payload", async () => {

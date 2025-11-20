@@ -1,4 +1,5 @@
-import { ERROR_MESSAGES } from "../constants";
+import { ERROR_DEFINITIONS } from "../constants";
+import { ApplicationError } from "../errors";
 import { bcryptService } from "../services";
 import {
   TEST_USER_ALTERNATIVE_PASSWORD,
@@ -33,11 +34,10 @@ describe("bcryptService", () => {
 
       expect(hash).toBeNull();
 
-      // ! Tmp commented
-      // TODO Should be refactored
-      // expect(error).toEqual({
-      //   errors: [ERROR_MESSAGES.INVALID_SALT_HASHING_STRING],
-      // });
+      expect(error).toBeInstanceOf(ApplicationError);
+      expect(error?.errorCode).toBe(
+        ERROR_DEFINITIONS.INVALID_SALT_HASHING_STRING.code
+      );
     });
 
     test("should return error when rounds is negative number", async () => {
@@ -48,11 +48,8 @@ describe("bcryptService", () => {
 
       expect(hash).toBeNull();
 
-      // ! Tmp commented
-      // TODO Should be refactored
-      // expect(error).toEqual({
-      //   errors: [ERROR_MESSAGES.ROUNDS_NEGATIVE],
-      // });
+      expect(error).toBeInstanceOf(ApplicationError);
+      expect(error?.errorCode).toBe(ERROR_DEFINITIONS.ROUNDS_NEGATIVE.code);
     });
 
     test("should return error when rounds is less than one", async () => {
@@ -63,11 +60,10 @@ describe("bcryptService", () => {
 
       expect(hash).toBeNull();
 
-      // ! Tmp commented
-      // TODO Should be refactored
-      // expect(error).toEqual({
-      //   errors: [ERROR_MESSAGES.ROUNDS_LESS_THAN_ONE],
-      // });
+      expect(error).toBeInstanceOf(ApplicationError);
+      expect(error?.errorCode).toBe(
+        ERROR_DEFINITIONS.ROUNDS_LESS_THAN_ONE.code
+      );
     });
   });
 

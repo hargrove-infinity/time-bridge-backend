@@ -1,8 +1,9 @@
 import jwt from "jsonwebtoken";
+import { ApplicationError } from "../errors";
 import {
   DEFAULT_ALGORITHM_TOKEN,
   DEFAULT_EXPIRES_IN_TOKEN_NUMBER,
-  ERROR_MESSAGES,
+  ERROR_DEFINITIONS,
   ONE_HOUR_IN_SECONDS,
 } from "../constants";
 import { jwtService } from "../services";
@@ -57,11 +58,10 @@ describe("jwtService", () => {
 
       expect(token).toBeNull();
 
-      // ! Tmp commented
-      // TODO Should be refactored
-      // expect(errorSign).toEqual({
-      //   errors: [ERROR_MESSAGES.EXPIRES_IN_NEGATIVE],
-      // });
+      expect(errorSign).toBeInstanceOf(ApplicationError);
+      expect(errorSign?.errorCode).toBe(
+        ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE.code
+      );
     });
 
     test("should return error when expiresIn number is less than 1", () => {
@@ -69,11 +69,10 @@ describe("jwtService", () => {
 
       expect(token).toBeNull();
 
-      // ! Tmp commented
-      // TODO Should be refactored
-      // expect(errorSign).toEqual({
-      //   errors: [ERROR_MESSAGES.EXPIRES_IN_LESS_THAN_ONE],
-      // });
+      expect(errorSign).toBeInstanceOf(ApplicationError);
+      expect(errorSign?.errorCode).toBe(
+        ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE.code
+      );
     });
   });
 
@@ -105,21 +104,33 @@ describe("jwtService", () => {
       const [data, error] = jwtService.verify({ token: "" });
 
       expect(data).toBeNull();
-      expect(error).toEqual({ errors: [ERROR_MESSAGES.ERROR_VERIFYING_TOKEN] });
+
+      expect(error).toBeInstanceOf(ApplicationError);
+      expect(error?.errorCode).toBe(
+        ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN.code
+      );
     });
 
     test("should return error when token is blank string", () => {
       const [data, error] = jwtService.verify({ token: " " });
 
       expect(data).toBeNull();
-      expect(error).toEqual({ errors: [ERROR_MESSAGES.ERROR_VERIFYING_TOKEN] });
+
+      expect(error).toBeInstanceOf(ApplicationError);
+      expect(error?.errorCode).toBe(
+        ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN.code
+      );
     });
 
     test("should return error when token is random string", () => {
       const [data, error] = jwtService.verify({ token: "abc" });
 
       expect(data).toBeNull();
-      expect(error).toEqual({ errors: [ERROR_MESSAGES.ERROR_VERIFYING_TOKEN] });
+
+      expect(error).toBeInstanceOf(ApplicationError);
+      expect(error?.errorCode).toBe(
+        ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN.code
+      );
     });
 
     test("should return error when token is expired", async () => {
@@ -133,7 +144,8 @@ describe("jwtService", () => {
 
       expect(verifyResult).toBeNull();
 
-      expect(errorVerify).toEqual({ errors: [ERROR_MESSAGES.TOKEN_EXPIRED] });
+      expect(errorVerify).toBeInstanceOf(ApplicationError);
+      expect(errorVerify?.errorCode).toBe(ERROR_DEFINITIONS.TOKEN_EXPIRED.code);
     });
   });
 });

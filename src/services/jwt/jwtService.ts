@@ -1,6 +1,6 @@
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { envVariables } from "../../common";
-import { ERROR_DEFINITIONS, ERROR_MESSAGES } from "../../constants";
+import { ERROR_DEFINITIONS } from "../../constants";
 import { ApplicationError } from "../../errors";
 import {
   SignTokenArgs,
@@ -59,10 +59,24 @@ function verify(args: VerifyTokenArgs): VerifyTokenResult {
     return [result, null];
   } catch (error) {
     if (error instanceof TokenExpiredError) {
-      return [null, { errors: [ERROR_MESSAGES.TOKEN_EXPIRED] }];
+      return [
+        null,
+        new ApplicationError({
+          errorCode: ERROR_DEFINITIONS.TOKEN_EXPIRED.code,
+          errorDescription: ERROR_DEFINITIONS.TOKEN_EXPIRED.description,
+          statusCode: 500,
+        }),
+      ];
     }
 
-    return [null, { errors: [ERROR_MESSAGES.ERROR_VERIFYING_TOKEN] }];
+    return [
+      null,
+      new ApplicationError({
+        errorCode: ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN.code,
+        errorDescription: ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN.description,
+        statusCode: 500,
+      }),
+    ];
   }
 }
 

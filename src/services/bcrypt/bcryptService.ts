@@ -1,9 +1,5 @@
 import bcrypt from "bcrypt";
-import {
-  DEFAULT_HASHING_ROUNDS,
-  ERROR_DEFINITIONS,
-  ERROR_MESSAGES,
-} from "../../constants";
+import { DEFAULT_HASHING_ROUNDS, ERROR_DEFINITIONS } from "../../constants";
 import { ApplicationError } from "../../errors";
 import {
   BcryptHashArgs,
@@ -76,7 +72,15 @@ async function compare({
     const isMatched = await bcrypt.compare(data, encrypted);
     return [isMatched, null];
   } catch (error) {
-    return [null, { errors: [ERROR_MESSAGES.ERROR_COMPARING_HASH_STRING] }];
+    return [
+      null,
+      new ApplicationError({
+        errorCode: ERROR_DEFINITIONS.ERROR_COMPARING_HASH_STRING.code,
+        errorDescription:
+          ERROR_DEFINITIONS.ERROR_COMPARING_HASH_STRING.description,
+        statusCode: 500,
+      }),
+    ];
   }
 }
 

@@ -1,4 +1,4 @@
-import { ApplicationError, ErrorData } from "../../errors";
+import { ApplicationError } from "../../errors";
 
 export interface BcryptHashArgs {
   data: string | Buffer;
@@ -14,4 +14,6 @@ export interface CompareHashArgs {
   encrypted: string;
 }
 
-export type CompareHashResult = Promise<[boolean, null] | [null, ErrorData]>;
+export type CompareHashResult = Promise<
+  [boolean, null] | [null, ApplicationError]
+>;

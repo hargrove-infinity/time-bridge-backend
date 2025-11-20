@@ -27,7 +27,7 @@ async function login(
   const [token, error] = await userService.login(body);
 
   if (error) {
-    res.status(400).send(error);
+    res.status(error.statusCode).send({ errors: error.buildErrorPayload() });
     return;
   }
 
