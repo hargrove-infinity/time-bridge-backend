@@ -115,7 +115,13 @@ async function login(
   });
 
   if (errorSignToken) {
-    return [null, errorSignToken];
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
   }
 
   return [token, null];
