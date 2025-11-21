@@ -1,6 +1,6 @@
 import jwt, { TokenExpiredError } from "jsonwebtoken";
 import { envVariables } from "../../common";
-import { ERROR_DEFINITIONS, ERROR_MESSAGES } from "../../constants";
+import { ERROR_DEFINITIONS } from "../../constants";
 import { ApplicationError } from "../../errors";
 import {
   SignTokenArgs,
@@ -18,9 +18,7 @@ function sign(args: SignTokenArgs): SignTokenResult {
       return [
         null,
         new ApplicationError({
-          errorCode: ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE.code,
-          errorDescription:
-            ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE.description,
+          errorDefinition: ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE,
           statusCode: 500,
         }),
       ];
@@ -30,8 +28,7 @@ function sign(args: SignTokenArgs): SignTokenResult {
       return [
         null,
         new ApplicationError({
-          errorCode: ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE.code,
-          errorDescription: ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE.description,
+          errorDefinition: ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE,
           statusCode: 500,
         }),
       ];
@@ -43,8 +40,7 @@ function sign(args: SignTokenArgs): SignTokenResult {
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.ERROR_SIGNING_TOKEN.code,
-        errorDescription: ERROR_DEFINITIONS.ERROR_SIGNING_TOKEN.description,
+        errorDefinition: ERROR_DEFINITIONS.ERROR_SIGNING_TOKEN,
         statusCode: 500,
       }),
     ];
@@ -59,10 +55,22 @@ function verify(args: VerifyTokenArgs): VerifyTokenResult {
     return [result, null];
   } catch (error) {
     if (error instanceof TokenExpiredError) {
-      return [null, { errors: [ERROR_MESSAGES.TOKEN_EXPIRED] }];
+      return [
+        null,
+        new ApplicationError({
+          errorDefinition: ERROR_DEFINITIONS.TOKEN_EXPIRED,
+          statusCode: 500,
+        }),
+      ];
     }
 
-    return [null, { errors: [ERROR_MESSAGES.ERROR_VERIFYING_TOKEN] }];
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN,
+        statusCode: 500,
+      }),
+    ];
   }
 }
 

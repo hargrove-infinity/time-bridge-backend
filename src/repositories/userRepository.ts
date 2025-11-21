@@ -12,21 +12,14 @@ async function create(
   args: CreateUserArgs
 ): Promise<[UserDocumentWithoutPassword, null] | [null, ApplicationError]> {
   try {
-    // ! Tmp passed password as an object to cause mongodb error
-    // TODO Should be removed
-    const createdUser = await UserModel.create({
-      ...args,
-      password: { key: 1 },
-    });
+    const createdUser = await UserModel.create(args);
     const { password, ...userWithoutPassword } = createdUser.toObject();
     return [userWithoutPassword, null];
   } catch (error) {
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.CREATE_USER_DATABASE_ERROR.code,
-        errorDescription:
-          ERROR_DEFINITIONS.CREATE_USER_DATABASE_ERROR.description,
+        errorDefinition: ERROR_DEFINITIONS.CREATE_USER_DATABASE_ERROR,
         statusCode: 500,
       }),
     ];
@@ -45,7 +38,13 @@ async function findOne(
 
     return [foundUser, null];
   } catch (error) {
-    return [null, error];
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.FIND_ONE_USER_DATABASE_ERROR,
+        statusCode: 500,
+      }),
+    ];
   }
 }
 

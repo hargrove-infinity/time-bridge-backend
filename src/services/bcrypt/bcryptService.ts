@@ -1,9 +1,5 @@
 import bcrypt from "bcrypt";
-import {
-  DEFAULT_HASHING_ROUNDS,
-  ERROR_DEFINITIONS,
-  ERROR_MESSAGES,
-} from "../../constants";
+import { DEFAULT_HASHING_ROUNDS, ERROR_DEFINITIONS } from "../../constants";
 import { ApplicationError } from "../../errors";
 import {
   BcryptHashArgs,
@@ -18,8 +14,7 @@ async function hash({ data, saltOrRounds }: BcryptHashArgs): BcryptHashResult {
       return [
         null,
         new ApplicationError({
-          errorCode: ERROR_DEFINITIONS.ROUNDS_NEGATIVE.code,
-          errorDescription: ERROR_DEFINITIONS.ROUNDS_NEGATIVE.description,
+          errorDefinition: ERROR_DEFINITIONS.ROUNDS_NEGATIVE,
           statusCode: 500,
         }),
       ];
@@ -29,8 +24,7 @@ async function hash({ data, saltOrRounds }: BcryptHashArgs): BcryptHashResult {
       return [
         null,
         new ApplicationError({
-          errorCode: ERROR_DEFINITIONS.ROUNDS_LESS_THAN_ONE.code,
-          errorDescription: ERROR_DEFINITIONS.ROUNDS_LESS_THAN_ONE.description,
+          errorDefinition: ERROR_DEFINITIONS.ROUNDS_LESS_THAN_ONE,
           statusCode: 500,
         }),
       ];
@@ -49,9 +43,7 @@ async function hash({ data, saltOrRounds }: BcryptHashArgs): BcryptHashResult {
       return [
         null,
         new ApplicationError({
-          errorCode: ERROR_DEFINITIONS.INVALID_SALT_HASHING_STRING.code,
-          errorDescription:
-            ERROR_DEFINITIONS.INVALID_SALT_HASHING_STRING.description,
+          errorDefinition: ERROR_DEFINITIONS.INVALID_SALT_HASHING_STRING,
           statusCode: 500,
         }),
       ];
@@ -60,8 +52,7 @@ async function hash({ data, saltOrRounds }: BcryptHashArgs): BcryptHashResult {
     return [
       null,
       new ApplicationError({
-        errorCode: ERROR_DEFINITIONS.ERROR_HASHING_STRING.code,
-        errorDescription: ERROR_DEFINITIONS.ERROR_HASHING_STRING.description,
+        errorDefinition: ERROR_DEFINITIONS.ERROR_HASHING_STRING,
         statusCode: 500,
       }),
     ];
@@ -76,7 +67,13 @@ async function compare({
     const isMatched = await bcrypt.compare(data, encrypted);
     return [isMatched, null];
   } catch (error) {
-    return [null, { errors: [ERROR_MESSAGES.ERROR_COMPARING_HASH_STRING] }];
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.ERROR_COMPARING_HASH_STRING,
+        statusCode: 500,
+      }),
+    ];
   }
 }
 

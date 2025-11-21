@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import {
   DEFAULT_EXPIRES_IN_TOKEN_NUMBER,
-  ERROR_MESSAGES,
+  ERROR_DEFINITIONS,
   ONE_HOUR_IN_SECONDS,
 } from "../constants";
 import { UserModel } from "../models";
@@ -103,7 +103,13 @@ describe("userRoutes", () => {
       const dataLoginUser = responseLoginUser._getData();
 
       expect(dataLoginUser).toEqual({
-        errors: [ERROR_MESSAGES.USER_EMAIL_NOT_EXIST],
+        errors: [
+          {
+            code: ERROR_DEFINITIONS.LOGIN_FAILED.code,
+            description: ERROR_DEFINITIONS.LOGIN_FAILED.description,
+            data: [],
+          },
+        ],
       });
     });
 
@@ -124,7 +130,13 @@ describe("userRoutes", () => {
       const dataLoginUser = responseLoginUser._getData();
 
       expect(dataLoginUser).toEqual({
-        errors: [ERROR_MESSAGES.USER_PASSWORD_WRONG],
+        errors: [
+          {
+            code: ERROR_DEFINITIONS.LOGIN_FAILED.code,
+            description: ERROR_DEFINITIONS.LOGIN_FAILED.description,
+            data: [],
+          },
+        ],
       });
     });
   });

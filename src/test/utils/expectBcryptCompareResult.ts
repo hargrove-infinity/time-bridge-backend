@@ -1,10 +1,10 @@
-import { ErrorData } from "../../errors";
+import { ApplicationError } from "../../errors";
 
 export function expectBcryptCompareResult({
   data,
   result,
 }: {
-  data: [boolean, null] | [null, ErrorData];
+  data: [boolean, null] | [null, ApplicationError];
   result: boolean;
 }) {
   const [isMatched, errorCompare] = data;
