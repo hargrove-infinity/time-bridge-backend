@@ -1,14 +1,15 @@
 import { z } from "zod";
-import { ERROR_DEFINITIONS } from "../../constants";
+import { ERROR_DEFINITIONS, PASSWORD_MIN_LEN } from "../../constants";
 
 export const userValidationSchema = z.object({
-  email: z
-    .string(ERROR_DEFINITIONS.EMAIL_UNDEFINED.code)
-    .min(1, ERROR_DEFINITIONS.EMAIL_EMPTY.code)
-    .email(ERROR_DEFINITIONS.EMAIL_INVALID.code),
+  email: z.email(ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code),
   password: z
-    .string(ERROR_DEFINITIONS.PASSWORD_UNDEFINED.code)
-    .min(6, ERROR_DEFINITIONS.PASSWORD_LENGTH.code),
+    .string(ERROR_DEFINITIONS.PASSWORD_NOT_STRING.code)
+    .min(PASSWORD_MIN_LEN, ERROR_DEFINITIONS.PASSWORD_MIN_LEN_FAILED.code)
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/,
+      ERROR_DEFINITIONS.PASSWORD_REQUIREMENTS_NOT_MET.code
+    ),
 });
 
 export type CreateUserInput = z.infer<typeof userValidationSchema>;

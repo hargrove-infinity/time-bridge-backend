@@ -21,6 +21,8 @@ export const DEFAULT_HASHING_ROUNDS = 10;
 export const ZOD_ISSUE_MESSAGE_EXPECTED_OBJECT_UNDEFINED =
   "expected object, received undefined";
 
+export const PASSWORD_MIN_LEN = 8;
+
 const ERROR_DEFINITIONS_MISC = {
   UNKNOWN_ERROR: {
     code: "UNKNOWN_ERROR",
@@ -109,25 +111,22 @@ const ERROR_DEFINITIONS_AUTH = {
     code: "AUTH_BODY_UNDEFINED",
     description: "Validation error. Request body is not passed.",
   },
-  EMAIL_UNDEFINED: {
-    code: "EMAIL_UNDEFINED",
-    description: "Validation error. Email field is missing.",
+  EMAIL_INCORRECT_PATTERN: {
+    code: "EMAIL_INCORRECT_PATTERN",
+    description: "Validation error. Email is undefined, empty, or invalid.",
   },
-  EMAIL_EMPTY: {
-    code: "EMAIL_EMPTY",
-    description: "Validation error. Email field is empty string.",
+  PASSWORD_NOT_STRING: {
+    code: "PASSWORD_NOT_STRING",
+    description: "Validation error. Password must be a valid string.",
   },
-  EMAIL_INVALID: {
-    code: "EMAIL_INVALID",
-    description: "Validation error. Email field is invalid.",
+  PASSWORD_MIN_LEN_FAILED: {
+    code: "PASSWORD_MIN_LEN_FAILED",
+    description: `Validation error. Password does not meet the minimum length requirement: ${PASSWORD_MIN_LEN} characters.`,
   },
-  PASSWORD_UNDEFINED: {
-    code: "PASSWORD_UNDEFINED",
-    description: "Validation error. Password field is missing.",
-  },
-  PASSWORD_LENGTH: {
-    code: "PASSWORD_LENGTH",
-    description: "Validation error. Password field is less than 6 characters.",
+  PASSWORD_REQUIREMENTS_NOT_MET: {
+    code: "PASSWORD_REQUIREMENTS_NOT_MET",
+    description:
+      "Validation error. Password must contain uppercase, lowercase, and numeric characters.",
   },
 };
 

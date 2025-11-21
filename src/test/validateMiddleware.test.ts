@@ -19,14 +19,14 @@ describe("validate middleware", () => {
 
     expect(data.errors).toEqual([
       {
-        code: ERROR_DEFINITIONS.EMAIL_UNDEFINED.code,
+        code: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code,
         data: [],
-        description: ERROR_DEFINITIONS.EMAIL_UNDEFINED.description,
+        description: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.description,
       },
       {
-        code: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.code,
+        code: ERROR_DEFINITIONS.PASSWORD_NOT_STRING.code,
         data: [],
-        description: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.description,
+        description: ERROR_DEFINITIONS.PASSWORD_NOT_STRING.description,
       },
     ]);
 
@@ -51,14 +51,9 @@ describe("validate middleware", () => {
 
     expect(data.errors).toEqual([
       {
-        code: ERROR_DEFINITIONS.EMAIL_EMPTY.code,
+        code: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code,
         data: [],
-        description: ERROR_DEFINITIONS.EMAIL_EMPTY.description,
-      },
-      {
-        code: ERROR_DEFINITIONS.EMAIL_INVALID.code,
-        data: [],
-        description: ERROR_DEFINITIONS.EMAIL_INVALID.description,
+        description: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.description,
       },
     ]);
 
@@ -83,9 +78,9 @@ describe("validate middleware", () => {
 
     expect(data.errors).toEqual([
       {
-        code: ERROR_DEFINITIONS.EMAIL_INVALID.code,
+        code: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code,
         data: ["abc"],
-        description: ERROR_DEFINITIONS.EMAIL_INVALID.description,
+        description: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.description,
       },
     ]);
   });
@@ -108,9 +103,9 @@ describe("validate middleware", () => {
 
     expect(data.errors).toEqual([
       {
-        code: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.code,
+        code: ERROR_DEFINITIONS.PASSWORD_NOT_STRING.code,
         data: [],
-        description: ERROR_DEFINITIONS.PASSWORD_UNDEFINED.description,
+        description: ERROR_DEFINITIONS.PASSWORD_NOT_STRING.description,
       },
     ]);
   });
@@ -133,9 +128,15 @@ describe("validate middleware", () => {
 
     expect(data.errors).toEqual([
       {
-        code: ERROR_DEFINITIONS.PASSWORD_LENGTH.code,
+        code: ERROR_DEFINITIONS.PASSWORD_MIN_LEN_FAILED.code,
         data: ["pass"],
-        description: ERROR_DEFINITIONS.PASSWORD_LENGTH.description,
+        description: ERROR_DEFINITIONS.PASSWORD_MIN_LEN_FAILED.description,
+      },
+      {
+        code: ERROR_DEFINITIONS.PASSWORD_REQUIREMENTS_NOT_MET.code,
+        data: ["pass"],
+        description:
+          ERROR_DEFINITIONS.PASSWORD_REQUIREMENTS_NOT_MET.description,
       },
     ]);
   });
