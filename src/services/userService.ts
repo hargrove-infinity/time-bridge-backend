@@ -39,6 +39,19 @@ async function register(
     ];
   }
 
+  // TODO send email with code
+  // emailService.sendEmail()
+
+  // TODO add document to the collection
+  // emailConfirmationRepository.create({
+  //   user: args.email,
+  //   isEmailSent: true,
+  //   isEmailConfirmed: false,
+  //   code: "123456", // create util function for that
+  //   expireCodeTime: "date", // 30 mins from now
+  // });
+
+  // TODO remove signing and sending token
   const [token, errorSignToken] = jwtService.sign({
     payload: { _id: user._id, email: user.email },
     options: {
@@ -57,8 +70,20 @@ async function register(
     ];
   }
 
+  // TODO return new payload
+  // return [{some payload}, null]
+
   return [token, null];
 }
+
+// TODO add new emailConfirm service
+// async function emailConfirm(args: { email: string; code: string }) {
+//   // emailConfirmationRepository.findOne({email, code});
+//   // If emailConfirmation has been found and not expired then update record
+//   // emailConfirmationRepository.updateOne({
+//   //   isEmailConfirmed: true,
+//   // });
+// }
 
 async function login(
   args: CreateUserInput
