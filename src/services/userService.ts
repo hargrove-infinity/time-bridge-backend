@@ -44,7 +44,7 @@ async function register(
 
   // TODO add document to the collection
   // emailConfirmationRepository.create({
-  //   user: args.email,
+  //   user: user._id, // id of created user
   //   isEmailSent: true,
   //   isEmailConfirmed: false,
   //   code: "123456", // create util function for that
