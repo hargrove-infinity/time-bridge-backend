@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const emailConfirmationSchema = new mongoose.Schema(
+export const emailConfirmationSchema = new mongoose.Schema(
   {
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     isEmailSent: { type: Boolean, required: true },
