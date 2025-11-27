@@ -7,6 +7,7 @@ export const TEST_USER_EMAIL_PARTIAL = "mail@mail";
 export const TEST_USER_PASSWORD = "Password1";
 export const TEST_USER_ALTERNATIVE_PASSWORD = "Password2";
 export const TEST_USER_ID_STRING = "68ebd190b3622e4aa75ca9b0";
+export const TEST_EMAIL_CONFIRMATION_CODE = "123456";
 export const MOCK_SUCCESS_SEND_EMAIL_RESPONSE = {
   data: { id: "abcd" },
   error: null,

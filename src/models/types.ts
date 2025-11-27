@@ -1,6 +1,11 @@
 import mongoose, { InferSchemaType } from "mongoose";
 import { UserModel, userSchema } from "./userModel";
+import {
+  EmailConfirmationModel,
+  emailConfirmationSchema,
+} from "./emailConfirmationModel";
 
+// User
 type UserSchema = InferSchemaType<typeof userSchema>;
 
 export type CreateUserArgs = Pick<UserSchema, "email" | "password">;
@@ -14,3 +19,15 @@ export type UserDocumentWithoutPassword = Omit<UserSchema, "password"> & {
 };
 
 export type FindOneUserArgs = Parameters<(typeof UserModel)["findOne"]>[0];
+
+// Email confirmation
+type EmailConfirmationSchema = InferSchemaType<typeof emailConfirmationSchema>;
+
+export type CreateEmailConfirmationArgs = Omit<
+  EmailConfirmationSchema,
+  "createdAt" | "updatedAt"
+>;
+
+export type EmailConfirmationDocument = ReturnType<
+  (typeof EmailConfirmationModel)["hydrate"]
+>;
