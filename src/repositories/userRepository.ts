@@ -31,11 +31,6 @@ async function findOne(
 ): Promise<[UserDocument | null, null] | [null, unknown]> {
   try {
     const foundUser = await UserModel.findOne(args);
-
-    if (foundUser) {
-      return [foundUser, null];
-    }
-
     return [foundUser, null];
   } catch (error) {
     return [
