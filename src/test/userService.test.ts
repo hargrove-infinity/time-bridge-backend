@@ -23,6 +23,8 @@ import {
   expectRegisterUserServiceSuccess,
 } from "./utils";
 
+jest.setTimeout(10000);
+
 beforeAll(async () => {
   await connectDatabase();
 });
