@@ -1,8 +1,7 @@
 import httpMocks from "node-mocks-http";
-import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 import {
   DEFAULT_EXPIRES_IN_TOKEN_NUMBER,
+  EMAIL_CONFIRMATION_STEP,
   ERROR_DEFINITIONS,
   ONE_HOUR_IN_SECONDS,
 } from "../constants";
@@ -16,9 +15,8 @@ import {
   TEST_USER_PASSWORD,
 } from "./constants";
 import {
-  expectJwtPayload,
-  expectCreateUserRouteReturnsValidJwt,
   expectLoginUserRouteReturnsValidJwt,
+  expectRegisterUserRouteReturnsCorrectPayload,
 } from "./utils";
 
 beforeAll(async () => {
@@ -45,7 +43,7 @@ describe("userRoutes", () => {
       expect(spy).toHaveBeenCalled();
     });
 
-    test("should return JWT in response", async () => {
+    test("should return correct payload in response", async () => {
       const request = httpMocks.createRequest({
         body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
       });
@@ -56,13 +54,7 @@ describe("userRoutes", () => {
 
       const data = response._getData();
 
-      expect(typeof data.payload).toBe("string");
-
-      const decoded = jwt.decode(data.payload);
-
-      expectJwtPayload(decoded);
-
-      expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
+      expect(data.payload).toEqual({ nextStep: EMAIL_CONFIRMATION_STEP });
     });
   });
   describe("userRoutes.login", () => {
@@ -77,12 +69,12 @@ describe("userRoutes", () => {
     });
 
     test("should return a JWT token with correct payload", async () => {
-      await expectCreateUserRouteReturnsValidJwt();
+      await expectRegisterUserRouteReturnsCorrectPayload();
       await expectLoginUserRouteReturnsValidJwt();
     });
 
     test("should return a JWT token with with correct expiration time", async () => {
-      await expectCreateUserRouteReturnsValidJwt();
+      await expectRegisterUserRouteReturnsCorrectPayload();
 
       const decodedJwt = await expectLoginUserRouteReturnsValidJwt();
 
@@ -114,7 +106,7 @@ describe("userRoutes", () => {
     });
 
     test("should return error message when password is incorrect", async () => {
-      await expectCreateUserRouteReturnsValidJwt();
+      await expectRegisterUserRouteReturnsCorrectPayload();
 
       const requestLoginUser = httpMocks.createRequest({
         body: {

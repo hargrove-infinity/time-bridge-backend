@@ -4,6 +4,8 @@ import {
   CreateEmailConfirmationArgs,
   EmailConfirmationDocument,
   EmailConfirmationModel,
+  FindOneEmailConfirmationArgs,
+  FindOneAndUpdateEmailConfirmationArgs,
 } from "../models";
 
 async function create(
@@ -24,4 +26,52 @@ async function create(
   }
 }
 
-export const emailConfirmationRepository = { create } as const;
+async function findOne(
+  args: FindOneEmailConfirmationArgs
+): Promise<
+  [EmailConfirmationDocument | null, null] | [null, ApplicationError]
+> {
+  try {
+    const foundEmailConfirmation = await EmailConfirmationModel.findOne(args);
+    return [foundEmailConfirmation, null];
+  } catch (error) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition:
+          ERROR_DEFINITIONS.FIND_ONE_EMAIL_CONFIRMATION_DATABASE_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
+}
+
+async function findOneAndUpdate(
+  args: FindOneAndUpdateEmailConfirmationArgs
+): Promise<
+  [EmailConfirmationDocument | null, null] | [null, ApplicationError]
+> {
+  const { filter, update, options } = args;
+
+  try {
+    const updatedEmailConfirmation =
+      await EmailConfirmationModel.findOneAndUpdate(filter, update, options);
+
+    return [updatedEmailConfirmation, null];
+  } catch (error) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition:
+          ERROR_DEFINITIONS.FIND_ONE_AND_UPDATE_EMAIL_CONFIRMATION_DATABASE_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
+}
+
+export const emailConfirmationRepository = {
+  create,
+  findOne,
+  findOneAndUpdate,
+} as const;

@@ -31,3 +31,17 @@ export type CreateEmailConfirmationArgs = Omit<
 export type EmailConfirmationDocument = ReturnType<
   (typeof EmailConfirmationModel)["hydrate"]
 >;
+
+export type FindOneEmailConfirmationArgs = Parameters<
+  (typeof EmailConfirmationModel)["findOne"]
+>[0];
+
+type FindOneAndUpdateEmailConfirmationParameters = Parameters<
+  (typeof EmailConfirmationModel)["findOneAndUpdate"]
+>;
+
+export interface FindOneAndUpdateEmailConfirmationArgs {
+  filter?: FindOneAndUpdateEmailConfirmationParameters[0];
+  update?: FindOneAndUpdateEmailConfirmationParameters[1];
+  options?: FindOneAndUpdateEmailConfirmationParameters[2];
+}

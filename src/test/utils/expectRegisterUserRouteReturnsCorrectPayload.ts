@@ -1,11 +1,9 @@
 import httpMocks from "node-mocks-http";
-import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
+import { EMAIL_CONFIRMATION_STEP } from "../../constants";
 import { userRoutes } from "../../routes";
 import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "../constants";
-import { expectJwtPayload } from "./expectJwtPayload";
 
-export async function expectCreateUserRouteReturnsValidJwt(): Promise<void> {
+export async function expectRegisterUserRouteReturnsCorrectPayload(): Promise<void> {
   const requestCreateUser = httpMocks.createRequest({
     body: { email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD },
   });
@@ -16,11 +14,7 @@ export async function expectCreateUserRouteReturnsValidJwt(): Promise<void> {
 
   const dataCreateUser = responseCreateUser._getData();
 
-  expect(typeof dataCreateUser.payload).toBe("string");
-
-  const decodedJwt = jwt.decode(dataCreateUser.payload);
-
-  expectJwtPayload(decodedJwt);
-
-  expect(mongoose.Types.ObjectId.isValid(decodedJwt._id)).toBe(true);
+  expect(dataCreateUser.payload).toEqual({
+    nextStep: EMAIL_CONFIRMATION_STEP,
+  });
 }

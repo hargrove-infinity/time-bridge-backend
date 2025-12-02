@@ -5,21 +5,22 @@ import {
   DEFAULT_EXPIRES_IN_TOKEN_NUMBER,
   ERROR_DEFINITIONS,
   ONE_HOUR_IN_SECONDS,
+  MINUTES_IN_MILLISECONDS,
 } from "../constants";
 import { UserModel } from "../models";
-import { userRepository } from "../repositories";
-import { jwtService, userService } from "../services";
+import { emailConfirmationRepository, userRepository } from "../repositories";
+import { emailService, userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import {
+  MOCK_SUCCESS_SEND_EMAIL_RESPONSE,
   TEST_USER_ALTERNATIVE_PASSWORD,
   TEST_USER_EMAIL,
   TEST_USER_PASSWORD,
 } from "./constants";
 import {
-  expectCreateUserInService,
-  expectTokenString,
   expectUserDocument,
   expectLoginUserServiceReturnsValidJwt,
+  expectRegisterUserServiceSuccess,
 } from "./utils";
 
 beforeAll(async () => {
@@ -84,31 +85,71 @@ describe("userService", () => {
       expect(isPasswordsMatched).toBe(true);
     });
 
-    test("should return JWT", async () => {
-      const [token, errorCreateUser] = await userService.register({
+    test("should return correct payload", async () => {
+      await expectRegisterUserServiceSuccess();
+    });
+
+    test("should create email confirmation document", async () => {
+      const spyOnCreateConfirmationRepo = jest.spyOn(
+        emailConfirmationRepository,
+        "create"
+      );
+
+      await userService.register({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
       });
 
-      expect(errorCreateUser).toBe(null);
+      expect(spyOnCreateConfirmationRepo).toHaveBeenCalled();
 
-      expectTokenString(token);
-
-      const [verifyResult, errorVerify] = jwtService.verify({ token });
-
-      expect(verifyResult).toBeDefined();
-      expect(verifyResult).not.toBeNull();
-
-      expect(typeof verifyResult).not.toBe("string");
-      expect(typeof verifyResult).toBe("object");
-
-      expect(verifyResult).toMatchObject({
+      const [foundUser, errorFoundUser] = await userRepository.findOne({
         email: TEST_USER_EMAIL,
-        iat: expect.any(Number),
-        exp: expect.any(Number),
       });
 
-      expect(errorVerify).toBe(null);
+      expect(errorFoundUser).toBeNull();
+
+      const [foundEmailConfirmation, errorEmailConfirmation] =
+        await emailConfirmationRepository.findOne({
+          user: foundUser?._id,
+        });
+
+      expect(errorEmailConfirmation).toBeNull();
+
+      expect(foundEmailConfirmation?.toObject()).toMatchObject({
+        user: foundUser?._id,
+        isEmailSent: true,
+        isEmailConfirmed: false,
+      });
+
+      expect(foundEmailConfirmation?.expireCodeTime.getTime()).toBeGreaterThan(
+        Date.now() + MINUTES_IN_MILLISECONDS[29]
+      );
+
+      expect(foundEmailConfirmation?.expireCodeTime.getTime()).toBeLessThan(
+        Date.now() + MINUTES_IN_MILLISECONDS[31]
+      );
+    });
+
+    test("should call sendEmail service", async () => {
+      const spyOnEmailServiceSendEmailMockImpl = jest
+        .spyOn(emailService, "sendEmail")
+        .mockImplementation(async () => {
+          return [MOCK_SUCCESS_SEND_EMAIL_RESPONSE, null];
+        });
+
+      await userService.register({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      expect(spyOnEmailServiceSendEmailMockImpl).toHaveBeenCalled();
+
+      const call = spyOnEmailServiceSendEmailMockImpl.mock.calls[0];
+
+      expect(call?.[0].html).toMatch(/^Your code is/);
+      expect(call?.[0].html.length).toBe(19);
+      expect(call?.[0].subject).toBe("Registration");
+      expect(call?.[0].toEmail).toBe(TEST_USER_EMAIL);
     });
   });
 
@@ -139,7 +180,7 @@ describe("userService", () => {
     });
 
     test("should throw an error when password is incorrect", async () => {
-      await expectCreateUserInService();
+      await expectRegisterUserServiceSuccess();
 
       const [tokenLoginUser, errorLoginUser] = await userService.login({
         email: TEST_USER_EMAIL,
@@ -155,13 +196,14 @@ describe("userService", () => {
     });
 
     test("should return a JWT token with correct payload", async () => {
-      await expectCreateUserInService();
+      await expectRegisterUserServiceSuccess();
+
       const decoded = await expectLoginUserServiceReturnsValidJwt();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
     });
 
     test("should return a JWT token with correct expiration time", async () => {
-      await expectCreateUserInService();
+      await expectRegisterUserServiceSuccess();
       const decoded = await expectLoginUserServiceReturnsValidJwt();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
       const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
