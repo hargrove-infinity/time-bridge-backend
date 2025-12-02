@@ -8,6 +8,7 @@ import {
 import { emailConfirmationRepository, userRepository } from "../repositories";
 import { ApplicationError } from "../errors";
 import { CreateUserInput } from "../validation";
+import { generateRandomStringCode } from "../utils";
 import { jwtService } from "./jwt";
 import { bcryptService } from "./bcrypt";
 import { emailService, transporter } from "./email";
@@ -42,7 +43,7 @@ async function register(
     ];
   }
 
-  const confirmationCode = Math.floor(Math.random() * 1000000);
+  const confirmationCode = generateRandomStringCode();
 
   const [, errorSendEmail] = await emailService.sendEmail({
     transporter,
