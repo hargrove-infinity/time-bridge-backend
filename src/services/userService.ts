@@ -1,17 +1,21 @@
 import {
   DEFAULT_ALGORITHM_TOKEN,
   DEFAULT_EXPIRES_IN_TOKEN_STRING,
+  EMAIL_CONFIRMATION_STEP,
   ERROR_DEFINITIONS,
+  MINUTES_IN_MILLISECONDS,
 } from "../constants";
-import { userRepository } from "../repositories";
+import { emailConfirmationRepository, userRepository } from "../repositories";
 import { ApplicationError } from "../errors";
 import { CreateUserInput } from "../validation";
+import { generateRandomStringCode } from "../utils";
 import { jwtService } from "./jwt";
 import { bcryptService } from "./bcrypt";
+import { emailService, transporter } from "./email";
 
 async function register(
   args: CreateUserInput
-): Promise<[string, null] | [null, ApplicationError]> {
+): Promise<[{ nextStep: string }, null] | [null, ApplicationError]> {
   const [hash, errorHash] = await bcryptService.hash({ data: args.password });
 
   if (errorHash) {
@@ -39,28 +43,16 @@ async function register(
     ];
   }
 
-  // TODO send email with code
-  // emailService.sendEmail()
+  const confirmationCode = generateRandomStringCode();
 
-  // TODO add document to the collection
-  // emailConfirmationRepository.create({
-  //   user: user._id, // id of created user
-  //   isEmailSent: true,
-  //   isEmailConfirmed: false,
-  //   code: "123456", // create util function for that
-  //   expireCodeTime: "date", // 30 mins from now
-  // });
-
-  // TODO remove signing and sending token
-  const [token, errorSignToken] = jwtService.sign({
-    payload: { _id: user._id, email: user.email },
-    options: {
-      algorithm: DEFAULT_ALGORITHM_TOKEN,
-      expiresIn: DEFAULT_EXPIRES_IN_TOKEN_STRING,
-    },
+  const [, errorSendEmail] = await emailService.sendEmail({
+    transporter,
+    toEmail: args.email,
+    subject: "Registration",
+    html: `Your code is ${confirmationCode}`,
   });
 
-  if (errorSignToken) {
+  if (errorSendEmail) {
     return [
       null,
       new ApplicationError({
@@ -70,19 +62,71 @@ async function register(
     ];
   }
 
-  // TODO return new payload
-  // return [{some payload}, null]
+  const [, errorCreateEmailConfirmation] =
+    await emailConfirmationRepository.create({
+      user: user._id,
+      isEmailSent: true,
+      isEmailConfirmed: false,
+      code: String(confirmationCode),
+      expireCodeTime: new Date(Date.now() + MINUTES_IN_MILLISECONDS[30]),
+    });
 
-  return [token, null];
+  if (errorCreateEmailConfirmation) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
+
+  return [{ nextStep: EMAIL_CONFIRMATION_STEP }, null];
 }
 
 // TODO add new emailConfirm service
 // async function emailConfirm(args: { email: string; code: string }) {
-//   // emailConfirmationRepository.findOne({email, code});
-//   // If emailConfirmation has been found and not expired then update record
-//   // emailConfirmationRepository.updateOne({
-//   //   isEmailConfirmed: true,
-//   // });
+//   // Find user by email first
+//   // Since emailConfirm takes the user's email,
+//   // whereas emailConfirmationModel references
+//   // the user by the user's _id (not email),
+//   // the user's email should be retrieved first
+
+//   const [foundUser, errorFindUser] = await userRepository.findOne({
+//     email: args.email,
+//   });
+
+//   if (errorFindUser) {
+//     return [
+//       null,
+//       new ApplicationError({
+//         errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+//         statusCode: 500,
+//       }),
+//     ];
+//   }
+
+//   if (!foundUser) {
+//     return [
+//       null,
+//       new ApplicationError({
+//         errorDefinition: ERROR_DEFINITIONS.LOGIN_FAILED,
+//         statusCode: 400,
+//       }),
+//     ];
+//   }
+
+//   // Find and update email confirmation document in database
+//   const [updatedEmailConfirmation, errorFindOneAndUpdateEmailConfirmation] =
+//     await emailConfirmationRepository.findOneAndUpdate({
+//       filter: {
+//         user: foundUser._id,
+//         code: args.code,
+//         expireCodeTime: { $gt: new Date() },
+//       },
+//       update: { isEmailConfirmed: true },
+//       options: { new: true },
+//     });
 // }
 
 async function login(
@@ -111,6 +155,8 @@ async function login(
       }),
     ];
   }
+
+  // TODO: add check if user's email is confirmed
 
   const [isMatched, errorCompare] = await bcryptService.compare({
     data: args.password,

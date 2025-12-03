@@ -36,7 +36,7 @@ import {
   TEST_USER_EMAIL,
   TEST_USER_PASSWORD,
 } from "./constants";
-import { expectCreateUserRequest, expectJwtPayload } from "./utils";
+import { expectJwtPayload, expectRegisterRequestSuccess } from "./utils";
 
 let app: Express;
 
@@ -83,7 +83,7 @@ describe("userRouter", () => {
     });
 
     test("should respond with correct payload", async () => {
-      await expectCreateUserRequest(app);
+      await expectRegisterRequestSuccess();
     });
   });
 
@@ -106,10 +106,10 @@ describe("userRouter", () => {
     });
 
     test("should receive 200 status code", async () => {
-      const responseCreateUser = await request(app)
+      const responseRegisterUser = await request(app)
         .post(paths.auth.register)
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
-      expect(responseCreateUser.status).toBe(200);
+      expect(responseRegisterUser.status).toBe(200);
 
       const responseLoginUser = await request(app)
         .post(paths.auth.login)
@@ -118,7 +118,7 @@ describe("userRouter", () => {
     });
 
     test("should respond with correct payload", async () => {
-      await expectCreateUserRequest(app);
+      await expectRegisterRequestSuccess();
 
       const response = await request(app).post(paths.auth.login).send({
         email: TEST_USER_EMAIL,
@@ -154,15 +154,15 @@ describe("userRouter", () => {
     });
 
     test("should return 400 when password is incorrect", async () => {
-      await expectCreateUserRequest(app);
+      await expectRegisterRequestSuccess();
 
-      const response = await request(app).post(paths.auth.login).send({
+      const responseLogin = await request(app).post(paths.auth.login).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_ALTERNATIVE_PASSWORD,
       });
 
-      expect(response.status).toBe(400);
-      expect(response.body).toEqual({
+      expect(responseLogin.status).toBe(400);
+      expect(responseLogin.body).toEqual({
         errors: [
           {
             code: ERROR_DEFINITIONS.LOGIN_FAILED.code,

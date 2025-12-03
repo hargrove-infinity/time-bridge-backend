@@ -15,7 +15,12 @@ export const DEFAULT_EXPIRES_IN_TOKEN_NUMBER = 3;
 export const DEFAULT_ALGORITHM_TOKEN: Algorithm = "HS256";
 
 export const ONE_HOUR_IN_SECONDS = 3600;
-export const THIRTY_MINS_IN_MILLISECONDS = 1800000;
+
+export const MINUTES_IN_MILLISECONDS = {
+  29: 1740000,
+  30: 1800000,
+  31: 1860000,
+};
 
 export const DEFAULT_HASHING_ROUNDS = 10;
 
@@ -23,6 +28,8 @@ export const ZOD_ISSUE_MESSAGE_EXPECTED_OBJECT_UNDEFINED =
   "expected object, received undefined";
 
 export const PASSWORD_MIN_LEN = 8;
+
+export const EMAIL_CONFIRMATION_STEP = "EMAIL_CONFIRMATION";
 
 const ERROR_DEFINITIONS_MISC = {
   UNKNOWN_ERROR: {
@@ -119,6 +126,16 @@ const ERROR_DEFINITIONS_EMAIL_CONFIRMATION_REPOSITORY = {
     code: "CREATE_EMAIL_CONFIRMATION_DATABASE_ERROR",
     description:
       "Error during creation email confirmation document in database",
+  },
+  FIND_ONE_EMAIL_CONFIRMATION_DATABASE_ERROR: {
+    code: "FIND_ONE_EMAIL_CONFIRMATION_DATABASE_ERROR",
+    description:
+      "Error during find one email confirmation document in database",
+  },
+  FIND_ONE_AND_UPDATE_EMAIL_CONFIRMATION_DATABASE_ERROR: {
+    code: "FIND_ONE_AND_UPDATE_EMAIL_CONFIRMATION_DATABASE_ERROR",
+    description:
+      "Error during find one and update email confirmation document in database",
   },
 };
 
