@@ -1,3 +1,2 @@
-export * from "./emailConfirmationModel";
-export * from "./types";
-export * from "./userModel";
+export * from "./emailConfirmation";
+export * from "./user";

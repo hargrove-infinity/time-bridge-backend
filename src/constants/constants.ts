@@ -31,6 +31,8 @@ export const PASSWORD_MIN_LEN = 8;
 
 export const EMAIL_CONFIRMATION_STEP = "EMAIL_CONFIRMATION";
 
+export const EMAIL_CONFIRM_CODE_LEN = 6;
+
 const ERROR_DEFINITIONS_MISC = {
   UNKNOWN_ERROR: {
     code: "UNKNOWN_ERROR",
@@ -160,6 +162,14 @@ const ERROR_DEFINITIONS_AUTH = {
     code: "PASSWORD_REQUIREMENTS_NOT_MET",
     description:
       "Validation error. Password must contain uppercase, lowercase, and numeric characters.",
+  },
+  EMAIL_CONFIRM_CODE_NOT_STRING: {
+    code: "EMAIL_CONFIRM_CODE_NOT_STRING",
+    description: "Validation error. Email confirm code must be a valid string.",
+  },
+  EMAIL_CONFIRM_CODE_MUST_BE_6_DIGITS: {
+    code: "EMAIL_CONFIRM_CODE_MUST_BE_6_DIGITS",
+    description: `Validation error. Email confirm code must contain ${EMAIL_CONFIRM_CODE_LEN} digits.`,
   },
 };
 

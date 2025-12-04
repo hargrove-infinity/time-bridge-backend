@@ -7,14 +7,14 @@ import {
 } from "../constants";
 import { emailConfirmationRepository, userRepository } from "../repositories";
 import { ApplicationError } from "../errors";
-import { CreateUserInput } from "../validation";
+import { UserInput } from "../validation";
 import { generateRandomStringCode } from "../utils";
 import { jwtService } from "./jwt";
 import { bcryptService } from "./bcrypt";
 import { emailService, transporter } from "./email";
 
 async function register(
-  args: CreateUserInput
+  args: UserInput
 ): Promise<[{ nextStep: string }, null] | [null, ApplicationError]> {
   const [hash, errorHash] = await bcryptService.hash({ data: args.password });
 
@@ -127,10 +127,51 @@ async function register(
 //       update: { isEmailConfirmed: true },
 //       options: { new: true },
 //     });
+
+//   if (errorFindOneAndUpdateEmailConfirmation) {
+//     return [
+//       null,
+//       new ApplicationError({
+//         errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+//         statusCode: 500,
+//       }),
+//     ];
+//   }
+
+//   if (!updatedEmailConfirmation) {
+//     return [
+//       null,
+//       new ApplicationError({
+//         errorDefinition: ERROR_DEFINITIONS.LOGIN_FAILED,
+//         statusCode: 400,
+//       }),
+//     ];
+//   }
+
+//   // Add signing and sending token
+//   const [token, errorSignToken] = jwtService.sign({
+//     payload: { _id: foundUser._id, email: foundUser.email },
+//     options: {
+//       algorithm: DEFAULT_ALGORITHM_TOKEN,
+//       expiresIn: DEFAULT_EXPIRES_IN_TOKEN_STRING,
+//     },
+//   });
+
+//   if (errorSignToken) {
+//     return [
+//       null,
+//       new ApplicationError({
+//         errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+//         statusCode: 500,
+//       }),
+//     ];
+//   }
+
+//   return [token, null];
 // }
 
 async function login(
-  args: CreateUserInput
+  args: UserInput
 ): Promise<[string, null] | [null, ApplicationError]> {
   const [foundUser, errorFindUser] = await userRepository.findOne({
     email: args.email,

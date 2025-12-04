@@ -26,12 +26,14 @@ import { userRoutes } from "../routes/userRoutes";
 
 // Create spies at module level, BEFORE userRouter is imported
 const spyOnUserRoutesRegister = jest.spyOn(userRoutes, "register");
+const spyOnUserRoutesEmailConfirm = jest.spyOn(userRoutes, "emailConfirm");
 const spyOnUserRoutesLogin = jest.spyOn(userRoutes, "login");
 
 // Import userRouter AFTER creating spies
 import { userRouter } from "../routes/userRouter";
 
 import {
+  TEST_EMAIL_CONFIRMATION_CODE,
   TEST_USER_ALTERNATIVE_PASSWORD,
   TEST_USER_EMAIL,
   TEST_USER_PASSWORD,
@@ -59,7 +61,7 @@ afterAll(async () => {
 
 describe("userRouter", () => {
   describe("userRouter.register", () => {
-    test("should call validate middleware", async () => {
+    test("should call validate middleware on userRouter.register", async () => {
       await request(app).post(paths.auth.register).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
@@ -75,20 +77,51 @@ describe("userRouter", () => {
       expect(spyOnUserRoutesRegister).toHaveBeenCalled();
     });
 
-    test("should receive 200 status code", async () => {
+    test("should receive 200 status code from userRoutes.register", async () => {
       const response = await request(app)
         .post(paths.auth.register)
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
+
       expect(response.status).toBe(200);
     });
 
-    test("should respond with correct payload", async () => {
+    test("should respond with correct payload from userRoutes.register", async () => {
       await expectRegisterRequestSuccess();
     });
   });
 
+  describe("userRouter.emailConfirm", () => {
+    test("should call validate middleware on userRouter.emailConfirm", async () => {
+      await request(app)
+        .post(paths.auth.emailConfirm)
+        .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
+
+      expect(validateSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test("should call userRoutes.emailConfirm", async () => {
+      await request(app)
+        .post(paths.auth.emailConfirm)
+        .send({ email: TEST_USER_EMAIL, code: TEST_EMAIL_CONFIRMATION_CODE });
+
+      expect(spyOnUserRoutesEmailConfirm).toHaveBeenCalled();
+    });
+
+    test("should receive 200 status code from userRouter.emailConfirm", async () => {
+      const response = await request(app)
+        .post(paths.auth.emailConfirm)
+        .send({ email: TEST_USER_EMAIL, code: TEST_EMAIL_CONFIRMATION_CODE });
+
+      expect(response.status).toBe(200);
+    });
+
+    test.todo(
+      "should respond with correct payload from userRouter.emailConfirm"
+    );
+  });
+
   describe("userRouter.login", () => {
-    test("should call validate middleware", async () => {
+    test("should call validate middleware on userRouter.login", async () => {
       await request(app).post(paths.auth.login).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
@@ -105,7 +138,7 @@ describe("userRouter", () => {
       expect(spyOnUserRoutesLogin).toHaveBeenCalled();
     });
 
-    test("should receive 200 status code", async () => {
+    test("should receive 200 status code from userRouter.login", async () => {
       const responseRegisterUser = await request(app)
         .post(paths.auth.register)
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
@@ -117,7 +150,7 @@ describe("userRouter", () => {
       expect(responseLoginUser.status).toBe(200);
     });
 
-    test("should respond with correct payload", async () => {
+    test("should respond with correct payload from userRoutes.login", async () => {
       await expectRegisterRequestSuccess();
 
       const response = await request(app).post(paths.auth.login).send({
@@ -135,7 +168,7 @@ describe("userRouter", () => {
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
     });
 
-    test("should return 400 when email does not exist", async () => {
+    test("should return 400 when email does not exist from userRoutes.login", async () => {
       const response = await request(app).post(paths.auth.login).send({
         email: TEST_USER_EMAIL,
         password: TEST_USER_PASSWORD,
@@ -153,7 +186,7 @@ describe("userRouter", () => {
       });
     });
 
-    test("should return 400 when password is incorrect", async () => {
+    test("should return 400 when password is incorrect from userRoutes.login", async () => {
       await expectRegisterRequestSuccess();
 
       const responseLogin = await request(app).post(paths.auth.login).send({

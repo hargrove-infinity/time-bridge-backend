@@ -12,4 +12,16 @@ export const userValidationSchema = z.object({
     ),
 });
 
-export type CreateUserInput = z.infer<typeof userValidationSchema>;
+export type UserInput = z.infer<typeof userValidationSchema>;
+
+export const emailConfirmValidationSchema = z.object({
+  email: z.email(ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code),
+  code: z
+    .string(ERROR_DEFINITIONS.EMAIL_CONFIRM_CODE_NOT_STRING.code)
+    .regex(
+      /^\d{6}$/,
+      ERROR_DEFINITIONS.EMAIL_CONFIRM_CODE_MUST_BE_6_DIGITS.code
+    ),
+});
+
+export type EmailConfirmInput = z.infer<typeof emailConfirmValidationSchema>;
