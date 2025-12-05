@@ -19,6 +19,7 @@ import {
   TEST_USER_PASSWORD,
 } from "./constants";
 import {
+  expectEmailConfirmRepoFindOneSuccess,
   expectUserRepoFindOneSuccess,
   expectUserServiceLoginSuccess,
   expectUserServiceRegisterSuccess,
@@ -183,31 +184,21 @@ describe("userService", () => {
 
       const userInDb = await expectUserRepoFindOneSuccess();
 
-      const [emailConfirmationBefore, errorFindOneEmailConfirmationBefore] =
-        await emailConfirmationRepository.findOne({ user: userInDb._id });
-
-      expect(errorFindOneEmailConfirmationBefore).toBeNull();
-
-      expect(typeof emailConfirmationBefore?.code).toBe("string");
-
-      if (!emailConfirmationBefore?.code) {
-        throw new Error("Email confirmation code is missing");
-      }
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({ user: userInDb._id });
 
       await userService.emailConfirm({
         email: TEST_USER_EMAIL,
-        code: emailConfirmationBefore.code,
+        code: emailConfirmDocumentBefore.code,
       });
 
-      const [emailConfirmationAfter, errorFindOneEmailConfirmationAfter] =
-        await emailConfirmationRepository.findOne({
+      const emailConfirmDocumentAfter =
+        await expectEmailConfirmRepoFindOneSuccess({
           user: userInDb._id,
-          code: emailConfirmationBefore.code,
+          code: emailConfirmDocumentBefore.code,
         });
 
-      expect(errorFindOneEmailConfirmationAfter).toBeNull();
-
-      expect(emailConfirmationAfter?.isEmailConfirmed).toBe(true);
+      expect(emailConfirmDocumentAfter?.isEmailConfirmed).toBe(true);
     });
 
     test.todo("should return a JWT token with correct payload");
