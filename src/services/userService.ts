@@ -191,7 +191,31 @@ async function login(
     ];
   }
 
-  // TODO: add check if user's email is confirmed
+  const [foundEmailConfirmation, errorFindOneEmailConfirmation] =
+    await emailConfirmationRepository.findOne({
+      user: foundUser._id,
+      isEmailConfirmed: true,
+    });
+
+  if (errorFindOneEmailConfirmation) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
+
+  if (!foundEmailConfirmation) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.LOGIN_FAILED,
+        statusCode: 400,
+      }),
+    ];
+  }
 
   const [isMatched, errorCompare] = await bcryptService.compare({
     data: args.password,

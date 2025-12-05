@@ -339,8 +339,44 @@ describe("userService", () => {
       );
     });
 
+    test("should throw an error when user's email is not confirmed", async () => {
+      await expectUserServiceRegisterSuccess();
+
+      const [token, errorLogin] = await userService.login({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      expect(token).toBeNull();
+
+      expect(errorLogin).toBeInstanceOf(ApplicationError);
+      expect(errorLogin?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.LOGIN_FAILED
+      );
+    });
+
     test("should return a JWT token with correct payload", async () => {
       await expectUserServiceRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+        });
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: emailConfirmDocumentBefore.code,
+      });
+
+      const emailConfirmDocumentAfter =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+          code: emailConfirmDocumentBefore.code,
+        });
+
+      expect(emailConfirmDocumentAfter?.isEmailConfirmed).toBe(true);
 
       const decoded = await expectUserServiceLoginSuccess();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
@@ -348,6 +384,27 @@ describe("userService", () => {
 
     test("should return a JWT token with correct expiration time", async () => {
       await expectUserServiceRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+        });
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: emailConfirmDocumentBefore.code,
+      });
+
+      const emailConfirmDocumentAfter =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+          code: emailConfirmDocumentBefore.code,
+        });
+
+      expect(emailConfirmDocumentAfter?.isEmailConfirmed).toBe(true);
+
       const decoded = await expectUserServiceLoginSuccess();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
       const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
