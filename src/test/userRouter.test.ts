@@ -177,6 +177,17 @@ describe("userRouter", () => {
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
       expect(responseRegisterUser.status).toBe(200);
 
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocument = await expectEmailConfirmRepoFindOneSuccess({
+        user: userInDb._id,
+      });
+
+      const responseEmailConfirm = await request(app)
+        .post(paths.auth.emailConfirm)
+        .send({ email: TEST_USER_EMAIL, code: emailConfirmDocument.code });
+      expect(responseEmailConfirm.status).toBe(200);
+
       const responseLoginUser = await request(app)
         .post(paths.auth.login)
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
@@ -185,6 +196,20 @@ describe("userRouter", () => {
 
     test("should respond with correct payload from userRoutes.login", async () => {
       await expectUserRequestRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocument = await expectEmailConfirmRepoFindOneSuccess({
+        user: userInDb._id,
+      });
+
+      const responseEmailConfirm = await request(app)
+        .post(paths.auth.emailConfirm)
+        .send({
+          email: TEST_USER_EMAIL,
+          code: emailConfirmDocument.code,
+        });
+      expect(responseEmailConfirm.status).toBe(200);
 
       const response = await request(app).post(paths.auth.login).send({
         email: TEST_USER_EMAIL,

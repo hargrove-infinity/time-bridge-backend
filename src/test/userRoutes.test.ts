@@ -175,11 +175,28 @@ describe("userRoutes", () => {
 
     test("should return a JWT token with correct payload", async () => {
       await expectUserRouteRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocument = await expectEmailConfirmRepoFindOneSuccess({
+        user: userInDb._id,
+      });
+
+      await expectUserRouteEmailConfirmSuccess(emailConfirmDocument.code);
+
       await expectUserRouteLoginSuccess();
     });
 
     test("should return a JWT token with with correct expiration time", async () => {
       await expectUserRouteRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocument = await expectEmailConfirmRepoFindOneSuccess({
+        user: userInDb._id,
+      });
+
+      await expectUserRouteEmailConfirmSuccess(emailConfirmDocument.code);
 
       const decodedJwt = await expectUserRouteLoginSuccess();
 
