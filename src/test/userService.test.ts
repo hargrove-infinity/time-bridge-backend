@@ -7,17 +7,19 @@ import {
   ONE_HOUR_IN_SECONDS,
   MINUTES_IN_MILLISECONDS,
 } from "../constants";
-import { UserModel } from "../models";
+import { EmailConfirmationModel, UserModel } from "../models";
 import { emailConfirmationRepository, userRepository } from "../repositories";
 import { emailService, userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import {
   MOCK_SUCCESS_SEND_EMAIL_RESPONSE,
+  TEST_EMAIL_CONFIRMATION_CODE,
   TEST_USER_ALTERNATIVE_PASSWORD,
   TEST_USER_EMAIL,
   TEST_USER_PASSWORD,
 } from "./constants";
 import {
+  expectEmailConfirmRepoFindOneSuccess,
   expectUserRepoFindOneSuccess,
   expectUserServiceLoginSuccess,
   expectUserServiceRegisterSuccess,
@@ -31,6 +33,7 @@ beforeAll(async () => {
 
 afterEach(async () => {
   await UserModel.deleteMany({});
+  await EmailConfirmationModel.deleteMany({});
 });
 
 afterAll(async () => {
@@ -151,6 +154,149 @@ describe("userService", () => {
     });
   });
 
+  describe("userService.emailConfirm", () => {
+    test("should call userRepository.findOne", async () => {
+      const spy = jest.spyOn(userRepository, "findOne");
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: TEST_EMAIL_CONFIRMATION_CODE,
+      });
+
+      expect(spy).toHaveBeenCalled();
+    });
+
+    test("should call emailConfirmationRepository.findOneAndUpdate", async () => {
+      await expectUserServiceRegisterSuccess();
+
+      const spy = jest.spyOn(emailConfirmationRepository, "findOneAndUpdate");
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: TEST_EMAIL_CONFIRMATION_CODE,
+      });
+
+      expect(spy).toHaveBeenCalled();
+    });
+
+    test("should find and update email confirmation document", async () => {
+      await expectUserServiceRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({ user: userInDb._id });
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: emailConfirmDocumentBefore.code,
+      });
+
+      const emailConfirmDocumentAfter =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+          code: emailConfirmDocumentBefore.code,
+        });
+
+      expect(emailConfirmDocumentAfter?.isEmailConfirmed).toBe(true);
+    });
+
+    test("should return a JWT token with correct payload", async () => {
+      await expectUserServiceRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+        });
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: emailConfirmDocumentBefore.code,
+      });
+
+      const emailConfirmDocumentAfter =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+          code: emailConfirmDocumentBefore.code,
+        });
+
+      expect(emailConfirmDocumentAfter?.isEmailConfirmed).toBe(true);
+
+      const decoded = await expectUserServiceLoginSuccess();
+      expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
+    });
+
+    test("should return a JWT token with correct expiration time", async () => {
+      await expectUserServiceRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+        });
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: emailConfirmDocumentBefore.code,
+      });
+
+      const emailConfirmDocumentAfter =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+          code: emailConfirmDocumentBefore.code,
+        });
+
+      expect(emailConfirmDocumentAfter?.isEmailConfirmed).toBe(true);
+
+      const decoded = await expectUserServiceLoginSuccess();
+      expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
+      const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
+      expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);
+    });
+
+    test("should throw an error when email is not found", async () => {
+      const [token, errorEmailConfirm] = await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: TEST_EMAIL_CONFIRMATION_CODE,
+      });
+
+      expect(token).toBeNull();
+      expect(errorEmailConfirm).toBeInstanceOf(ApplicationError);
+      expect(errorEmailConfirm?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.EMAIL_CONFIRMATION_FAILED
+      );
+    });
+
+    test("should throw an error when code is wrong", async () => {
+      await expectUserServiceRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+        });
+
+      const wrongCode = (parseInt(emailConfirmDocumentBefore.code) + 1)
+        .toString()
+        .padStart(6, "0");
+
+      const [token, errorEmailConfirm] = await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: wrongCode,
+      });
+
+      expect(token).toBeNull();
+      expect(errorEmailConfirm).toBeInstanceOf(ApplicationError);
+      expect(errorEmailConfirm?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.EMAIL_CONFIRMATION_FAILED
+      );
+    });
+  });
+
   describe("userService.login", () => {
     test("should call userRepository.findOne", async () => {
       const spy = jest.spyOn(userRepository, "findOne");
@@ -193,8 +339,44 @@ describe("userService", () => {
       );
     });
 
+    test("should throw an error when user's email is not confirmed", async () => {
+      await expectUserServiceRegisterSuccess();
+
+      const [token, errorLogin] = await userService.login({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      expect(token).toBeNull();
+
+      expect(errorLogin).toBeInstanceOf(ApplicationError);
+      expect(errorLogin?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.LOGIN_FAILED
+      );
+    });
+
     test("should return a JWT token with correct payload", async () => {
       await expectUserServiceRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+        });
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: emailConfirmDocumentBefore.code,
+      });
+
+      const emailConfirmDocumentAfter =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+          code: emailConfirmDocumentBefore.code,
+        });
+
+      expect(emailConfirmDocumentAfter?.isEmailConfirmed).toBe(true);
 
       const decoded = await expectUserServiceLoginSuccess();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
@@ -202,6 +384,27 @@ describe("userService", () => {
 
     test("should return a JWT token with correct expiration time", async () => {
       await expectUserServiceRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+        });
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: emailConfirmDocumentBefore.code,
+      });
+
+      const emailConfirmDocumentAfter =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+          code: emailConfirmDocumentBefore.code,
+        });
+
+      expect(emailConfirmDocumentAfter?.isEmailConfirmed).toBe(true);
+
       const decoded = await expectUserServiceLoginSuccess();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
       const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;

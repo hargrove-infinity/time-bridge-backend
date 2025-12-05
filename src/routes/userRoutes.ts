@@ -20,6 +20,22 @@ async function register(
   res.status(200).send({ payload: token });
 }
 
+async function emailConfirm(
+  req: Request<{}, {}, EmailConfirmInput>,
+  res: Response
+): Promise<void> {
+  const { body } = req;
+
+  const [token, error] = await userService.emailConfirm(body);
+
+  if (error) {
+    res.status(error.statusCode).send({ errors: error.buildErrorPayload() });
+    return;
+  }
+
+  res.status(200).send({ payload: token });
+}
+
 async function login(
   req: Request<{}, {}, UserInput>,
   res: Response
@@ -36,12 +52,4 @@ async function login(
   res.status(200).send({ payload: token });
 }
 
-async function emailConfirm(
-  req: Request<{}, {}, EmailConfirmInput>,
-  res: Response
-): Promise<void> {
-  // TODO refactor
-  res.status(200).send({ payload: "token" });
-}
-
-export const userRoutes = { register, login, emailConfirm } as const;
+export const userRoutes = { register, emailConfirm, login } as const;

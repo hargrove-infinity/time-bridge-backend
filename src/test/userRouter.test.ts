@@ -38,7 +38,12 @@ import {
   TEST_USER_EMAIL,
   TEST_USER_PASSWORD,
 } from "./constants";
-import { expectJwtPayload, expectUserRequestRegisterSuccess } from "./utils";
+import {
+  expectEmailConfirmRepoFindOneSuccess,
+  expectJwtPayload,
+  expectUserRepoFindOneSuccess,
+  expectUserRequestRegisterSuccess,
+} from "./utils";
 
 let app: Express;
 
@@ -108,16 +113,44 @@ describe("userRouter", () => {
     });
 
     test("should receive 200 status code from userRouter.emailConfirm", async () => {
+      await expectUserRequestRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocument = await expectEmailConfirmRepoFindOneSuccess({
+        user: userInDb._id,
+      });
+
       const response = await request(app)
         .post(paths.auth.emailConfirm)
-        .send({ email: TEST_USER_EMAIL, code: TEST_EMAIL_CONFIRMATION_CODE });
+        .send({ email: TEST_USER_EMAIL, code: emailConfirmDocument.code });
 
       expect(response.status).toBe(200);
     });
 
-    test.todo(
-      "should respond with correct payload from userRouter.emailConfirm"
-    );
+    test("should respond with correct payload from userRouter.emailConfirm", async () => {
+      await expectUserRequestRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocument = await expectEmailConfirmRepoFindOneSuccess({
+        user: userInDb._id,
+      });
+
+      const response = await request(app).post(paths.auth.emailConfirm).send({
+        email: TEST_USER_EMAIL,
+        code: emailConfirmDocument.code,
+      });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toStrictEqual({ payload: expect.any(String) });
+
+      const decoded = jwt.decode(response.body.payload);
+
+      expectJwtPayload(decoded);
+
+      expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
+    });
   });
 
   describe("userRouter.login", () => {
@@ -144,6 +177,17 @@ describe("userRouter", () => {
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
       expect(responseRegisterUser.status).toBe(200);
 
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocument = await expectEmailConfirmRepoFindOneSuccess({
+        user: userInDb._id,
+      });
+
+      const responseEmailConfirm = await request(app)
+        .post(paths.auth.emailConfirm)
+        .send({ email: TEST_USER_EMAIL, code: emailConfirmDocument.code });
+      expect(responseEmailConfirm.status).toBe(200);
+
       const responseLoginUser = await request(app)
         .post(paths.auth.login)
         .send({ email: TEST_USER_EMAIL, password: TEST_USER_PASSWORD });
@@ -152,6 +196,20 @@ describe("userRouter", () => {
 
     test("should respond with correct payload from userRoutes.login", async () => {
       await expectUserRequestRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocument = await expectEmailConfirmRepoFindOneSuccess({
+        user: userInDb._id,
+      });
+
+      const responseEmailConfirm = await request(app)
+        .post(paths.auth.emailConfirm)
+        .send({
+          email: TEST_USER_EMAIL,
+          code: emailConfirmDocument.code,
+        });
+      expect(responseEmailConfirm.status).toBe(200);
 
       const response = await request(app).post(paths.auth.login).send({
         email: TEST_USER_EMAIL,
