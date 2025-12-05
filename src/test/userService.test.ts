@@ -257,7 +257,18 @@ describe("userService", () => {
       expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);
     });
 
-    test.todo("should throw an error when email is not found");
+    test("should throw an error when email is not found", async () => {
+      const [token, errorEmailConfirm] = await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: TEST_EMAIL_CONFIRMATION_CODE,
+      });
+
+      expect(token).toBeNull();
+      expect(errorEmailConfirm).toBeInstanceOf(ApplicationError);
+      expect(errorEmailConfirm?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.EMAIL_CONFIRMATION_FAILED
+      );
+    });
 
     test.todo("should throw an error when code is wrong");
 

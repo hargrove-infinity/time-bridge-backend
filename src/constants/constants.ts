@@ -114,6 +114,10 @@ const ERROR_DEFINITIONS_USER_SERVICE = {
     code: "LOGIN_FAILED",
     description: "Login failed. Please check your credentials.",
   },
+  EMAIL_CONFIRMATION_FAILED: {
+    code: "EMAIL_CONFIRMATION_FAILED",
+    description: "Email confirmation failed.",
+  },
 };
 
 const ERROR_DEFINITIONS_EMAIL_SERVICE = {

@@ -84,7 +84,10 @@ async function register(
   return [{ nextStep: EMAIL_CONFIRMATION_STEP }, null];
 }
 
-async function emailConfirm(args: { email: string; code: string }) {
+async function emailConfirm(args: {
+  email: string;
+  code: string;
+}): Promise<[string, null] | [null, ApplicationError]> {
   const [foundUser, errorFindUser] = await userRepository.findOne({
     email: args.email,
   });
@@ -103,7 +106,7 @@ async function emailConfirm(args: { email: string; code: string }) {
     return [
       null,
       new ApplicationError({
-        errorDefinition: ERROR_DEFINITIONS.LOGIN_FAILED,
+        errorDefinition: ERROR_DEFINITIONS.EMAIL_CONFIRMATION_FAILED,
         statusCode: 400,
       }),
     ];
@@ -134,7 +137,7 @@ async function emailConfirm(args: { email: string; code: string }) {
     return [
       null,
       new ApplicationError({
-        errorDefinition: ERROR_DEFINITIONS.LOGIN_FAILED,
+        errorDefinition: ERROR_DEFINITIONS.EMAIL_CONFIRMATION_FAILED,
         statusCode: 400,
       }),
     ];
