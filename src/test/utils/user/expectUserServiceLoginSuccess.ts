@@ -1,10 +1,9 @@
 import jwt from "jsonwebtoken";
-import { userService } from "../../services";
-import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "../constants";
-import { expectSignTokenResult } from "./expectSignTokenResult";
-import { expectJwtPayload } from "./expectJwtPayload";
+import { userService } from "../../../services";
+import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "../../constants";
+import { expectJwtPayload, expectSignTokenResult } from "../jwt";
 
-export async function expectLoginUserServiceReturnsValidJwt(): Promise<{
+export async function expectUserServiceLoginSuccess(): Promise<{
   _id: string;
   email: string;
   iat: number;

@@ -1,4 +1,4 @@
-import { TEST_USER_EMAIL } from "../constants";
+import { TEST_USER_EMAIL } from "../../constants";
 
 export function expectJwtPayload(data: unknown): asserts data is {
   _id: string;

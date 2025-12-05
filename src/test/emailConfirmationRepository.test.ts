@@ -4,7 +4,7 @@ import { EmailConfirmationModel } from "../models";
 import { emailConfirmationRepository } from "../repositories";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import { TEST_EMAIL_CONFIRMATION_CODE, TEST_USER_ID_STRING } from "./constants";
-import { expectCreateEmailConfirmationInDb, sleep } from "./utils";
+import { expectEmailConfirmRepoCreateSuccess, sleep } from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -25,7 +25,7 @@ describe("emailConfirmationRepository", () => {
       const userId = new mongoose.Types.ObjectId(TEST_USER_ID_STRING);
       const expireCodeTime = new Date(Date.now() + MINUTES_IN_MILLISECONDS[30]);
 
-      await expectCreateEmailConfirmationInDb({
+      await expectEmailConfirmRepoCreateSuccess({
         user: userId,
         isEmailSent: true,
         isEmailConfirmed: false,
@@ -53,7 +53,7 @@ describe("emailConfirmationRepository", () => {
       const userId = new mongoose.Types.ObjectId(TEST_USER_ID_STRING);
       const expireCodeTime = new Date(Date.now() + MINUTES_IN_MILLISECONDS[30]);
 
-      await expectCreateEmailConfirmationInDb({
+      await expectEmailConfirmRepoCreateSuccess({
         user: userId,
         isEmailSent: true,
         isEmailConfirmed: false,
@@ -92,7 +92,7 @@ describe("emailConfirmationRepository", () => {
         expireCodeTime,
       };
 
-      await expectCreateEmailConfirmationInDb(emailConfirmationData);
+      await expectEmailConfirmRepoCreateSuccess(emailConfirmationData);
 
       const [updatedEmailConfirmation, errorFindOneAndUpdateEmailConfirmation] =
         await emailConfirmationRepository.findOneAndUpdate({
@@ -131,7 +131,7 @@ describe("emailConfirmationRepository", () => {
       const userId = new mongoose.Types.ObjectId(TEST_USER_ID_STRING);
       const expireCodeTime = new Date(Date.now());
 
-      await expectCreateEmailConfirmationInDb({
+      await expectEmailConfirmRepoCreateSuccess({
         user: userId,
         isEmailSent: true,
         isEmailConfirmed: false,

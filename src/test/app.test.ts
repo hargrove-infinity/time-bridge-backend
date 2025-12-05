@@ -4,7 +4,7 @@ import { envVariables } from "../common";
 import { paths } from "../constants";
 import { UserModel } from "../models";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
-import { expectRegisterRequestSuccess } from "./utils";
+import { expectUserRequestRegisterSuccess } from "./utils";
 
 beforeAll(async () => {
   await connectDatabase();
@@ -27,6 +27,6 @@ describe("app.ts", () => {
   });
 
   test("should mount the user create route", async () => {
-    await expectRegisterRequestSuccess();
+    await expectUserRequestRegisterSuccess();
   });
 });

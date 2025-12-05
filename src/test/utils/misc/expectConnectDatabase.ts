@@ -1,5 +1,5 @@
 import { connection } from "mongoose";
-import { connectDatabase } from "../../utils";
+import { connectDatabase } from "../../../utils";
 
 export async function expectConnectDatabase(): Promise<void> {
   expect(connection.readyState).toBe(0);
