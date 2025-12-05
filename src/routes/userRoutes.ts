@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
 import { userService } from "../services";
-import { CreateUserInput } from "../validation";
+import { UserInput, EmailConfirmInput } from "../validation";
 
 async function register(
-  req: Request<{}, {}, CreateUserInput>,
+  req: Request<{}, {}, UserInput>,
   res: Response
 ): Promise<void> {
   const { body } = req;
@@ -11,6 +11,8 @@ async function register(
   const [token, error] = await userService.register(body);
 
   if (error) {
+    console.log("userRoutes.register: ", error);
+
     res.status(error.statusCode).send({ errors: error.buildErrorPayload() });
     return;
   }
@@ -19,7 +21,7 @@ async function register(
 }
 
 async function login(
-  req: Request<{}, {}, CreateUserInput>,
+  req: Request<{}, {}, UserInput>,
   res: Response
 ): Promise<void> {
   const { body } = req;
@@ -34,4 +36,12 @@ async function login(
   res.status(200).send({ payload: token });
 }
 
-export const userRoutes = { register, login } as const;
+async function emailConfirm(
+  req: Request<{}, {}, EmailConfirmInput>,
+  res: Response
+): Promise<void> {
+  // TODO refactor
+  res.status(200).send({ payload: "token" });
+}
+
+export const userRoutes = { register, login, emailConfirm } as const;
