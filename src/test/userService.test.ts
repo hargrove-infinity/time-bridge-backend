@@ -295,8 +295,6 @@ describe("userService", () => {
         ERROR_DEFINITIONS.EMAIL_CONFIRMATION_FAILED
       );
     });
-
-    test.todo("should throw an error when code is expired");
   });
 
   describe("userService.login", () => {
