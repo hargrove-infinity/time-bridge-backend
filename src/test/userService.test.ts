@@ -270,7 +270,31 @@ describe("userService", () => {
       );
     });
 
-    test.todo("should throw an error when code is wrong");
+    test("should throw an error when code is wrong", async () => {
+      await expectUserServiceRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+        });
+
+      const wrongCode = (parseInt(emailConfirmDocumentBefore.code) + 1)
+        .toString()
+        .padStart(6, "0");
+
+      const [token, errorEmailConfirm] = await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: wrongCode,
+      });
+
+      expect(token).toBeNull();
+      expect(errorEmailConfirm).toBeInstanceOf(ApplicationError);
+      expect(errorEmailConfirm?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.EMAIL_CONFIRMATION_FAILED
+      );
+    });
 
     test.todo("should throw an error when code is expired");
   });
