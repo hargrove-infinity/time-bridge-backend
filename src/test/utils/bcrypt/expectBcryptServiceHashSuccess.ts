@@ -1,4 +1,4 @@
-export function expectBcryptCorrectHashResult(
+export function expectBcryptServiceHashSuccess(
   data: unknown
 ): asserts data is [string, null] {
   expect(Array.isArray(data)).toBe(true);

@@ -9,8 +9,8 @@ import {
 } from "./constants";
 import {
   expectValidDate,
-  expectCreateUserInDb,
-  expectFindOneUserInDb,
+  expectUserRepoCreateSuccess,
+  expectUserRepoFindOneSuccess,
 } from "./utils";
 
 beforeAll(async () => {
@@ -28,16 +28,16 @@ afterAll(async () => {
 describe("userRepository", () => {
   describe("userRepository.create", () => {
     test("should add a user to the database", async () => {
-      await expectCreateUserInDb();
+      await expectUserRepoCreateSuccess();
     });
 
     test("should give new users correct email", async () => {
-      const createdUser = await expectCreateUserInDb();
+      const createdUser = await expectUserRepoCreateSuccess();
       expect(createdUser.email).toEqual(TEST_USER_EMAIL);
     });
 
     test("should return user", async () => {
-      const createdUser = await expectCreateUserInDb();
+      const createdUser = await expectUserRepoCreateSuccess();
       expect(mongoose.Types.ObjectId.isValid(createdUser._id)).toBe(true);
       expect(createdUser.email).toEqual(TEST_USER_EMAIL);
       expectValidDate(createdUser.createdAt);
@@ -47,8 +47,8 @@ describe("userRepository", () => {
 
   describe("userRepository.findOne", () => {
     test("should return user when email exists", async () => {
-      await expectCreateUserInDb();
-      await expectFindOneUserInDb();
+      await expectUserRepoCreateSuccess();
+      await expectUserRepoFindOneSuccess();
     });
 
     test("should return null when user with given email does not exist", async () => {
@@ -61,8 +61,8 @@ describe("userRepository", () => {
     });
 
     test("should return correct user data structure", async () => {
-      await expectCreateUserInDb();
-      const foundUser = await expectFindOneUserInDb();
+      await expectUserRepoCreateSuccess();
+      const foundUser = await expectUserRepoFindOneSuccess();
       expect(mongoose.Types.ObjectId.isValid(foundUser._id)).toBe(true);
       expect(foundUser.email).toEqual(TEST_USER_EMAIL);
       expectValidDate(foundUser.createdAt);
@@ -70,7 +70,7 @@ describe("userRepository", () => {
     });
 
     test("should be case-sensitive for email lookup", async () => {
-      await expectCreateUserInDb();
+      await expectUserRepoCreateSuccess();
 
       const [foundUser, errorFindOneUser] = await userRepository.findOne({
         email: TEST_USER_EMAIL_UPPERCASE,
@@ -81,7 +81,7 @@ describe("userRepository", () => {
     });
 
     test("should find user by exact email match", async () => {
-      await expectCreateUserInDb();
+      await expectUserRepoCreateSuccess();
 
       const [foundUser, errorFindOneUser] = await userRepository.findOne({
         email: TEST_USER_EMAIL_PARTIAL,

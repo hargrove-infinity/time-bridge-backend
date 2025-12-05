@@ -1,4 +1,4 @@
-import { SignTokenResult } from "../../services";
+import { SignTokenResult } from "../../../services";
 
 export function expectSignTokenResult(
   data: SignTokenResult

@@ -1,11 +1,11 @@
 import httpMocks from "node-mocks-http";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
-import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "../constants";
-import { userRoutes } from "../../routes";
-import { expectJwtPayload } from "./expectJwtPayload";
+import { TEST_USER_EMAIL, TEST_USER_PASSWORD } from "../../constants";
+import { userRoutes } from "../../../routes";
+import { expectJwtPayload } from "../jwt";
 
-export async function expectLoginUserRouteReturnsValidJwt(): Promise<{
+export async function expectUserRouteLoginSuccess(): Promise<{
   _id: string;
   email: string;
   iat: number;

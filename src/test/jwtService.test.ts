@@ -14,17 +14,15 @@ import {
 } from "./constants";
 import {
   expectJwtPayload,
-  expectSignTokenResult,
   signTestJwt,
+  expectJwtServiceSignSuccess,
   sleep,
 } from "./utils";
 
 describe("jwtService", () => {
   describe("jwtService.sign", () => {
     test("should return valid tuple [JWT token, null] when provided with valid arguments", () => {
-      const result = signTestJwt();
-      expectSignTokenResult(result);
-      const [token] = result;
+      const [token] = expectJwtServiceSignSuccess();
       const decoded = jwt.decode(token);
 
       expect(decoded).toStrictEqual({
@@ -36,17 +34,13 @@ describe("jwtService", () => {
     });
 
     test("should use HS256 algorithm for signing", () => {
-      const result = signTestJwt();
-      expectSignTokenResult(result);
-      const [token] = result;
+      const [token] = expectJwtServiceSignSuccess();
       const decoded = jwt.decode(token, { complete: true });
       expect(decoded?.header.alg).toBe(DEFAULT_ALGORITHM_TOKEN);
     });
 
     test("should use correct expiresIn for signing", () => {
-      const result = signTestJwt();
-      expectSignTokenResult(result);
-      const [token] = result;
+      const [token] = expectJwtServiceSignSuccess();
       const decoded = jwt.decode(token, { json: true });
       expectJwtPayload(decoded);
       const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
@@ -55,9 +49,7 @@ describe("jwtService", () => {
 
     test("should return error when expiresIn is negative number", () => {
       const [token, errorSign] = signTestJwt({ options: { expiresIn: "-1h" } });
-
       expect(token).toBeNull();
-
       expect(errorSign).toBeInstanceOf(ApplicationError);
       expect(errorSign?.errorDefinition).toEqual(
         ERROR_DEFINITIONS.EXPIRES_IN_NEGATIVE
@@ -66,9 +58,7 @@ describe("jwtService", () => {
 
     test("should return error when expiresIn number is less than 1", () => {
       const [token, errorSign] = signTestJwt({ options: { expiresIn: 0.5 } });
-
       expect(token).toBeNull();
-
       expect(errorSign).toBeInstanceOf(ApplicationError);
       expect(errorSign?.errorDefinition).toEqual(
         ERROR_DEFINITIONS.EXPIRES_IN_LESS_THAN_ONE
@@ -78,10 +68,7 @@ describe("jwtService", () => {
 
   describe("jwtService.verify", () => {
     test("should return valid tuple [JWTPayload, null] when provided with valid arguments", () => {
-      const result = signTestJwt();
-      expectSignTokenResult(result);
-      const [token] = result;
-
+      const [token] = expectJwtServiceSignSuccess();
       const [verifyResult, errorVerify] = jwtService.verify({ token });
 
       expect(verifyResult).toBeDefined();
@@ -102,9 +89,7 @@ describe("jwtService", () => {
 
     test("should return error when token is empty string", () => {
       const [data, error] = jwtService.verify({ token: "" });
-
       expect(data).toBeNull();
-
       expect(error).toBeInstanceOf(ApplicationError);
       expect(error?.errorDefinition).toEqual(
         ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN
@@ -113,9 +98,7 @@ describe("jwtService", () => {
 
     test("should return error when token is blank string", () => {
       const [data, error] = jwtService.verify({ token: " " });
-
       expect(data).toBeNull();
-
       expect(error).toBeInstanceOf(ApplicationError);
       expect(error?.errorDefinition).toEqual(
         ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN
@@ -124,9 +107,7 @@ describe("jwtService", () => {
 
     test("should return error when token is random string", () => {
       const [data, error] = jwtService.verify({ token: "abc" });
-
       expect(data).toBeNull();
-
       expect(error).toBeInstanceOf(ApplicationError);
       expect(error?.errorDefinition).toEqual(
         ERROR_DEFINITIONS.ERROR_VERIFYING_TOKEN
@@ -134,9 +115,9 @@ describe("jwtService", () => {
     });
 
     test("should return error when token is expired", async () => {
-      const result = signTestJwt({ options: { expiresIn: "1ms" } });
-      expectSignTokenResult(result);
-      const [token] = result;
+      const [token] = expectJwtServiceSignSuccess({
+        options: { expiresIn: "1ms" },
+      });
 
       await sleep(TOKEN_EXPIRED_DELAY);
 

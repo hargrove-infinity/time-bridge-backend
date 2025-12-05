@@ -38,7 +38,7 @@ import {
   TEST_USER_EMAIL,
   TEST_USER_PASSWORD,
 } from "./constants";
-import { expectJwtPayload, expectRegisterRequestSuccess } from "./utils";
+import { expectJwtPayload, expectUserRequestRegisterSuccess } from "./utils";
 
 let app: Express;
 
@@ -86,7 +86,7 @@ describe("userRouter", () => {
     });
 
     test("should respond with correct payload from userRoutes.register", async () => {
-      await expectRegisterRequestSuccess();
+      await expectUserRequestRegisterSuccess();
     });
   });
 
@@ -151,7 +151,7 @@ describe("userRouter", () => {
     });
 
     test("should respond with correct payload from userRoutes.login", async () => {
-      await expectRegisterRequestSuccess();
+      await expectUserRequestRegisterSuccess();
 
       const response = await request(app).post(paths.auth.login).send({
         email: TEST_USER_EMAIL,
@@ -187,7 +187,7 @@ describe("userRouter", () => {
     });
 
     test("should return 400 when password is incorrect from userRoutes.login", async () => {
-      await expectRegisterRequestSuccess();
+      await expectUserRequestRegisterSuccess();
 
       const responseLogin = await request(app).post(paths.auth.login).send({
         email: TEST_USER_EMAIL,

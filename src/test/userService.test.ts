@@ -18,9 +18,9 @@ import {
   TEST_USER_PASSWORD,
 } from "./constants";
 import {
-  expectUserDocument,
-  expectLoginUserServiceReturnsValidJwt,
-  expectRegisterUserServiceSuccess,
+  expectUserRepoFindOneSuccess,
+  expectUserServiceLoginSuccess,
+  expectUserServiceRegisterSuccess,
 } from "./utils";
 
 jest.setTimeout(10000);
@@ -59,9 +59,7 @@ describe("userService", () => {
       expect(error).toBeNull();
       expect(user).toBeDefined();
 
-      const userInDb = await UserModel.findOne({ email: TEST_USER_EMAIL });
-
-      expectUserDocument(userInDb);
+      const userInDb = await expectUserRepoFindOneSuccess();
 
       expect(userInDb.password).not.toBe(TEST_USER_PASSWORD);
     });
@@ -75,9 +73,7 @@ describe("userService", () => {
       expect(error).toBeNull();
       expect(user).toBeDefined();
 
-      const userInDb = await UserModel.findOne({ email: TEST_USER_EMAIL });
-
-      expectUserDocument(userInDb);
+      const userInDb = await expectUserRepoFindOneSuccess();
 
       const isPasswordsMatched = await bcrypt.compare(
         TEST_USER_PASSWORD,
@@ -88,7 +84,7 @@ describe("userService", () => {
     });
 
     test("should return correct payload", async () => {
-      await expectRegisterUserServiceSuccess();
+      await expectUserServiceRegisterSuccess();
     });
 
     test("should create email confirmation document", async () => {
@@ -182,7 +178,7 @@ describe("userService", () => {
     });
 
     test("should throw an error when password is incorrect", async () => {
-      await expectRegisterUserServiceSuccess();
+      await expectUserServiceRegisterSuccess();
 
       const [tokenLoginUser, errorLoginUser] = await userService.login({
         email: TEST_USER_EMAIL,
@@ -198,15 +194,15 @@ describe("userService", () => {
     });
 
     test("should return a JWT token with correct payload", async () => {
-      await expectRegisterUserServiceSuccess();
+      await expectUserServiceRegisterSuccess();
 
-      const decoded = await expectLoginUserServiceReturnsValidJwt();
+      const decoded = await expectUserServiceLoginSuccess();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
     });
 
     test("should return a JWT token with correct expiration time", async () => {
-      await expectRegisterUserServiceSuccess();
-      const decoded = await expectLoginUserServiceReturnsValidJwt();
+      await expectUserServiceRegisterSuccess();
+      const decoded = await expectUserServiceLoginSuccess();
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
       const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
       expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);

@@ -6,15 +6,15 @@ import {
   TEST_USER_PASSWORD,
 } from "./constants";
 import {
-  expectBcryptCompareResult,
-  expectBcryptCorrectHashResult,
+  expectBcryptServiceCompareAnyResult,
+  expectBcryptServiceHashSuccess,
 } from "./utils";
 
 describe("bcryptService", () => {
   describe("bcryptService.hash", () => {
     test("should successfully hash a password with default rounds", async () => {
       const result = await bcryptService.hash({ data: TEST_USER_PASSWORD });
-      expectBcryptCorrectHashResult(result);
+      expectBcryptServiceHashSuccess(result);
     });
 
     test("should successfully hash a password with custom rounds", async () => {
@@ -23,7 +23,7 @@ describe("bcryptService", () => {
         saltOrRounds: 12,
       });
 
-      expectBcryptCorrectHashResult(result);
+      expectBcryptServiceHashSuccess(result);
     });
 
     test("should return error when salt is a random string", async () => {
@@ -73,7 +73,7 @@ describe("bcryptService", () => {
         data: TEST_USER_PASSWORD,
       });
 
-      expectBcryptCorrectHashResult(resultHashing);
+      expectBcryptServiceHashSuccess(resultHashing);
 
       const [hash] = resultHashing;
 
@@ -82,7 +82,10 @@ describe("bcryptService", () => {
         encrypted: hash,
       });
 
-      expectBcryptCompareResult({ data: resultComparing, result: true });
+      expectBcryptServiceCompareAnyResult({
+        data: resultComparing,
+        result: true,
+      });
     });
 
     test("should return false when password does not match the hash", async () => {
@@ -90,7 +93,7 @@ describe("bcryptService", () => {
         data: TEST_USER_PASSWORD,
       });
 
-      expectBcryptCorrectHashResult(resultHashing);
+      expectBcryptServiceHashSuccess(resultHashing);
 
       const [hash] = resultHashing;
 
@@ -99,7 +102,10 @@ describe("bcryptService", () => {
         encrypted: hash,
       });
 
-      expectBcryptCompareResult({ data: resultComparing, result: false });
+      expectBcryptServiceCompareAnyResult({
+        data: resultComparing,
+        result: false,
+      });
     });
 
     test("should return false when comparing valid string with empty hash", async () => {
@@ -108,7 +114,10 @@ describe("bcryptService", () => {
         encrypted: "",
       });
 
-      expectBcryptCompareResult({ data: resultComparing, result: false });
+      expectBcryptServiceCompareAnyResult({
+        data: resultComparing,
+        result: false,
+      });
     });
 
     test("should return false when comparing empty string with valid hash", async () => {
@@ -116,7 +125,7 @@ describe("bcryptService", () => {
         data: TEST_USER_PASSWORD,
       });
 
-      expectBcryptCorrectHashResult(resultHashing);
+      expectBcryptServiceHashSuccess(resultHashing);
       const [hash] = resultHashing;
 
       const resultComparing = await bcryptService.compare({
@@ -124,7 +133,10 @@ describe("bcryptService", () => {
         encrypted: hash,
       });
 
-      expectBcryptCompareResult({ data: resultComparing, result: false });
+      expectBcryptServiceCompareAnyResult({
+        data: resultComparing,
+        result: false,
+      });
     });
 
     test("should return false when data and hash arguments are swapped", async () => {
@@ -132,7 +144,7 @@ describe("bcryptService", () => {
         data: TEST_USER_PASSWORD,
       });
 
-      expectBcryptCorrectHashResult(resultHashing);
+      expectBcryptServiceHashSuccess(resultHashing);
       const [hash] = resultHashing;
 
       const resultComparing = await bcryptService.compare({
@@ -140,7 +152,10 @@ describe("bcryptService", () => {
         encrypted: TEST_USER_PASSWORD,
       });
 
-      expectBcryptCompareResult({ data: resultComparing, result: false });
+      expectBcryptServiceCompareAnyResult({
+        data: resultComparing,
+        result: false,
+      });
     });
   });
 });

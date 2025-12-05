@@ -1,6 +1,6 @@
-import { ApplicationError } from "../../errors";
+import { ApplicationError } from "../../../errors";
 
-export function expectBcryptCompareResult({
+export function expectBcryptServiceCompareAnyResult({
   data,
   result,
 }: {

@@ -1,7 +1,7 @@
-import { CreateEmailConfirmationArgs } from "../../models";
-import { emailConfirmationRepository } from "../../repositories";
+import { CreateEmailConfirmationArgs } from "../../../models";
+import { emailConfirmationRepository } from "../../../repositories";
 
-export async function expectCreateEmailConfirmationInDb(
+export async function expectEmailConfirmRepoCreateSuccess(
   args: CreateEmailConfirmationArgs
 ): Promise<void> {
   const [createdEmailConfirmation, errorCreateEmailConfirmation] =
