@@ -84,91 +84,82 @@ async function register(
   return [{ nextStep: EMAIL_CONFIRMATION_STEP }, null];
 }
 
-// TODO add new emailConfirm service
-// async function emailConfirm(args: { email: string; code: string }) {
-//   // Find user by email first
-//   // Since emailConfirm takes the user's email,
-//   // whereas emailConfirmationModel references
-//   // the user by the user's _id (not email),
-//   // the user's email should be retrieved first
+async function emailConfirm(args: { email: string; code: string }) {
+  const [foundUser, errorFindUser] = await userRepository.findOne({
+    email: args.email,
+  });
 
-//   const [foundUser, errorFindUser] = await userRepository.findOne({
-//     email: args.email,
-//   });
+  if (errorFindUser) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
 
-//   if (errorFindUser) {
-//     return [
-//       null,
-//       new ApplicationError({
-//         errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
-//         statusCode: 500,
-//       }),
-//     ];
-//   }
+  if (!foundUser) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.LOGIN_FAILED,
+        statusCode: 400,
+      }),
+    ];
+  }
 
-//   if (!foundUser) {
-//     return [
-//       null,
-//       new ApplicationError({
-//         errorDefinition: ERROR_DEFINITIONS.LOGIN_FAILED,
-//         statusCode: 400,
-//       }),
-//     ];
-//   }
+  const [updatedEmailConfirmation, errorFindOneAndUpdateEmailConfirmation] =
+    await emailConfirmationRepository.findOneAndUpdate({
+      filter: {
+        user: foundUser._id,
+        code: args.code,
+        expireCodeTime: { $gt: new Date() },
+      },
+      update: { isEmailConfirmed: true },
+      options: { new: true },
+    });
 
-//   // Find and update email confirmation document in database
-//   const [updatedEmailConfirmation, errorFindOneAndUpdateEmailConfirmation] =
-//     await emailConfirmationRepository.findOneAndUpdate({
-//       filter: {
-//         user: foundUser._id,
-//         code: args.code,
-//         expireCodeTime: { $gt: new Date() },
-//       },
-//       update: { isEmailConfirmed: true },
-//       options: { new: true },
-//     });
+  if (errorFindOneAndUpdateEmailConfirmation) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
 
-//   if (errorFindOneAndUpdateEmailConfirmation) {
-//     return [
-//       null,
-//       new ApplicationError({
-//         errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
-//         statusCode: 500,
-//       }),
-//     ];
-//   }
+  if (!updatedEmailConfirmation) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.LOGIN_FAILED,
+        statusCode: 400,
+      }),
+    ];
+  }
 
-//   if (!updatedEmailConfirmation) {
-//     return [
-//       null,
-//       new ApplicationError({
-//         errorDefinition: ERROR_DEFINITIONS.LOGIN_FAILED,
-//         statusCode: 400,
-//       }),
-//     ];
-//   }
+  const [token, errorSignToken] = jwtService.sign({
+    payload: { _id: foundUser._id, email: foundUser.email },
+    options: {
+      algorithm: DEFAULT_ALGORITHM_TOKEN,
+      expiresIn: DEFAULT_EXPIRES_IN_TOKEN_STRING,
+    },
+  });
 
-//   // Add signing and sending token
-//   const [token, errorSignToken] = jwtService.sign({
-//     payload: { _id: foundUser._id, email: foundUser.email },
-//     options: {
-//       algorithm: DEFAULT_ALGORITHM_TOKEN,
-//       expiresIn: DEFAULT_EXPIRES_IN_TOKEN_STRING,
-//     },
-//   });
+  if (errorSignToken) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
 
-//   if (errorSignToken) {
-//     return [
-//       null,
-//       new ApplicationError({
-//         errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
-//         statusCode: 500,
-//       }),
-//     ];
-//   }
-
-//   return [token, null];
-// }
+  return [token, null];
+}
 
 async function login(
   args: UserInput
@@ -239,4 +230,4 @@ async function login(
   return [token, null];
 }
 
-export const userService = { register, login } as const;
+export const userService = { register, emailConfirm, login } as const;

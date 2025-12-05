@@ -7,12 +7,13 @@ import {
   ONE_HOUR_IN_SECONDS,
   MINUTES_IN_MILLISECONDS,
 } from "../constants";
-import { UserModel } from "../models";
+import { EmailConfirmationModel, UserModel } from "../models";
 import { emailConfirmationRepository, userRepository } from "../repositories";
 import { emailService, userService } from "../services";
 import { closeConnectionDatabase, connectDatabase } from "../utils";
 import {
   MOCK_SUCCESS_SEND_EMAIL_RESPONSE,
+  TEST_EMAIL_CONFIRMATION_CODE,
   TEST_USER_ALTERNATIVE_PASSWORD,
   TEST_USER_EMAIL,
   TEST_USER_PASSWORD,
@@ -31,6 +32,7 @@ beforeAll(async () => {
 
 afterEach(async () => {
   await UserModel.deleteMany({});
+  await EmailConfirmationModel.deleteMany({});
 });
 
 afterAll(async () => {
@@ -149,6 +151,74 @@ describe("userService", () => {
       expect(call?.[0].subject).toBe("Registration");
       expect(call?.[0].toEmail).toBe(TEST_USER_EMAIL);
     });
+  });
+
+  describe("userService.emailConfirm", () => {
+    test("should call userRepository.findOne", async () => {
+      const spy = jest.spyOn(userRepository, "findOne");
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: TEST_EMAIL_CONFIRMATION_CODE,
+      });
+
+      expect(spy).toHaveBeenCalled();
+    });
+
+    test("should call emailConfirmationRepository.findOneAndUpdate", async () => {
+      await expectUserServiceRegisterSuccess();
+
+      const spy = jest.spyOn(emailConfirmationRepository, "findOneAndUpdate");
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: TEST_EMAIL_CONFIRMATION_CODE,
+      });
+
+      expect(spy).toHaveBeenCalled();
+    });
+
+    test("should find and update email confirmation document", async () => {
+      await expectUserServiceRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const [emailConfirmationBefore, errorFindOneEmailConfirmationBefore] =
+        await emailConfirmationRepository.findOne({ user: userInDb._id });
+
+      expect(errorFindOneEmailConfirmationBefore).toBeNull();
+
+      expect(typeof emailConfirmationBefore?.code).toBe("string");
+
+      if (!emailConfirmationBefore?.code) {
+        throw new Error("Email confirmation code is missing");
+      }
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: emailConfirmationBefore.code,
+      });
+
+      const [emailConfirmationAfter, errorFindOneEmailConfirmationAfter] =
+        await emailConfirmationRepository.findOne({
+          user: userInDb._id,
+          code: emailConfirmationBefore.code,
+        });
+
+      expect(errorFindOneEmailConfirmationAfter).toBeNull();
+
+      expect(emailConfirmationAfter?.isEmailConfirmed).toBe(true);
+    });
+
+    test.todo("should return a JWT token with correct payload");
+
+    test.todo("should return a JWT token with correct expiration time");
+
+    test.todo("should throw an error when email is not found");
+
+    test.todo("should throw an error when code is wrong");
+
+    test.todo("should throw an error when code is expired");
   });
 
   describe("userService.login", () => {
