@@ -201,9 +201,61 @@ describe("userService", () => {
       expect(emailConfirmDocumentAfter?.isEmailConfirmed).toBe(true);
     });
 
-    test.todo("should return a JWT token with correct payload");
+    test("should return a JWT token with correct payload", async () => {
+      await expectUserServiceRegisterSuccess();
 
-    test.todo("should return a JWT token with correct expiration time");
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+        });
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: emailConfirmDocumentBefore.code,
+      });
+
+      const emailConfirmDocumentAfter =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+          code: emailConfirmDocumentBefore.code,
+        });
+
+      expect(emailConfirmDocumentAfter?.isEmailConfirmed).toBe(true);
+
+      const decoded = await expectUserServiceLoginSuccess();
+      expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
+    });
+
+    test("should return a JWT token with correct expiration time", async () => {
+      await expectUserServiceRegisterSuccess();
+
+      const userInDb = await expectUserRepoFindOneSuccess();
+
+      const emailConfirmDocumentBefore =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+        });
+
+      await userService.emailConfirm({
+        email: TEST_USER_EMAIL,
+        code: emailConfirmDocumentBefore.code,
+      });
+
+      const emailConfirmDocumentAfter =
+        await expectEmailConfirmRepoFindOneSuccess({
+          user: userInDb._id,
+          code: emailConfirmDocumentBefore.code,
+        });
+
+      expect(emailConfirmDocumentAfter?.isEmailConfirmed).toBe(true);
+
+      const decoded = await expectUserServiceLoginSuccess();
+      expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
+      const expiresInHrs = (decoded.exp - decoded.iat) / ONE_HOUR_IN_SECONDS;
+      expect(expiresInHrs).toBe(DEFAULT_EXPIRES_IN_TOKEN_NUMBER);
+    });
 
     test.todo("should throw an error when email is not found");
 
