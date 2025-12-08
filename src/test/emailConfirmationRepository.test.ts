@@ -35,6 +35,65 @@ describe("emailConfirmationRepository", () => {
     });
   });
 
+  describe("emailConfirmationRepository.find", () => {
+    test("should return email confirmations collection with one document", async () => {
+      const userId = new mongoose.Types.ObjectId(TEST_USER_ID_STRING);
+      const expireCodeTime = new Date(Date.now() + MINUTES_IN_MILLISECONDS[30]);
+
+      await expectEmailConfirmRepoCreateSuccess({
+        user: userId,
+        isEmailSent: true,
+        isEmailConfirmed: false,
+        code: TEST_EMAIL_CONFIRMATION_CODE,
+        expireCodeTime,
+      });
+
+      const [foundEmailConfirmations, errorFindEmailConfirmations] =
+        await emailConfirmationRepository.find({ filter: { user: userId } });
+
+      expect(errorFindEmailConfirmations).toBeNull();
+      expect(foundEmailConfirmations).not.toBeNull();
+
+      if (foundEmailConfirmations === null) {
+        throw new Error("Expected foundEmailConfirmations to not be null");
+      }
+
+      expect(foundEmailConfirmations).toHaveLength(1);
+
+      const firstDoc = foundEmailConfirmations[0];
+
+      if (!firstDoc) {
+        throw new Error("Expected first document to exist");
+      }
+
+      expect(firstDoc.toObject()).toMatchObject({
+        user: userId,
+        isEmailSent: true,
+        isEmailConfirmed: false,
+        code: TEST_EMAIL_CONFIRMATION_CODE,
+        expireCodeTime,
+      });
+    });
+
+    test("should return empty email confirmations collection", async () => {
+      const userId = new mongoose.Types.ObjectId(TEST_USER_ID_STRING);
+
+      const [foundEmailConfirmations, errorFindEmailConfirmations] =
+        await emailConfirmationRepository.find({
+          filter: { user: userId },
+        });
+
+      expect(errorFindEmailConfirmations).toBeNull();
+      expect(foundEmailConfirmations).not.toBeNull();
+
+      if (foundEmailConfirmations === null) {
+        throw new Error("Expected foundEmailConfirmations to not be null");
+      }
+
+      expect(foundEmailConfirmations).toHaveLength(0);
+    });
+  });
+
   describe("emailConfirmationRepository.findOne", () => {
     test("should return null when given user's email and code does not exist", async () => {
       const userId = new mongoose.Types.ObjectId(TEST_USER_ID_STRING);

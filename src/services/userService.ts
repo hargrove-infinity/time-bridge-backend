@@ -164,6 +164,34 @@ async function emailConfirm(args: {
   return [token, null];
 }
 
+// TODO: implement POST /resend-code endpoint
+
+// 5 - times of resendings
+// 10 seconds - delay between resendings
+
+// POST /resend-code
+// check length of emailConfirmation by user
+// if length is 5 then block user
+//
+// otherwise
+//
+// check emailConfirmation within 10 seconds from now
+// find the latest emailConfirmation (sort by createdAt in DESC)
+// check if the latest emailConfirmation has createdAt at 10 seconds ago (now() - 10 seconds)
+// if there is not emailConfirmation document with criteria above
+//
+// create new emailConfirmation document
+// and send email
+//
+
+// TODO: implement POST /check endpoint
+// emailConfirmation createdAt: 2025-12-08T18:45:00.000+00:00
+// next possible resend time emailConfirmation createdAt + 10 seconds (2025-12-08T18:45:10.000+00:00)
+// backend sends nextResendTime: 2025-12-08T18:45:10.000+00:00
+// user reloads page on 2025-12-08T18:45:05.000+00:00
+// /check returns nextResendTime: 2025-12-08T18:45:10.000+00:00
+// on frontend: left time = now() - nextResendTime
+
 async function login(
   args: UserInput
 ): Promise<[string, null] | [null, ApplicationError]> {
