@@ -1,4 +1,9 @@
-import { InferSchemaType } from "mongoose";
+import {
+  InferSchemaType,
+  FilterQuery,
+  ProjectionType,
+  QueryOptions,
+} from "mongoose";
 import {
   EmailConfirmationModel,
   emailConfirmationSchema,
@@ -6,14 +11,20 @@ import {
 
 type EmailConfirmationSchema = InferSchemaType<typeof emailConfirmationSchema>;
 
+export type EmailConfirmationDocument = ReturnType<
+  (typeof EmailConfirmationModel)["hydrate"]
+>;
+
 export type CreateEmailConfirmationArgs = Omit<
   EmailConfirmationSchema,
   "createdAt" | "updatedAt"
 >;
 
-export type EmailConfirmationDocument = ReturnType<
-  (typeof EmailConfirmationModel)["hydrate"]
->;
+export interface FindEmailConfirmationsArgs {
+  filter?: FilterQuery<EmailConfirmationDocument>;
+  projection?: ProjectionType<EmailConfirmationDocument> | null;
+  options?: QueryOptions<EmailConfirmationDocument> | null;
+}
 
 export type FindOneEmailConfirmationArgs = Parameters<
   (typeof EmailConfirmationModel)["findOne"]

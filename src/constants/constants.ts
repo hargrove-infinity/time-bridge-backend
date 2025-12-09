@@ -133,6 +133,10 @@ const ERROR_DEFINITIONS_EMAIL_CONFIRMATION_REPOSITORY = {
     description:
       "Error during creation email confirmation document in database",
   },
+  FIND_EMAIL_CONFIRMATIONS_DATABASE_ERROR: {
+    code: "FIND_EMAIL_CONFIRMATIONS_DATABASE_ERROR",
+    description: "Error during find email confirmation documents in database",
+  },
   FIND_ONE_EMAIL_CONFIRMATION_DATABASE_ERROR: {
     code: "FIND_ONE_EMAIL_CONFIRMATION_DATABASE_ERROR",
     description:
