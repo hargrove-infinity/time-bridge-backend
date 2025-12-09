@@ -5,6 +5,8 @@ export const emailValidationSchema = z.object({
   email: z.email(ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code),
 });
 
+export type EmailInput = z.infer<typeof emailValidationSchema>;
+
 export const userValidationSchema = emailValidationSchema.extend({
   password: z
     .string(ERROR_DEFINITIONS.PASSWORD_NOT_STRING.code)

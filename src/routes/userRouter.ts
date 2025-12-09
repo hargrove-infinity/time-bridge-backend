@@ -4,6 +4,7 @@ import { middlewares } from "../middlewares";
 import {
   userValidationSchema,
   emailConfirmValidationSchema,
+  emailValidationSchema,
 } from "../validation";
 import { userRoutes } from "./userRoutes";
 
@@ -19,6 +20,12 @@ userRouter.post(
   paths.auth.emailConfirm,
   middlewares.validate({ schema: emailConfirmValidationSchema }),
   userRoutes.emailConfirm
+);
+
+userRouter.post(
+  paths.auth.resendCode,
+  middlewares.validate({ schema: emailValidationSchema }),
+  userRoutes.resendCode
 );
 
 userRouter.post(
