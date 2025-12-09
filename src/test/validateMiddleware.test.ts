@@ -3,6 +3,7 @@ import { ERROR_DEFINITIONS } from "../constants";
 import { middlewares } from "../middlewares";
 import {
   emailConfirmValidationSchema,
+  emailValidationSchema,
   userValidationSchema,
 } from "../validation";
 import {
@@ -435,6 +436,138 @@ describe("validate middleware", () => {
 
       const middleware = middlewares.validate({
         schema: emailConfirmValidationSchema,
+      });
+
+      middleware(request, response, next);
+
+      expect(response.statusCode).toBe(200);
+
+      expect(next).toHaveBeenCalled();
+    });
+  });
+
+  describe("emailValidationSchema", () => {
+    test("should fail: email is undefined", () => {
+      const request = httpMocks.createRequest({
+        body: { email: undefined },
+      });
+
+      const response = httpMocks.createResponse();
+
+      const next = jest.fn();
+
+      const middleware = middlewares.validate({
+        schema: emailValidationSchema,
+      });
+
+      middleware(request, response, next);
+
+      expect(response.statusCode).toBe(400);
+
+      const data = response._getData();
+
+      expect(data.errors).toEqual([
+        {
+          code: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code,
+          data: [],
+          description: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.description,
+        },
+      ]);
+    });
+
+    test("should fail: email is null", () => {
+      const request = httpMocks.createRequest({ body: { email: null } });
+
+      const response = httpMocks.createResponse();
+
+      const next = jest.fn();
+
+      const middleware = middlewares.validate({
+        schema: emailValidationSchema,
+      });
+
+      middleware(request, response, next);
+
+      expect(response.statusCode).toBe(400);
+
+      const data = response._getData();
+
+      expect(data.errors).toEqual([
+        {
+          code: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code,
+          data: [],
+          description: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.description,
+        },
+      ]);
+    });
+
+    test("should fail: email is empty string", () => {
+      const request = httpMocks.createRequest({
+        body: { email: "" },
+      });
+
+      const response = httpMocks.createResponse();
+
+      const next = jest.fn();
+
+      const middleware = middlewares.validate({
+        schema: emailValidationSchema,
+      });
+
+      middleware(request, response, next);
+
+      expect(response.statusCode).toBe(400);
+
+      const data = response._getData();
+
+      expect(data.errors).toEqual([
+        {
+          code: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code,
+          data: [],
+          description: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.description,
+        },
+      ]);
+    });
+
+    test("should fail: email is random string", () => {
+      const request = httpMocks.createRequest({
+        body: { email: "abc" },
+      });
+
+      const response = httpMocks.createResponse();
+
+      const next = jest.fn();
+
+      const middleware = middlewares.validate({
+        schema: emailValidationSchema,
+      });
+
+      middleware(request, response, next);
+
+      expect(response.statusCode).toBe(400);
+
+      const data = response._getData();
+
+      expect(data.errors).toEqual([
+        {
+          code: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code,
+          data: ["abc"],
+          description: ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.description,
+        },
+      ]);
+    });
+
+    test("should pass: email is valid", () => {
+      const request = httpMocks.createRequest({
+        body: { email: TEST_USER_EMAIL },
+      });
+
+      const response = httpMocks.createResponse();
+
+      const next = jest.fn();
+
+      const middleware = middlewares.validate({
+        schema: emailValidationSchema,
       });
 
       middleware(request, response, next);
