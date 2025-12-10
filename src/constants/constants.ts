@@ -17,6 +17,13 @@ export const DEFAULT_ALGORITHM_TOKEN: Algorithm = "HS256";
 export const ONE_HOUR_IN_SECONDS = 3600;
 
 export const MINUTES_IN_MILLISECONDS = {
+  1: 60000,
+  2: 120000,
+  3: 180000,
+  4: 240000,
+  26: 1560000,
+  27: 1620000,
+  28: 1680000,
   29: 1740000,
   30: 1800000,
   31: 1860000,
@@ -32,6 +39,8 @@ export const PASSWORD_MIN_LEN = 8;
 export const EMAIL_CONFIRMATION_STEP = "EMAIL_CONFIRMATION";
 
 export const EMAIL_CONFIRM_CODE_LEN = 6;
+
+export const ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE_BEFORE_BLOCK = 5;
 
 const ERROR_DEFINITIONS_MISC = {
   UNKNOWN_ERROR: {
@@ -117,6 +126,14 @@ const ERROR_DEFINITIONS_USER_SERVICE = {
   EMAIL_CONFIRMATION_FAILED: {
     code: "EMAIL_CONFIRMATION_FAILED",
     description: "Email confirmation failed.",
+  },
+  RESEND_CODE_FAILED: {
+    code: "RESEND_CODE_FAILED",
+    description: "Resend code failed.",
+  },
+  BLOCKED_AFTER_EXCEED_ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE: {
+    code: "BLOCKED_AFTER_EXCEED_ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE",
+    description: `User reached limit to resend email confirmation code: ${ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE_BEFORE_BLOCK} attempts.`,
   },
 };
 

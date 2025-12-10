@@ -19,7 +19,9 @@ import {
   TEST_USER_PASSWORD,
 } from "./constants";
 import {
+  createMockEmailConfirmations,
   expectEmailConfirmRepoFindOneSuccess,
+  expectUserRepoCreateSuccess,
   expectUserRepoFindOneSuccess,
   expectUserServiceLoginSuccess,
   expectUserServiceRegisterSuccess,
@@ -295,6 +297,66 @@ describe("userService", () => {
         ERROR_DEFINITIONS.EMAIL_CONFIRMATION_FAILED
       );
     });
+  });
+
+  describe("userService.resendCode", () => {
+    test("user with no existing email requested to resend code", async () => {
+      const [resultResendCode, errorResendCode] = await userService.resendCode(
+        TEST_USER_EMAIL
+      );
+
+      expect(resultResendCode).toBeNull();
+      expect(errorResendCode).toBeInstanceOf(ApplicationError);
+      expect(errorResendCode?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.RESEND_CODE_FAILED
+      );
+    });
+
+    test.todo("user requested to resend code maximum attempts - 1: 4 times");
+
+    test("user requested to resend code maximum attempts: 5 times", async () => {
+      const userInDb = await expectUserRepoCreateSuccess();
+      const documents = createMockEmailConfirmations(userInDb._id);
+      await EmailConfirmationModel.insertMany(documents);
+
+      const [resultResendCode, errorResendCode] = await userService.resendCode(
+        TEST_USER_EMAIL
+      );
+
+      expect(resultResendCode).toBeNull();
+      expect(errorResendCode).toBeInstanceOf(ApplicationError);
+      expect(errorResendCode?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.BLOCKED_AFTER_EXCEED_ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE
+      );
+    });
+
+    test.todo("should call userRepository.findOne");
+
+    test.todo("should call emailConfirmationRepository.find");
+
+    test.todo(
+      "user within maximum attempts requested to resend code and did not wait delay between resends"
+    );
+
+    test("emailConfirmation documents should be fetched in createdAt DESC order", async () => {
+      const spy = jest.spyOn(emailConfirmationRepository, "find");
+      const userInDb = await expectUserRepoCreateSuccess();
+      await userService.resendCode(TEST_USER_EMAIL);
+
+      expect(spy).toHaveBeenCalledWith({
+        filter: { user: userInDb._id },
+        projection: {},
+        options: { sort: { createdAt: "desc" } },
+      });
+    });
+
+    test.todo(
+      "user within maximum attempts requested to resend code and waited delay between resends: emailConfirmation document should be created"
+    );
+
+    test.todo(
+      "user within maximum attempts requested to resend code and waited delay between resends: correct payload should be sent"
+    );
   });
 
   describe("userService.login", () => {

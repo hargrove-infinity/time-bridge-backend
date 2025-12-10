@@ -1,4 +1,5 @@
 import {
+  ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE_BEFORE_BLOCK,
   DEFAULT_ALGORITHM_TOKEN,
   DEFAULT_EXPIRES_IN_TOKEN_STRING,
   EMAIL_CONFIRMATION_STEP,
@@ -165,24 +166,94 @@ async function emailConfirm(args: {
 }
 
 // TODO: implement POST /resend-code endpoint
-
 // 5 - times of resendings
 // 10 seconds - delay between resendings
-
 // POST /resend-code
-// check length of emailConfirmation by user
-// if length is 5 then block user
-//
-// otherwise
-//
-// check emailConfirmation within 10 seconds from now
-// find the latest emailConfirmation (sort by createdAt in DESC)
-// check if the latest emailConfirmation has createdAt at 10 seconds ago (now() - 10 seconds)
-// if there is not emailConfirmation document with criteria above
-//
-// create new emailConfirmation document
-// and send email
-//
+async function resendCode(
+  email: string
+  // TODO: fix return type
+): Promise<[any, null] | [null, ApplicationError]> {
+  // fetch user by email to get user._id
+  const [foundUser, errorFindUser] = await userRepository.findOne({ email });
+
+  if (errorFindUser) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
+
+  if (!foundUser) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.RESEND_CODE_FAILED,
+        statusCode: 400,
+      }),
+    ];
+  }
+
+  // check length of emailConfirmation by user
+  // if length is 5 then block user
+
+  const [foundEmailConfirmations, errorFindEmailConfirmations] =
+    await emailConfirmationRepository.find({
+      filter: { user: foundUser._id },
+      projection: {},
+      options: { sort: { createdAt: "desc" } },
+    });
+
+  if (errorFindEmailConfirmations) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
+
+  if (!foundEmailConfirmations) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.RESEND_CODE_FAILED,
+        statusCode: 400,
+      }),
+    ];
+  }
+
+  if (
+    foundEmailConfirmations.length >=
+    ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE_BEFORE_BLOCK
+  ) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition:
+          ERROR_DEFINITIONS.BLOCKED_AFTER_EXCEED_ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE,
+        statusCode: 400,
+      }),
+    ];
+  }
+
+  // TODO: refactor returned payload
+  return [{ msg: "resend" }, null];
+
+  // otherwise
+  //
+  // check emailConfirmation within 10 seconds from now
+  // find the latest emailConfirmation (sort by createdAt in DESC)
+  // check if the latest emailConfirmation has createdAt at 10 seconds ago (now() - 10 seconds)
+  // if there is not emailConfirmation document with criteria above
+  //
+
+  // create new emailConfirmation document
+  // and send email
+}
 
 // TODO: implement POST /check endpoint
 // emailConfirmation createdAt: 2025-12-08T18:45:00.000+00:00
@@ -285,4 +356,9 @@ async function login(
   return [token, null];
 }
 
-export const userService = { register, emailConfirm, login } as const;
+export const userService = {
+  register,
+  emailConfirm,
+  resendCode,
+  login,
+} as const;
