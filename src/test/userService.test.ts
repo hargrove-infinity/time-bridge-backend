@@ -330,13 +330,18 @@ describe("userService", () => {
       );
     });
 
-    test.todo("should call userRepository.findOne");
+    test("should call userRepository.findOne", async () => {
+      const spy = jest.spyOn(userRepository, "findOne");
+      await userService.resendCode(TEST_USER_EMAIL);
+      expect(spy).toHaveBeenCalled();
+    });
 
-    test.todo("should call emailConfirmationRepository.find");
-
-    test.todo(
-      "user within maximum attempts requested to resend code and did not wait delay between resends"
-    );
+    test("should call emailConfirmationRepository.find", async () => {
+      const spy = jest.spyOn(emailConfirmationRepository, "find");
+      await expectUserRepoCreateSuccess();
+      await userService.resendCode(TEST_USER_EMAIL);
+      expect(spy).toHaveBeenCalled();
+    });
 
     test("emailConfirmation documents should be fetched in createdAt DESC order", async () => {
       const spy = jest.spyOn(emailConfirmationRepository, "find");
@@ -349,6 +354,10 @@ describe("userService", () => {
         options: { sort: { createdAt: "desc" } },
       });
     });
+
+    test.todo(
+      "user within maximum attempts requested to resend code and did not wait delay between resends"
+    );
 
     test.todo(
       "user within maximum attempts requested to resend code and waited delay between resends: emailConfirmation document should be created"
