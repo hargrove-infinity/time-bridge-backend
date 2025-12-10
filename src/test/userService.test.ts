@@ -25,6 +25,8 @@ import {
   expectUserRepoFindOneSuccess,
   expectUserServiceLoginSuccess,
   expectUserServiceRegisterSuccess,
+  expectValidDate,
+  sleep,
 } from "./utils";
 
 jest.setTimeout(10000);
@@ -355,9 +357,18 @@ describe("userService", () => {
       });
     });
 
-    test.todo(
-      "user within maximum attempts requested to resend code and did not wait delay between resends"
-    );
+    test("user within maximum attempts requested to resend code and did not wait delay between resends", async () => {
+      await expectUserServiceRegisterSuccess();
+      await userService.resendCode(TEST_USER_EMAIL);
+      await sleep(3000);
+
+      const [resultResendCode, errorResendCode] = await userService.resendCode(
+        TEST_USER_EMAIL
+      );
+
+      expect(errorResendCode).toBeNull();
+      expectValidDate(resultResendCode.nextResendTime);
+    });
 
     test.todo(
       "user within maximum attempts requested to resend code and waited delay between resends: emailConfirmation document should be created"

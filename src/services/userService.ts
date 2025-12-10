@@ -5,6 +5,7 @@ import {
   EMAIL_CONFIRMATION_STEP,
   ERROR_DEFINITIONS,
   MINUTES_IN_MILLISECONDS,
+  TEN_SECONDS_IN_MILLISECONDS,
 } from "../constants";
 import { emailConfirmationRepository, userRepository } from "../repositories";
 import { ApplicationError } from "../errors";
@@ -216,7 +217,7 @@ async function resendCode(
     ];
   }
 
-  if (!foundEmailConfirmations) {
+  if (!foundEmailConfirmations || foundEmailConfirmations.length === 0) {
     return [
       null,
       new ApplicationError({
@@ -240,9 +241,6 @@ async function resendCode(
     ];
   }
 
-  // TODO: refactor returned payload
-  return [{ msg: "resend" }, null];
-
   // otherwise
   //
   // check emailConfirmation within 10 seconds from now
@@ -251,8 +249,33 @@ async function resendCode(
   // if there is not emailConfirmation document with criteria above
   //
 
+  const lastEmailConfirmation = foundEmailConfirmations[0];
+
+  if (!lastEmailConfirmation) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.RESEND_CODE_FAILED,
+        statusCode: 400,
+      }),
+    ];
+  }
+
+  const { createdAt } = lastEmailConfirmation;
+
+  const createdAtPlus10Sec = new Date(
+    createdAt.getTime() + TEN_SECONDS_IN_MILLISECONDS
+  );
+
+  if (createdAtPlus10Sec > new Date()) {
+    return [{ nextResendTime: createdAtPlus10Sec }, null];
+  }
+
   // create new emailConfirmation document
   // and send email
+
+  // TODO: refactor returned payload
+  return [{ msg: "resend" }, null];
 }
 
 // TODO: implement POST /check endpoint

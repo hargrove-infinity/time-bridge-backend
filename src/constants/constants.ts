@@ -16,6 +16,8 @@ export const DEFAULT_ALGORITHM_TOKEN: Algorithm = "HS256";
 
 export const ONE_HOUR_IN_SECONDS = 3600;
 
+export const TEN_SECONDS_IN_MILLISECONDS = 10000;
+
 export const MINUTES_IN_MILLISECONDS = {
   1: 60000,
   2: 120000,
