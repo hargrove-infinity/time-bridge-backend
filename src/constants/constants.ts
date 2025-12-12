@@ -42,7 +42,7 @@ export const EMAIL_CONFIRMATION_STEP = "EMAIL_CONFIRMATION";
 
 export const EMAIL_CONFIRM_CODE_LEN = 6;
 
-export const ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE_BEFORE_BLOCK = 5;
+export const EMAIL_CONFIRM_RESEND_LIMIT = 5;
 
 const ERROR_DEFINITIONS_MISC = {
   UNKNOWN_ERROR: {
@@ -133,9 +133,9 @@ const ERROR_DEFINITIONS_USER_SERVICE = {
     code: "RESEND_CODE_FAILED",
     description: "Resend code failed.",
   },
-  BLOCKED_AFTER_EXCEED_ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE: {
-    code: "BLOCKED_AFTER_EXCEED_ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE",
-    description: `User reached limit to resend email confirmation code: ${ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE_BEFORE_BLOCK} attempts.`,
+  EMAIL_CONFIRM_RESEND_LIMIT_REACHED_BLOCKED: {
+    code: "EMAIL_CONFIRM_RESEND_LIMIT_REACHED_BLOCKED",
+    description: `User reached the limit for resend email confirmation code (${EMAIL_CONFIRM_RESEND_LIMIT} attempts) and has been blocked.`,
   },
 };
 

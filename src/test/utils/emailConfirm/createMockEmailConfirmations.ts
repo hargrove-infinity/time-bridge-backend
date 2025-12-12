@@ -2,7 +2,16 @@ import { Types } from "mongoose";
 import { MINUTES_IN_MILLISECONDS } from "../../../constants";
 import { TEST_EMAIL_CONFIRMATION_CODE } from "../../constants";
 
-export function createMockEmailConfirmations(userId: Types.ObjectId) {
+interface CreateMockEmailConfirmationsArgs {
+  userId: Types.ObjectId;
+  shouldIncludeLast: boolean;
+}
+
+export function createMockEmailConfirmations(
+  args: CreateMockEmailConfirmationsArgs
+) {
+  const { userId, shouldIncludeLast } = args;
+
   const emailConfirmData = {
     user: userId,
     isEmailSent: true,
@@ -10,7 +19,7 @@ export function createMockEmailConfirmations(userId: Types.ObjectId) {
     code: TEST_EMAIL_CONFIRMATION_CODE,
   };
 
-  return [
+  const fourEmailConfirmations = [
     {
       ...emailConfirmData,
       expireCodeTime: new Date(Date.now() + MINUTES_IN_MILLISECONDS[26]),
@@ -35,11 +44,17 @@ export function createMockEmailConfirmations(userId: Types.ObjectId) {
       createdAt: new Date(Date.now() - MINUTES_IN_MILLISECONDS[1]),
       updatedAt: new Date(Date.now() - MINUTES_IN_MILLISECONDS[1]),
     },
-    {
-      ...emailConfirmData,
-      expireCodeTime: new Date(Date.now() + MINUTES_IN_MILLISECONDS[30]),
-      createdAt: new Date(Date.now()),
-      updatedAt: new Date(Date.now()),
-    },
   ];
+
+  return shouldIncludeLast
+    ? [
+        ...fourEmailConfirmations,
+        {
+          ...emailConfirmData,
+          expireCodeTime: new Date(Date.now() + MINUTES_IN_MILLISECONDS[30]),
+          createdAt: new Date(Date.now()),
+          updatedAt: new Date(Date.now()),
+        },
+      ]
+    : fourEmailConfirmations;
 }

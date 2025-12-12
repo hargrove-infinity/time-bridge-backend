@@ -1,7 +1,7 @@
 import {
-  ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE_BEFORE_BLOCK,
   DEFAULT_ALGORITHM_TOKEN,
   DEFAULT_EXPIRES_IN_TOKEN_STRING,
+  EMAIL_CONFIRM_RESEND_LIMIT,
   EMAIL_CONFIRMATION_STEP,
   ERROR_DEFINITIONS,
   MINUTES_IN_MILLISECONDS,
@@ -166,15 +166,9 @@ async function emailConfirm(args: {
   return [token, null];
 }
 
-// TODO: implement POST /resend-code endpoint
-// 5 - times of resendings
-// 10 seconds - delay between resendings
-// POST /resend-code
 async function resendCode(
   email: string
-  // TODO: fix return type
-): Promise<[any, null] | [null, ApplicationError]> {
-  // fetch user by email to get user._id
+): Promise<[{ nextResendTime: Date }, null] | [null, ApplicationError]> {
   const [foundUser, errorFindUser] = await userRepository.findOne({ email });
 
   if (errorFindUser) {
@@ -196,9 +190,6 @@ async function resendCode(
       }),
     ];
   }
-
-  // check length of emailConfirmation by user
-  // if length is 5 then block user
 
   const [foundEmailConfirmations, errorFindEmailConfirmations] =
     await emailConfirmationRepository.find({
@@ -227,27 +218,16 @@ async function resendCode(
     ];
   }
 
-  if (
-    foundEmailConfirmations.length >=
-    ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE_BEFORE_BLOCK
-  ) {
+  if (foundEmailConfirmations.length >= EMAIL_CONFIRM_RESEND_LIMIT) {
     return [
       null,
       new ApplicationError({
         errorDefinition:
-          ERROR_DEFINITIONS.BLOCKED_AFTER_EXCEED_ATTEMPTS_TO_RESEND_EMAIL_CONFIRM_CODE,
+          ERROR_DEFINITIONS.EMAIL_CONFIRM_RESEND_LIMIT_REACHED_BLOCKED,
         statusCode: 400,
       }),
     ];
   }
-
-  // otherwise
-  //
-  // check emailConfirmation within 10 seconds from now
-  // find the latest emailConfirmation (sort by createdAt in DESC)
-  // check if the latest emailConfirmation has createdAt at 10 seconds ago (now() - 10 seconds)
-  // if there is not emailConfirmation document with criteria above
-  //
 
   const lastEmailConfirmation = foundEmailConfirmations[0];
 
@@ -261,21 +241,67 @@ async function resendCode(
     ];
   }
 
-  const { createdAt } = lastEmailConfirmation;
-
-  const createdAtPlus10Sec = new Date(
-    createdAt.getTime() + TEN_SECONDS_IN_MILLISECONDS
+  const resendTimeLastEmailConfirmation = new Date(
+    lastEmailConfirmation.createdAt.getTime() + TEN_SECONDS_IN_MILLISECONDS
   );
 
-  if (createdAtPlus10Sec > new Date()) {
-    return [{ nextResendTime: createdAtPlus10Sec }, null];
+  if (resendTimeLastEmailConfirmation > new Date()) {
+    return [{ nextResendTime: resendTimeLastEmailConfirmation }, null];
   }
 
-  // create new emailConfirmation document
-  // and send email
+  const confirmationCode = generateRandomStringCode();
 
-  // TODO: refactor returned payload
-  return [{ msg: "resend" }, null];
+  const [, errorSendEmail] = await emailService.sendEmail({
+    transporter,
+    toEmail: email,
+    subject: "Registration",
+    html: `Your code is ${confirmationCode}`,
+  });
+
+  if (errorSendEmail) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
+
+  const [createdEmailConfirmation, errorCreateEmailConfirmation] =
+    await emailConfirmationRepository.create({
+      user: foundUser._id,
+      isEmailSent: true,
+      isEmailConfirmed: false,
+      code: String(confirmationCode),
+      expireCodeTime: new Date(Date.now() + MINUTES_IN_MILLISECONDS[30]),
+    });
+
+  if (errorCreateEmailConfirmation) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
+
+  if (!createdEmailConfirmation) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.RESEND_CODE_FAILED,
+        statusCode: 500,
+      }),
+    ];
+  }
+
+  const resendTimeCreatedEmailConfirmation = new Date(
+    createdEmailConfirmation.createdAt.getTime() + TEN_SECONDS_IN_MILLISECONDS
+  );
+
+  return [{ nextResendTime: resendTimeCreatedEmailConfirmation }, null];
 }
 
 // TODO: implement POST /check endpoint
