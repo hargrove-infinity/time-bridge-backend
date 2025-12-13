@@ -26,6 +26,7 @@ import { userRoutes } from "../routes/userRoutes";
 
 // Create spies at module level, BEFORE userRouter is imported
 const spyOnUserRoutesRegister = jest.spyOn(userRoutes, "register");
+const spyOnUserRoutesResendCode = jest.spyOn(userRoutes, "resendCode");
 const spyOnUserRoutesEmailConfirm = jest.spyOn(userRoutes, "emailConfirm");
 const spyOnUserRoutesLogin = jest.spyOn(userRoutes, "login");
 
@@ -151,6 +152,27 @@ describe("userRouter", () => {
 
       expect(mongoose.Types.ObjectId.isValid(decoded._id)).toBe(true);
     });
+  });
+
+  describe("userRouter.resendCode", () => {
+    test("should call validate middleware on userRouter.resendCode", async () => {
+      await request(app)
+        .post(paths.auth.resendCode)
+        .send({ email: TEST_USER_EMAIL });
+
+      expect(validateSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test("should call userRoutes.resendCode", async () => {
+      await request(app)
+        .post(paths.auth.resendCode)
+        .send({ email: TEST_USER_EMAIL });
+      expect(spyOnUserRoutesResendCode).toHaveBeenCalled();
+    });
+
+    test.todo("should receive 200 status code from userRouter.resendCode");
+
+    test.todo("should respond with correct payload from userRouter.resendCode");
   });
 
   describe("userRouter.login", () => {

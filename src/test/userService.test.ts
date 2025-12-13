@@ -19,13 +19,15 @@ import {
   TEST_USER_PASSWORD,
 } from "./constants";
 import {
+  createMockEmailConfirmations,
   expectEmailConfirmRepoFindOneSuccess,
+  expectUserRepoCreateSuccess,
   expectUserRepoFindOneSuccess,
   expectUserServiceLoginSuccess,
   expectUserServiceRegisterSuccess,
+  expectValidDate,
+  sleep,
 } from "./utils";
-
-jest.setTimeout(10000);
 
 beforeAll(async () => {
   await connectDatabase();
@@ -51,6 +53,7 @@ describe("userService", () => {
       });
 
       expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
     });
 
     test("should not store user's password as plain text", async () => {
@@ -129,6 +132,8 @@ describe("userService", () => {
       expect(foundEmailConfirmation?.expireCodeTime.getTime()).toBeLessThan(
         Date.now() + MINUTES_IN_MILLISECONDS[31]
       );
+
+      spyOnCreateConfirmationRepo.mockRestore();
     });
 
     test("should call sendEmail service", async () => {
@@ -151,6 +156,8 @@ describe("userService", () => {
       expect(call?.[0].html.length).toBe(19);
       expect(call?.[0].subject).toBe("Registration");
       expect(call?.[0].toEmail).toBe(TEST_USER_EMAIL);
+
+      spyOnEmailServiceSendEmailMockImpl.mockRestore();
     });
   });
 
@@ -164,6 +171,7 @@ describe("userService", () => {
       });
 
       expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
     });
 
     test("should call emailConfirmationRepository.findOneAndUpdate", async () => {
@@ -177,6 +185,7 @@ describe("userService", () => {
       });
 
       expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
     });
 
     test("should find and update email confirmation document", async () => {
@@ -297,6 +306,176 @@ describe("userService", () => {
     });
   });
 
+  describe("userService.resendCode", () => {
+    test("should return error when user does not exist", async () => {
+      const [resultResendCode, errorResendCode] = await userService.resendCode(
+        TEST_USER_EMAIL
+      );
+
+      expect(resultResendCode).toBeNull();
+      expect(errorResendCode).toBeInstanceOf(ApplicationError);
+      expect(errorResendCode?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.RESEND_CODE_FAILED
+      );
+    });
+
+    test("should return nextResendTime when user has 4 resend attempts (one below maximum)", async () => {
+      const userInDb = await expectUserRepoCreateSuccess();
+
+      const documents = createMockEmailConfirmations({
+        userId: userInDb._id,
+        shouldIncludeLast: false,
+      });
+
+      await EmailConfirmationModel.insertMany(documents);
+
+      const [resultResendCode, errorResendCode] = await userService.resendCode(
+        TEST_USER_EMAIL
+      );
+
+      expect(errorResendCode).toBeNull();
+
+      if (!resultResendCode || !resultResendCode?.nextResendTime) {
+        throw new Error("nextResendTime is missing");
+      }
+
+      expectValidDate(resultResendCode.nextResendTime);
+    });
+
+    test("should return error when user reaches maximum 5 resend attempts", async () => {
+      const userInDb = await expectUserRepoCreateSuccess();
+
+      const documents = createMockEmailConfirmations({
+        userId: userInDb._id,
+        shouldIncludeLast: true,
+      });
+
+      await EmailConfirmationModel.insertMany(documents);
+
+      const [resultResendCode, errorResendCode] = await userService.resendCode(
+        TEST_USER_EMAIL
+      );
+
+      expect(resultResendCode).toBeNull();
+      expect(errorResendCode).toBeInstanceOf(ApplicationError);
+      expect(errorResendCode?.errorDefinition).toEqual(
+        ERROR_DEFINITIONS.EMAIL_CONFIRM_RESEND_LIMIT_REACHED_BLOCKED
+      );
+    });
+
+    test("should call userRepository.findOne to look up user", async () => {
+      const spy = jest.spyOn(userRepository, "findOne");
+      await userService.resendCode(TEST_USER_EMAIL);
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
+    });
+
+    test("should call emailConfirmationRepository.find to retrieve confirmation history", async () => {
+      const spy = jest.spyOn(emailConfirmationRepository, "find");
+      await expectUserRepoCreateSuccess();
+      await userService.resendCode(TEST_USER_EMAIL);
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
+    });
+
+    test("should fetch emailConfirmation documents sorted by createdAt in descending order", async () => {
+      const spy = jest.spyOn(emailConfirmationRepository, "find");
+      const userInDb = await expectUserRepoCreateSuccess();
+      await userService.resendCode(TEST_USER_EMAIL);
+
+      expect(spy).toHaveBeenCalledWith({
+        filter: { user: userInDb._id },
+        projection: {},
+        options: { sort: { createdAt: "desc" } },
+      });
+
+      spy.mockRestore();
+    });
+
+    test("should return nextResendTime when user requests resend before delay period expires", async () => {
+      await expectUserServiceRegisterSuccess();
+      await userService.resendCode(TEST_USER_EMAIL);
+      await sleep(3000);
+
+      const [resultResendCode, errorResendCode] = await userService.resendCode(
+        TEST_USER_EMAIL
+      );
+
+      expect(errorResendCode).toBeNull();
+
+      if (!resultResendCode || !resultResendCode.nextResendTime) {
+        throw new Error("nextResendTime is missing");
+      }
+
+      expectValidDate(resultResendCode.nextResendTime);
+    });
+
+    test("should create new emailConfirmation document when user waits required delay between resends", async () => {
+      const spy = jest.spyOn(emailConfirmationRepository, "create");
+      await expectUserServiceRegisterSuccess();
+      await userService.resendCode(TEST_USER_EMAIL);
+      expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
+    });
+
+    test("should return nextResendTime successfully when user waits required delay between resends", async () => {
+      const spyOnEmailServiceSendEmailMockImpl = jest
+        .spyOn(emailService, "sendEmail")
+        .mockImplementation(async () => {
+          return [MOCK_SUCCESS_SEND_EMAIL_RESPONSE, null];
+        });
+
+      await userService.register({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      await sleep(10100);
+
+      const [resultResendCode, errorResendCode] = await userService.resendCode(
+        TEST_USER_EMAIL
+      );
+
+      expect(errorResendCode).toBeNull();
+
+      if (!resultResendCode || !resultResendCode.nextResendTime) {
+        throw new Error("nextResendTime is missing");
+      }
+
+      expectValidDate(resultResendCode.nextResendTime);
+
+      spyOnEmailServiceSendEmailMockImpl.mockRestore();
+    }, 15000);
+
+    test("should send email with correct format and content after delay period", async () => {
+      const spyOnEmailServiceSendEmailMockImpl = jest
+        .spyOn(emailService, "sendEmail")
+        .mockImplementation(async () => {
+          return [MOCK_SUCCESS_SEND_EMAIL_RESPONSE, null];
+        });
+
+      await userService.register({
+        email: TEST_USER_EMAIL,
+        password: TEST_USER_PASSWORD,
+      });
+
+      await sleep(10100);
+
+      await userService.resendCode(TEST_USER_EMAIL);
+
+      expect(spyOnEmailServiceSendEmailMockImpl).toHaveBeenCalled();
+
+      const call = spyOnEmailServiceSendEmailMockImpl.mock.calls[1];
+
+      expect(call?.[0].html).toMatch(/^Your code is/);
+      expect(call?.[0].html.length).toBe(19);
+      expect(call?.[0].subject).toBe("Registration");
+      expect(call?.[0].toEmail).toBe(TEST_USER_EMAIL);
+
+      spyOnEmailServiceSendEmailMockImpl.mockRestore();
+    }, 15000);
+  });
+
   describe("userService.login", () => {
     test("should call userRepository.findOne", async () => {
       const spy = jest.spyOn(userRepository, "findOne");
@@ -307,6 +486,7 @@ describe("userService", () => {
       });
 
       expect(spy).toHaveBeenCalled();
+      spy.mockRestore();
     });
 
     test("should throw an error when email does not exist", async () => {

@@ -1,9 +1,11 @@
 import {
   DEFAULT_ALGORITHM_TOKEN,
   DEFAULT_EXPIRES_IN_TOKEN_STRING,
+  EMAIL_CONFIRM_RESEND_LIMIT,
   EMAIL_CONFIRMATION_STEP,
   ERROR_DEFINITIONS,
   MINUTES_IN_MILLISECONDS,
+  TEN_SECONDS_IN_MILLISECONDS,
 } from "../constants";
 import { emailConfirmationRepository, userRepository } from "../repositories";
 import { ApplicationError } from "../errors";
@@ -164,25 +166,143 @@ async function emailConfirm(args: {
   return [token, null];
 }
 
-// TODO: implement POST /resend-code endpoint
+async function resendCode(
+  email: string
+): Promise<[{ nextResendTime: Date }, null] | [null, ApplicationError]> {
+  const [foundUser, errorFindUser] = await userRepository.findOne({ email });
 
-// 5 - times of resendings
-// 10 seconds - delay between resendings
+  if (errorFindUser) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
 
-// POST /resend-code
-// check length of emailConfirmation by user
-// if length is 5 then block user
-//
-// otherwise
-//
-// check emailConfirmation within 10 seconds from now
-// find the latest emailConfirmation (sort by createdAt in DESC)
-// check if the latest emailConfirmation has createdAt at 10 seconds ago (now() - 10 seconds)
-// if there is not emailConfirmation document with criteria above
-//
-// create new emailConfirmation document
-// and send email
-//
+  if (!foundUser) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.RESEND_CODE_FAILED,
+        statusCode: 400,
+      }),
+    ];
+  }
+
+  const [foundEmailConfirmations, errorFindEmailConfirmations] =
+    await emailConfirmationRepository.find({
+      filter: { user: foundUser._id },
+      projection: {},
+      options: { sort: { createdAt: "desc" } },
+    });
+
+  if (errorFindEmailConfirmations) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
+
+  if (!foundEmailConfirmations || foundEmailConfirmations.length === 0) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.RESEND_CODE_FAILED,
+        statusCode: 400,
+      }),
+    ];
+  }
+
+  if (foundEmailConfirmations.length >= EMAIL_CONFIRM_RESEND_LIMIT) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition:
+          ERROR_DEFINITIONS.EMAIL_CONFIRM_RESEND_LIMIT_REACHED_BLOCKED,
+        statusCode: 400,
+      }),
+    ];
+  }
+
+  const lastEmailConfirmation = foundEmailConfirmations[0];
+
+  if (!lastEmailConfirmation) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.RESEND_CODE_FAILED,
+        statusCode: 400,
+      }),
+    ];
+  }
+
+  const resendTimeLastEmailConfirmation = new Date(
+    lastEmailConfirmation.createdAt.getTime() + TEN_SECONDS_IN_MILLISECONDS
+  );
+
+  if (resendTimeLastEmailConfirmation > new Date()) {
+    return [{ nextResendTime: resendTimeLastEmailConfirmation }, null];
+  }
+
+  const confirmationCode = generateRandomStringCode();
+
+  const [, errorSendEmail] = await emailService.sendEmail({
+    transporter,
+    toEmail: email,
+    subject: "Registration",
+    html: `Your code is ${confirmationCode}`,
+  });
+
+  if (errorSendEmail) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
+
+  const [createdEmailConfirmation, errorCreateEmailConfirmation] =
+    await emailConfirmationRepository.create({
+      user: foundUser._id,
+      isEmailSent: true,
+      isEmailConfirmed: false,
+      code: String(confirmationCode),
+      expireCodeTime: new Date(Date.now() + MINUTES_IN_MILLISECONDS[30]),
+    });
+
+  if (errorCreateEmailConfirmation) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.INTERNAL_SERVER_ERROR,
+        statusCode: 500,
+      }),
+    ];
+  }
+
+  if (!createdEmailConfirmation) {
+    return [
+      null,
+      new ApplicationError({
+        errorDefinition: ERROR_DEFINITIONS.RESEND_CODE_FAILED,
+        statusCode: 500,
+      }),
+    ];
+  }
+
+  const resendTimeCreatedEmailConfirmation = new Date(
+    createdEmailConfirmation.createdAt.getTime() + TEN_SECONDS_IN_MILLISECONDS
+  );
+
+  return [{ nextResendTime: resendTimeCreatedEmailConfirmation }, null];
+}
 
 // TODO: implement POST /check endpoint
 // emailConfirmation createdAt: 2025-12-08T18:45:00.000+00:00
@@ -285,4 +405,9 @@ async function login(
   return [token, null];
 }
 
-export const userService = { register, emailConfirm, login } as const;
+export const userService = {
+  register,
+  emailConfirm,
+  resendCode,
+  login,
+} as const;

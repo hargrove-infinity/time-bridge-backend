@@ -1,8 +1,13 @@
 import { z } from "zod";
 import { ERROR_DEFINITIONS, PASSWORD_MIN_LEN } from "../../constants";
 
-export const userValidationSchema = z.object({
+export const emailValidationSchema = z.object({
   email: z.email(ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code),
+});
+
+export type EmailInput = z.infer<typeof emailValidationSchema>;
+
+export const userValidationSchema = emailValidationSchema.extend({
   password: z
     .string(ERROR_DEFINITIONS.PASSWORD_NOT_STRING.code)
     .min(PASSWORD_MIN_LEN, ERROR_DEFINITIONS.PASSWORD_MIN_LEN_FAILED.code)
@@ -14,7 +19,7 @@ export const userValidationSchema = z.object({
 
 export type UserInput = z.infer<typeof userValidationSchema>;
 
-export const emailConfirmValidationSchema = z.object({
+export const emailConfirmValidationSchema = emailValidationSchema.extend({
   email: z.email(ERROR_DEFINITIONS.EMAIL_INCORRECT_PATTERN.code),
   code: z
     .string(ERROR_DEFINITIONS.EMAIL_CONFIRM_CODE_NOT_STRING.code)

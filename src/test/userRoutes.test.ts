@@ -162,6 +162,12 @@ describe("userRoutes", () => {
     });
   });
 
+  describe("userRoutes.resendCode", () => {
+    test.todo("should call userService.resendCode");
+
+    test.todo("should return correct payload in response");
+  });
+
   describe("userRoutes.login", () => {
     test("should call userService.login", async () => {
       const spy = jest.spyOn(userService, "login");

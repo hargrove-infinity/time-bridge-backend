@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { userService } from "../services";
-import { UserInput, EmailConfirmInput } from "../validation";
+import { UserInput, EmailConfirmInput, EmailInput } from "../validation";
 
 async function register(
   req: Request<{}, {}, UserInput>,
@@ -36,6 +36,14 @@ async function emailConfirm(
   res.status(200).send({ payload: token });
 }
 
+async function resendCode(
+  req: Request<{}, {}, EmailInput>,
+  res: Response
+): Promise<void> {
+  // TODO: refactor payload
+  res.status(200).send({ payload: "{nextResendTime}" });
+}
+
 async function login(
   req: Request<{}, {}, UserInput>,
   res: Response
@@ -52,4 +60,9 @@ async function login(
   res.status(200).send({ payload: token });
 }
 
-export const userRoutes = { register, emailConfirm, login } as const;
+export const userRoutes = {
+  register,
+  emailConfirm,
+  resendCode,
+  login,
+} as const;
