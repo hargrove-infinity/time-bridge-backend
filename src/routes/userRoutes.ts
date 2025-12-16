@@ -11,8 +11,6 @@ async function register(
   const [token, error] = await userService.register(body);
 
   if (error) {
-    console.log("userRoutes.register: ", error);
-
     res.status(error.statusCode).send({ errors: error.buildErrorPayload() });
     return;
   }
@@ -40,8 +38,16 @@ async function resendCode(
   req: Request<{}, {}, EmailInput>,
   res: Response
 ): Promise<void> {
-  // TODO: refactor payload
-  res.status(200).send({ payload: "{nextResendTime}" });
+  const { email } = req.body;
+
+  const [result, error] = await userService.resendCode(email);
+
+  if (error) {
+    res.status(error.statusCode).send({ errors: error.buildErrorPayload() });
+    return;
+  }
+
+  res.status(200).send({ payload: result });
 }
 
 async function login(
