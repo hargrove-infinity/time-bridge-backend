@@ -44,6 +44,7 @@ import {
   expectJwtPayload,
   expectUserRepoFindOneSuccess,
   expectUserRequestRegisterSuccess,
+  expectValidDate,
 } from "./utils";
 
 let app: Express;
@@ -170,9 +171,26 @@ describe("userRouter", () => {
       expect(spyOnUserRoutesResendCode).toHaveBeenCalled();
     });
 
-    test.todo("should receive 200 status code from userRouter.resendCode");
+    test("should receive 200 status code from userRouter.resendCode", async () => {
+      await expectUserRequestRegisterSuccess();
 
-    test.todo("should respond with correct payload from userRouter.resendCode");
+      const response = await request(app)
+        .post(paths.auth.resendCode)
+        .send({ email: TEST_USER_EMAIL });
+
+      expect(response.status).toBe(200);
+    });
+
+    test("should respond with correct payload from userRouter.resendCode", async () => {
+      await expectUserRequestRegisterSuccess();
+
+      const response = await request(app).post(paths.auth.resendCode).send({
+        email: TEST_USER_EMAIL,
+      });
+
+      expect(response.status).toBe(200);
+      expectValidDate(response.body.payload.nextResendTime);
+    });
   });
 
   describe("userRouter.login", () => {

@@ -21,6 +21,7 @@ import {
   expectUserRouteEmailConfirmSuccess,
   expectUserRouteLoginSuccess,
   expectUserRouteRegisterSuccess,
+  expectValidDate,
 } from "./utils";
 
 beforeAll(async () => {
@@ -163,9 +164,33 @@ describe("userRoutes", () => {
   });
 
   describe("userRoutes.resendCode", () => {
-    test.todo("should call userService.resendCode");
+    test("should call userService.resendCode", async () => {
+      const spy = jest.spyOn(userService, "resendCode");
+      const request = httpMocks.createRequest({
+        body: { email: TEST_USER_EMAIL },
+      });
+      const response = httpMocks.createResponse();
+      await userRoutes.resendCode(request, response);
+      expect(spy).toHaveBeenCalled();
+    });
 
-    test.todo("should return correct payload in response");
+    test("should return correct payload in response", async () => {
+      await expectUserRouteRegisterSuccess();
+
+      const request = httpMocks.createRequest({
+        body: { email: TEST_USER_EMAIL },
+      });
+
+      const response = httpMocks.createResponse();
+
+      await userRoutes.resendCode(request, response);
+
+      expect(response.statusCode).toBe(200);
+
+      const data = response._getData();
+
+      expectValidDate(data.payload.nextResendTime);
+    });
   });
 
   describe("userRoutes.login", () => {
